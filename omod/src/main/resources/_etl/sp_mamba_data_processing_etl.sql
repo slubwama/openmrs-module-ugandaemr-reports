@@ -8,6 +8,7 @@ BEGIN
     -- add base folder SP here if any --
     CALL sp_mamba_system_drop_fact_tables();
     CALL sp_data_processing_derived_opd_attendance();
+    CALL sp_fact_encounter_diagnosis();
     CALL sp_data_processing_derived_transfers();
     CALL sp_data_processing_derived_non_suppressed();
     CALL sp_data_processing_derived_hiv_art_card();

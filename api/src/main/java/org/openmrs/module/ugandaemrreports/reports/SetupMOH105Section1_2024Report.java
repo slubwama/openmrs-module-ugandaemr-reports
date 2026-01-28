@@ -87,8 +87,8 @@ public class SetupMOH105Section1_2024Report extends AggregateReportDataExportMan
     @Override
 
     public ReportDesign buildReportDesign(ReportDefinition reportDefinition) {
-        ReportDesign rd = createExcelTemplateDesign(getExcelDesignUuid(), reportDefinition, "105OPDAttendancesReferralsAndDiagnosee-2024.xls");
-        return rd;
+        //ReportDesign rd = createExcelTemplateDesign(getExcelDesignUuid(), reportDefinition, "105OPDAttendancesReferralsAndDiagnosee-2024.xls");
+        return null;
     }
 
     public ReportDesign buildJSONReportDesign(ReportDefinition reportDefinition) {

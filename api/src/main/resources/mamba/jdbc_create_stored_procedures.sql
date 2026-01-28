@@ -14530,6 +14530,7 @@ BEGIN
     -- add base folder SP here if any --
     CALL sp_mamba_system_drop_fact_tables();
     CALL sp_data_processing_derived_opd_attendance();
+    CALL sp_fact_encounter_diagnosis();
     CALL sp_data_processing_derived_transfers();
     CALL sp_data_processing_derived_non_suppressed();
     CALL sp_data_processing_derived_hiv_art_card();
@@ -15098,6 +15099,74 @@ CREATE TABLE mamba_dim_agegroup
     PRIMARY KEY (id)
 )
     CHARSET = UTF8MB4;
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_dim_age_group_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_dim_age_group_create;
+
+
+~-~-
+CREATE PROCEDURE sp_mamba_dim_age_group_create()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_mamba_dim_age_group_create', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_mamba_dim_age_group_create', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CREATE TABLE mamba_dim_age_category (
+                                        age_category_id   INT AUTO_INCREMENT PRIMARY KEY,
+                                        code              VARCHAR(50)  NOT NULL UNIQUE,
+                                        name              VARCHAR(100) NOT NULL,
+                                        description       TEXT,
+                                        version           VARCHAR(20)  DEFAULT 'v1',
+                                        effective_from    DATE         DEFAULT CURRENT_DATE,
+                                        effective_to      DATE,
+                                        is_active         BOOLEAN      DEFAULT TRUE,
+                                        created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+) CHARSET = UTF8MB4;
+
+CREATE TABLE mamba_dim_age_group (
+                                     age_group_id     INT AUTO_INCREMENT PRIMARY KEY,
+                                     age_category_id  INT NOT NULL,
+                                     code             VARCHAR(50),
+                                     label            VARCHAR(100) NOT NULL,
+                                     min_age_days     INT NOT NULL,
+                                     max_age_days     INT NOT NULL,
+                                     sort_order       INT NOT NULL,
+                                     is_active        BOOLEAN DEFAULT TRUE,
+                                     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                                     CONSTRAINT fk_mamba_age_category
+                                         FOREIGN KEY (age_category_id)
+                                             REFERENCES mamba_dim_age_category (age_category_id),
+
+                                     CONSTRAINT chk_mamba_age_range
+                                         CHECK (min_age_days <= max_age_days)
+) CHARSET = UTF8MB4;
 -- $END
 END;
 ~-~-
@@ -25830,6 +25899,150 @@ BEGIN
             VALUES (age, fn_mamba_calculate_agegroup(age), IF(age < 15, '<15', '15+'),fn_mamba_calculate_moh_age_group(age),fn_mamba_calculate_moh_2024_age_group(age),fn_mamba_calculate_moh_anc_age_group(age));
             SET age = age + 1;
         END WHILE;
+END;
+~-~-
+
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_seed_age_group  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+-- Drop old procedure (kept name, new behavior)
+DROP PROCEDURE IF EXISTS sp_mamba_seed_age_group;
+
+
+~-~-
+CREATE PROCEDURE sp_mamba_seed_age_group()
+BEGIN
+    /*
+      Seeds:
+        - mamba_dim_age_category (once)
+        - mamba_dim_age_group (age bands in DAYS) for selected categories
+      Notes:
+        - This procedure is idempotent-ish: it uses NOT EXISTS checks to avoid duplicates.
+        - Age caps use 30000 days (~82 years). Adjust if you want higher.
+        - This seeds the categories + MOH 105 OPD Diagnoses (Section 1A) bands.
+          You can extend with other categories similarly.
+    */
+
+    -- -----------------------------
+    -- 1) Seed Age Categories
+    -- -----------------------------
+    IF NOT EXISTS (SELECT 1 FROM mamba_dim_age_category WHERE code = 'MOH_105_OPD_DIAG') THEN
+        INSERT INTO mamba_dim_age_category (code, name, description, version, is_active)
+        VALUES ('MOH_105_OPD_DIAG', 'MOH 105 OPD Diagnoses Age Groups',
+                'Age/Gender disaggregation for OPD diagnoses in MOH 105 (Section 1A)', 'v1', TRUE);
+END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM mamba_dim_age_category WHERE code = 'MOH_105_NUTRITION') THEN
+        INSERT INTO mamba_dim_age_category (code, name, description, version, is_active)
+        VALUES ('MOH_105_NUTRITION', 'MOH 105 Nutrition Age Groups',
+                'Nutrition services age/gender disaggregation in MOH 105', 'v1', TRUE);
+END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM mamba_dim_age_category WHERE code = 'MOH_ANC') THEN
+        INSERT INTO mamba_dim_age_category (code, name, description, version, is_active)
+        VALUES ('MOH_ANC', 'MOH ANC / MCH Age Groups',
+                'ANC, maternity, postnatal and FP age disaggregation', 'v1', TRUE);
+END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM mamba_dim_age_category WHERE code = 'GBV') THEN
+        INSERT INTO mamba_dim_age_category (code, name, description, version, is_active)
+        VALUES ('GBV', 'GBV Services Age Groups',
+                'GBV services age/gender disaggregation', 'v1', TRUE);
+END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM mamba_dim_age_category WHERE code = 'HTS') THEN
+        INSERT INTO mamba_dim_age_category (code, name, description, version, is_active)
+        VALUES ('HTS', 'HIV Testing Services Age Groups',
+                'HTS age/gender disaggregation', 'v1', TRUE);
+END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM mamba_dim_age_category WHERE code = 'SMC') THEN
+        INSERT INTO mamba_dim_age_category (code, name, description, version, is_active)
+        VALUES ('SMC', 'Safe Male Circumcision Age Groups',
+                'SMC age/gender disaggregation', 'v1', TRUE);
+END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM mamba_dim_age_category WHERE code = 'HEPATITIS') THEN
+        INSERT INTO mamba_dim_age_category (code, name, description, version, is_active)
+        VALUES ('HEPATITIS', 'Hepatitis Services Age Groups',
+                'Hepatitis age/gender disaggregation', 'v1', TRUE);
+END IF;
+
+    -- -----------------------------
+    -- 2) Seed Age Groups for MOH_105_OPD_DIAG (Section 1A)
+    -- -----------------------------
+BEGIN
+        DECLARE v_cat_id INT;
+
+SELECT age_category_id
+INTO v_cat_id
+FROM mamba_dim_age_category
+WHERE code = 'MOH_105_OPD_DIAG'
+    LIMIT 1;
+
+-- 0–28 days
+IF NOT EXISTS (
+            SELECT 1 FROM mamba_dim_age_group
+             WHERE age_category_id = v_cat_id AND code = 'D0_28'
+        ) THEN
+            INSERT INTO mamba_dim_age_group
+                (age_category_id, code, label, min_age_days, max_age_days, sort_order, is_active)
+            VALUES
+                (v_cat_id, 'D0_28', '0–28 days', 0, 28, 1, TRUE);
+END IF;
+
+        -- 29 days – 4 yrs
+        IF NOT EXISTS (
+            SELECT 1 FROM mamba_dim_age_group
+             WHERE age_category_id = v_cat_id AND code = 'D29_4Y'
+        ) THEN
+            INSERT INTO mamba_dim_age_group
+                (age_category_id, code, label, min_age_days, max_age_days, sort_order, is_active)
+            VALUES
+                (v_cat_id, 'D29_4Y', '29 days – 4 yrs', 29, 1824, 2, TRUE);
+END IF;
+
+        -- 5–9 yrs
+        IF NOT EXISTS (
+            SELECT 1 FROM mamba_dim_age_group
+             WHERE age_category_id = v_cat_id AND code = 'Y5_9'
+        ) THEN
+            INSERT INTO mamba_dim_age_group
+                (age_category_id, code, label, min_age_days, max_age_days, sort_order, is_active)
+            VALUES
+                (v_cat_id, 'Y5_9', '5–9 yrs', 1825, 3649, 3, TRUE);
+END IF;
+
+        -- 10–19 yrs
+        IF NOT EXISTS (
+            SELECT 1 FROM mamba_dim_age_group
+             WHERE age_category_id = v_cat_id AND code = 'Y10_19'
+        ) THEN
+            INSERT INTO mamba_dim_age_group
+                (age_category_id, code, label, min_age_days, max_age_days, sort_order, is_active)
+            VALUES
+                (v_cat_id, 'Y10_19', '10–19 yrs', 3650, 7304, 4, TRUE);
+END IF;
+
+        -- 20 yrs & above
+        IF NOT EXISTS (
+            SELECT 1 FROM mamba_dim_age_group
+             WHERE age_category_id = v_cat_id AND code = 'Y20P'
+        ) THEN
+            INSERT INTO mamba_dim_age_group
+                (age_category_id, code, label, min_age_days, max_age_days, sort_order, is_active)
+            VALUES
+                (v_cat_id, 'Y20P', '20 yrs & above', 7305, 30000, 5, TRUE);
+END IF;
+END;
+
+    -- ✅ Extend seeding for other categories here in the same style
+    -- e.g., MOH_105_NUTRITION, GBV, HTS, SMC, HEPATITIS, MOH_ANC
+
 END;
 ~-~-
 
