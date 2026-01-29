@@ -252,68 +252,6 @@
       ]
     },
     {
-      "indicator_name": "EP01",
-      "indicator_label": "Malaria",
-      "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(*) AS total\nFROM mamba_fact_encounter_diagnosis a\n         JOIN mamba_fact_patients_latest_patient_demographics mdp\n              ON mdp.patient_id = a.patient_id\n         JOIN mamba_dim_age_category ac\n              ON ac.code = 'MOH_105_OPD_DIAG'\n         JOIN mamba_dim_age_group ag\n              ON ag.age_category_id = ac.age_category_id\n                  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n                     BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.diagnosis_coded = 116128\n  AND a.certainty IN ('PROVISIONAL','CONFIRMED')\n  AND a.dx_rank IN (1,2)\n  AND a.voided = 0\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-28d",
-          "dissaggregations2": "M",
-          "value_place_holder": "EP01_0_28d_M"
-        },
-        {
-          "dissaggregations1": "0-28d",
-          "dissaggregations2": "F",
-          "value_place_holder": "EP01_0_28d_F"
-        },
-        {
-          "dissaggregations1": "29d-4y",
-          "dissaggregations2": "M",
-          "value_place_holder": "EP01_29d_4y_M"
-        },
-        {
-          "dissaggregations1": "29d-4y",
-          "dissaggregations2": "F",
-          "value_place_holder": "EP01_29d_4y_F"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "EP01_5_9_M"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "EP01_5_9_F"
-        },
-        {
-          "dissaggregations1": "10-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "EP01_10_19_M"
-        },
-        {
-          "dissaggregations1": "10-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "EP01_10_19_F"
-        },
-        {
-          "dissaggregations1": "20+",
-          "dissaggregations2": "M",
-          "value_place_holder": "EP01_20p_M"
-        },
-        {
-          "dissaggregations1": "20+",
-          "dissaggregations2": "F",
-          "value_place_holder": "EP01_20p_F"
-        }
-      ]
-    },
-    {
       "indicator_name": "EP01a",
       "indicator_label": "Suspected Malaria (fever)",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
@@ -379,7 +317,7 @@
       "indicator_name": "EP01b",
       "indicator_label": "Malaria Tested (B/s & RDT)",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP01b'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT o.order_id) AS total_tested\nFROM conceptreview.mamba_dim_orders o\n         JOIN conceptreview.mamba_z_encounter_obs obs\n              ON obs.order_id = o.order_id\n                  AND obs.voided = 0\n                  AND obs.obs_datetime >= :startDate\n                  AND obs.obs_datetime <  :endDate\n         JOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n              ON mdp.patient_id = o.patient_id\n         JOIN conceptreview.mamba_dim_age_category ac\n              ON ac.code = 'MOH_105_OPD_DIAG'\n         JOIN conceptreview.mamba_dim_age_group ag\n              ON ag.age_category_id = ac.age_category_id\n                  AND TIMESTAMPDIFF(DAY, mdp.birthdate, obs.obs_datetime)\n                     BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE o.voided = 0\n  AND o.fulfiller_status = 'COMPLETED'\n  AND o.concept_id IN (1643,200058)\n  AND o.date_activated >= :startDate\n  AND o.date_activated <  :endDate\n  AND (o.date_stopped IS NULL\n    OR (o.date_stopped >= :startDate AND o.date_stopped < :endDate))\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -441,7 +379,7 @@
       "indicator_name": "EP01c",
       "indicator_label": "Malaria confirmed (B/s & RDT)",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP01c'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT o.order_id) AS total_confirmed\nFROM conceptreview.mamba_dim_orders o\n         JOIN conceptreview.mamba_z_encounter_obs obs\n              ON obs.order_id = o.order_id\n                  AND obs.voided = 0\n                  AND obs.obs_datetime >= :startDate\n                  AND obs.obs_datetime <  :endDate\n         JOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n              ON mdp.patient_id = o.patient_id\n         JOIN conceptreview.mamba_dim_age_category ac\n              ON ac.code = 'MOH_105_OPD_DIAG'\n         JOIN conceptreview.mamba_dim_age_group ag\n              ON ag.age_category_id = ac.age_category_id\n                  AND TIMESTAMPDIFF(DAY, mdp.birthdate, obs.obs_datetime)\n                     BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE o.voided = 0\n  AND o.fulfiller_status = 'COMPLETED'\n  AND o.concept_id IN (1643, 200058)\n  AND o.date_activated >= :startDate\n  AND o.date_activated <  :endDate\n  AND (o.date_stopped IS NULL OR (o.date_stopped >= :startDate AND o.date_stopped < :endDate))\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\n  AND (\n    -- RDT positive\n    (o.concept_id = 1643 AND obs.obs_value_coded = 703)\n\n        OR\n    (o.concept_id = 200058 AND (\n        (obs.obs_question_concept_id = 32 AND obs.obs_value_coded = 703)\n            OR (obs.obs_question_concept_id = 200057 AND obs.obs_value_coded IN (200052,200053,200054,200055,200056))\n            OR (obs.obs_question_concept_id = 200051 AND obs.obs_value_coded IN (90075,90076,90077))\n        ))\n    )\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -503,7 +441,7 @@
       "indicator_name": "EP01d",
       "indicator_label": "Confirmed Malaria cases treated",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP01d'\nGROUP BY age_group, gender;",
+      "sqlQuery": "WITH confirmed_by_diagnosis AS (\n        SELECT DISTINCT\n            a.patient_id,\n            a.date_created AS confirm_datetime\n        FROM mamba_fact_encounter_diagnosis a\n        WHERE a.date_created >= :startDate\n          AND a.date_created <  :endDate\n          AND a.diagnosis_coded = 116128\n          AND a.certainty = 'CONFIRMED'\n          AND a.dx_rank IN (1,2)\n          AND a.voided = 0\n    ),\n\n    confirmed_by_lab AS (\n        SELECT DISTINCT\n            o.patient_id,\n            obs.obs_datetime AS confirm_datetime\n        FROM conceptreview.mamba_dim_orders o\n                 JOIN conceptreview.mamba_z_encounter_obs obs\n                      ON obs.order_id = o.order_id\n                          AND obs.voided = 0\n                          AND obs.obs_datetime >= :startDate\n                          AND obs.obs_datetime <  :endDate\n        WHERE o.voided = 0\n          AND o.order_type_id = 3\n          AND o.fulfiller_status = 'COMPLETED'\n          AND o.concept_id IN (1643, 200058)\n          AND o.date_activated >= :startDate\n          AND o.date_activated <  :endDate\n          AND (o.date_stopped IS NULL OR (o.date_stopped >= :startDate AND o.date_stopped < :endDate))\n          AND (\n            (o.concept_id = 1643 AND obs.obs_value_coded = 703)\n                OR\n            (o.concept_id = 200058 AND (\n                (obs.obs_question_concept_id = 32     AND obs.obs_value_coded = 703)\n                    OR (obs.obs_question_concept_id = 200057 AND obs.obs_value_coded IN (200052,200053,200054,200055,200056))\n                    OR (obs.obs_question_concept_id = 200051 AND obs.obs_value_coded IN (90075,90076,90077))\n                ))\n            )\n    ),\n\n    confirmed_any AS (\n        SELECT patient_id, confirm_datetime FROM confirmed_by_diagnosis\n        UNION\n        SELECT patient_id, confirm_datetime FROM confirmed_by_lab\n    ),\n\n    treated_confirmed AS (\n        SELECT DISTINCT\n            c.patient_id,\n            c.confirm_datetime\n        FROM confirmed_any c\n                 JOIN conceptreview.mamba_dim_orders d\n                      ON d.patient_id = c.patient_id\n                          AND d.voided = 0\n                          AND d.order_type_id = 2\n                          AND d.date_activated >= :startDate\n                          AND d.date_activated <  :endDate\n                          AND d.concept_id IN (99266, 165779, 165944, 165566, 165777, 243)\n    )\n\nSELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT tc.patient_id) AS total_confirmed_treated\nFROM treated_confirmed tc\n         JOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n              ON mdp.patient_id = tc.patient_id\n         JOIN conceptreview.mamba_dim_age_category ac\n              ON ac.code = 'MOH_105_OPD_DIAG'\n         JOIN conceptreview.mamba_dim_age_group ag\n              ON ag.age_category_id = ac.age_category_id\n                  AND TIMESTAMPDIFF(DAY, mdp.birthdate, tc.confirm_datetime)\n                     BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -565,7 +503,7 @@
       "indicator_name": "EP01e",
       "indicator_label": "Total malaria cases treated",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP01e'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT o.patient_id) AS total_treated\nFROM conceptreview.mamba_dim_orders o\n         JOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n              ON mdp.patient_id = o.patient_id\n         JOIN conceptreview.mamba_dim_age_category ac\n              ON ac.code = 'MOH_105_OPD_DIAG'\n         JOIN conceptreview.mamba_dim_age_group ag\n              ON ag.age_category_id = ac.age_category_id\n                  AND TIMESTAMPDIFF(DAY, mdp.birthdate, o.date_activated)\n                     BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE o.voided = 0\n  AND o.order_type_id = 2\n  AND o.concept_id IN (99266, 165779, 165944, 165566, 165777, 243)\n  AND o.date_activated >= :startDate\n  AND o.date_activated <  :endDate\n  AND (o.date_stopped IS NULL OR (o.date_stopped >= :startDate AND o.date_stopped < :endDate))\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -627,7 +565,7 @@
       "indicator_name": "EP02",
       "indicator_label": "Acute Flaccid Paralysis",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP02'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 160426\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -689,7 +627,7 @@
       "indicator_name": "EP03",
       "indicator_label": "Animal Bites (suspected rabies)",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP03'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND AND a.diagnosis_coded = 122604\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -751,7 +689,7 @@
       "indicator_name": "EP04",
       "indicator_label": "Cholera",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP04'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND AND a.diagnosis_coded = 122604\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -813,7 +751,7 @@
       "indicator_name": "EP05",
       "indicator_label": "Dysentery",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP05'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND AND a.diagnosis_coded IN (124, 197, 14)\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -875,7 +813,7 @@
       "indicator_name": "EP06",
       "indicator_label": "Guinea Worm",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP06'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND AND a.diagnosis_coded = 137458\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -937,7 +875,7 @@
       "indicator_name": "EP07",
       "indicator_label": "Measles",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP07'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND AND a.diagnosis_coded = 134561\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -999,7 +937,7 @@
       "indicator_name": "EP08",
       "indicator_label": "Bacterial Meningitis",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP08'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND AND a.diagnosis_coded = 997\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1061,7 +999,7 @@
       "indicator_name": "EP09",
       "indicator_label": "Neonatal tetanus",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP09'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 124954\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1123,7 +1061,7 @@
       "indicator_name": "EP10",
       "indicator_label": "Plague",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP10'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 114120\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1185,7 +1123,7 @@
       "indicator_name": "EP11",
       "indicator_label": "Yellow Fever",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP11'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 122759\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1247,7 +1185,7 @@
       "indicator_name": "EP12",
       "indicator_label": "Other Viral Haemorrhagic Fevers",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP12'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 123112\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1309,7 +1247,7 @@
       "indicator_name": "EP13",
       "indicator_label": "Severe Acute Respiratory Infection (SARI)",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP13'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 200109\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1557,7 +1495,7 @@
       "indicator_name": "EP15",
       "indicator_label": "Typhoid Fever",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP15'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 141\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;\n",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1619,7 +1557,7 @@
       "indicator_name": "EP16",
       "indicator_label": "Refampicin resistant TB cases",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP16'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    x.gender,\n    COUNT(DISTINCT x.patient_id) AS value\nFROM\n    (\n        SELECT\n            o.patient_id,\n            mdp.gender,\n            mdp.birthdate,\n            obs.obs_datetime AS event_datetime\n        FROM conceptreview.mamba_dim_orders o\n                 JOIN conceptreview.mamba_z_encounter_obs obs\n                      ON obs.order_id = o.order_id\n                          AND obs.voided = 0\n                          AND obs.obs_datetime >= :startDate\n                          AND obs.obs_datetime <  :endDate\n                 JOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n                      ON mdp.patient_id = o.patient_id\n        WHERE o.voided = 0\n          AND o.order_type_id = 3\n          AND o.fulfiller_status = 'COMPLETED'\n          AND o.concept_id = 175392\n          AND o.date_activated >= :startDate\n          AND o.date_activated <  :endDate\n          AND (o.date_stopped IS NULL\n            OR (o.date_stopped >= :startDate AND o.date_stopped < :endDate))\n          AND obs.obs_question_concept_id = 175392\n          AND obs.obs_value_coded = 1301   -- DETECTED\n          AND mdp.birthdate IS NOT NULL\n          AND mdp.gender IS NOT NULL\n\n        UNION\n\n        SELECT\n            a.patient_id,\n            mdp.gender,\n            mdp.birthdate,\n            a.date_created AS event_datetime\n        FROM conceptreview.mamba_fact_encounter_diagnosis a\n                 JOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n                      ON mdp.patient_id = a.patient_id\n        WHERE a.diagnosis_coded = 164366\n          AND a.certainty = 'CONFIRMED'\n          AND a.dx_rank IN (1,2)\n          AND a.voided = 0\n          AND a.date_created >= :startDate\n          AND a.date_created <  :endDate\n          AND mdp.birthdate IS NOT NULL\n          AND mdp.gender IS NOT NULL\n    ) x\n        JOIN conceptreview.mamba_dim_age_category ac\n             ON ac.code = 'MOH_105_OPD_DIAG'\n        JOIN conceptreview.mamba_dim_age_group ag\n             ON ag.age_category_id = ac.age_category_id\n                 AND TIMESTAMPDIFF(DAY, x.birthdate, x.event_datetime)\n                    BETWEEN ag.min_age_days AND ag.max_age_days\nGROUP BY ag.sort_order, ag.label, x.gender\nORDER BY ag.sort_order, x.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1681,7 +1619,7 @@
       "indicator_name": "EP17",
       "indicator_label": "Other Emerging infectious Diseases (ILI, SARS, etc.)",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP17'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded IN (169622, 168599, 169624, 169623, 116958, 169579, 113021)\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1743,7 +1681,7 @@
       "indicator_name": "EP18",
       "indicator_label": "Covid-19",
       "subsection": "1.3.1 Epidemic-Prone Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EP18'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT\n    ag.label AS age_group,\n    mdp.gender,\n    COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp\n    ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac\n    ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n    ON ag.age_category_id = ac.age_category_id\n   AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created)\n       BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate\n  AND a.date_created <  :endDate\n  AND a.voided = 0\n  AND a.certainty = 'CONFIRMED'\n  AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 166326\n  AND mdp.birthdate IS NOT NULL\n  AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1805,7 +1743,7 @@
       "indicator_name": "CD01",
       "indicator_label": "Diarrhoea - Acute",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD01'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 149856\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1867,7 +1805,7 @@
       "indicator_name": "CD02",
       "indicator_label": "Diarrhoea - Persistent",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD02'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded IN (142412, 16)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1929,7 +1867,7 @@
       "indicator_name": "CD03",
       "indicator_label": "Urethral discharges",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD03'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 123529\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -1991,7 +1929,7 @@
       "indicator_name": "CD04",
       "indicator_label": "Genital ulcers",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD04'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded IN (135462, 145762, 178312, 178332)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2053,7 +1991,7 @@
       "indicator_name": "CD05",
       "indicator_label": "STI due to Sexual Gender Based Violence",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD05'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 164922\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2115,7 +2053,7 @@
       "indicator_name": "CD06",
       "indicator_label": "Other Sexually Transmitted Infections",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD06'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 112992\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2177,7 +2115,7 @@
       "indicator_name": "CD07",
       "indicator_label": "Urinary Tract Infections (UTI)",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD07'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 111633\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2239,7 +2177,7 @@
       "indicator_name": "CD08",
       "indicator_label": "Intestinal Worms",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD08'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 113073\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2301,7 +2239,7 @@
       "indicator_name": "CD09",
       "indicator_label": "Haematological Meningitis",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD09'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 164923\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2363,7 +2301,7 @@
       "indicator_name": "CD10",
       "indicator_label": "Other types of meningitis",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD10'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded IN (115835, 169458, 169462, 169461, 169480, 169485)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2425,7 +2363,7 @@
       "indicator_name": "CD11",
       "indicator_label": "Cough or cold - No pneumonia",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD11'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded IN (106, 143264)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2487,7 +2425,7 @@
       "indicator_name": "CD12",
       "indicator_label": "Pneumonia",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD12'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 43\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2549,7 +2487,7 @@
       "indicator_name": "CD13",
       "indicator_label": "Severe Pneumonia",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD13'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 200110\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2611,7 +2549,7 @@
       "indicator_name": "CD14",
       "indicator_label": "Skin Diseases",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD14'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded IN (177877, 177876, 170988, 177368)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2673,7 +2611,7 @@
       "indicator_name": "CD15",
       "indicator_label": "Tetanus (over 28 days)",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD15'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 124957\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) > 28\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2735,7 +2673,7 @@
       "indicator_name": "CD16",
       "indicator_label": "Sleeping sickness",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD16'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 149241\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2797,7 +2735,7 @@
       "indicator_name": "CD17",
       "indicator_label": "Pelvic Inflammatory Disease (PID)",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD17'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 178340\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2859,7 +2797,7 @@
       "indicator_name": "CD18",
       "indicator_label": "Brucellosis",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD18'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 169282\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2921,7 +2859,7 @@
       "indicator_name": "CD19",
       "indicator_label": "Surgical Site Infections (SSI)",
       "subsection": "1.3.2 Other Infectious/Communicable Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'CD19'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND a.diagnosis_coded = 184486\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -2983,7 +2921,7 @@
       "indicator_name": "ND01",
       "indicator_label": "Neonatal Sepsis (0-7days)",
       "subsection": "1.3.3 Neonatal Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'ND01'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\n  AND a.diagnosis_coded = 162006\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN 0 AND 7\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -3045,7 +2983,7 @@
       "indicator_name": "ND02",
       "indicator_label": "Neonatal Sepsis (8-28days)",
       "subsection": "1.3.3 Neonatal Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'ND02'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\n  AND a.diagnosis_coded = 162006\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN 8 AND 28\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -3107,7 +3045,7 @@
       "indicator_name": "ND03",
       "indicator_label": "Neonatal Pneumonia (0-7days)",
       "subsection": "1.3.3 Neonatal Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'ND03'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\n  AND a.diagnosis_coded = 157907\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN 0 AND 7\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -3169,7 +3107,7 @@
       "indicator_name": "ND04",
       "indicator_label": "Neonatal Pneumonia (8-28days)",
       "subsection": "1.3.3 Neonatal Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'ND04'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\n  AND a.diagnosis_coded = 157907\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN 8 AND 28\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -3231,7 +3169,7 @@
       "indicator_name": "ND05",
       "indicator_label": "Neonatal Meningitis",
       "subsection": "1.3.3 Neonatal Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'ND05'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\n  AND a.diagnosis_coded IN (997, 115835, 164927)\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN 0 AND 28\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -3293,7 +3231,7 @@
       "indicator_name": "ND06",
       "indicator_label": "Neonatal Jaundice",
       "subsection": "1.3.3 Neonatal Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'ND06'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\n  AND a.diagnosis_coded = 161571\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN 0 AND 28\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -3355,7 +3293,7 @@
       "indicator_name": "ND07",
       "indicator_label": "Other Neonatal Conditions",
       "subsection": "1.3.3 Neonatal Diseases",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'ND07'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM conceptreview.mamba_fact_encounter_diagnosis a\nJOIN conceptreview.mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN conceptreview.mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN conceptreview.mamba_dim_age_group ag\n  ON ag.age_category_id = ac.age_category_id\n AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\n  AND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\n  AND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\n  AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN 0 AND 28\n  AND a.diagnosis_coded IN (\n      179854,179875,179768,179870,179760,179955,179881,179807,179753,179513,\n      179778,173570,179897,179981,179964,179737,179863,179676,179890,179849,177667\n  )\n  AND a.diagnosis_coded NOT IN (162006,157907,161571,997,115835,164927)\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;\n",
       "dissaggregations": [
         "age_group",
         "gender"
