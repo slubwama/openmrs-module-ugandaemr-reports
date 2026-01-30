@@ -4161,7 +4161,7 @@
       "indicator_name": "EN01",
       "indicator_label": "Otitis media acute and chronic",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN01'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (174941, 174942)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4223,7 +4223,7 @@
       "indicator_name": "EN02",
       "indicator_label": "Mastoiditis",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN02'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (174952, 174953, 174954)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4285,7 +4285,7 @@
       "indicator_name": "EN03",
       "indicator_label": "Hearing loss",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN03'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded =117698\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4347,7 +4347,7 @@
       "indicator_name": "EN04",
       "indicator_label": "Rhinitis",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN04'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (175826, 175814,175815,175828)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4409,7 +4409,7 @@
       "indicator_name": "EN05",
       "indicator_label": "Sinusitis",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN05'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (175787, 175831, 175302)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4471,7 +4471,7 @@
       "indicator_name": "EN06",
       "indicator_label": "Epistaxis",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN06'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (173, 179710)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4533,7 +4533,7 @@
       "indicator_name": "EN07",
       "indicator_label": "Adenoid Hypertrophy",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN07'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded =175841\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4595,7 +4595,7 @@
       "indicator_name": "EN08",
       "indicator_label": "Foreign Body in nose/ear/aero-digestive system",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN08'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (184353, 184355, 184357, 184361, 184354)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4657,7 +4657,7 @@
       "indicator_name": "EN09",
       "indicator_label": "Infected pre-auricular sinuses and abscess",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN09'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded = 200108\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4719,7 +4719,7 @@
       "indicator_name": "EN10",
       "indicator_label": "Otitis external",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN10'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN =114431\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4781,7 +4781,7 @@
       "indicator_name": "EN11",
       "indicator_label": "Mastoid abscess",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN11'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (174952, 174953)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4843,7 +4843,7 @@
       "indicator_name": "EN12",
       "indicator_label": "Vertigo",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN12'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN =166830\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4905,7 +4905,7 @@
       "indicator_name": "EN13",
       "indicator_label": "Tonsillitis",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN13'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (149496, 175797, 175798, 175799)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4967,7 +4967,7 @@
       "indicator_name": "EN14",
       "indicator_label": "Tonsillar hypertrophy",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN14'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (175840, 175842)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5029,7 +5029,7 @@
       "indicator_name": "EN15",
       "indicator_label": "Tinnitus",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN15'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded =181832\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5091,7 +5091,7 @@
       "indicator_name": "EN16",
       "indicator_label": "Head and neck cancers",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN16'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded IN (170424, 170420, 170438, 170608)\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5153,7 +5153,7 @@
       "indicator_name": "EN17",
       "indicator_label": "Other ENT conditions",
       "subsection": "1.3.6 ENT Conditions",
-      "sqlQuery": "SELECT mda.moh_105_opd_age_group AS age_group, mdp.gender AS gender, COUNT(*) AS value\nFROM mamba_fact_opd_diagnosis d\nINNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON d.patient_id = mdp.patient_id\nLEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\nWHERE d.encounter_date >= ':startDate'\n  AND d.encounter_date <  ':endDate'\n  AND d.diagnosis_code = 'EN17'\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT ag.label AS age_group, mdp.gender, COUNT(DISTINCT a.patient_id) AS value\nFROM mamba_fact_encounter_diagnosis a\nJOIN mamba_fact_patients_latest_patient_demographics mdp ON mdp.patient_id = a.patient_id\nJOIN mamba_dim_age_category ac ON ac.code = 'MOH_105_OPD_DIAG'\nJOIN mamba_dim_age_group ag ON ag.age_category_id = ac.age_category_id AND TIMESTAMPDIFF(DAY, mdp.birthdate, a.date_created) BETWEEN ag.min_age_days AND ag.max_age_days\nWHERE a.date_created >= :startDate AND a.date_created < :endDate\nAND a.voided = 0 AND a.certainty = 'CONFIRMED' AND a.dx_rank IN (1,2)\nAND a.diagnosis_coded =164929\nAND mdp.birthdate IS NOT NULL AND mdp.gender IS NOT NULL\nGROUP BY ag.sort_order, ag.label, mdp.gender\nORDER BY ag.sort_order, mdp.gender;",
       "dissaggregations": [
         "age_group",
         "gender"
