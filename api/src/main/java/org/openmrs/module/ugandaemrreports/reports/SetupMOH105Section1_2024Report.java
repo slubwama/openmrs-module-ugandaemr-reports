@@ -47,7 +47,7 @@ public class SetupMOH105Section1_2024Report extends AggregateReportDataExportMan
 
     @Override
     public String getUuid() {
-        return "8212b1bd-ad1a-4c67-8032-f607fcd1715b";
+        return "88c2a1c4-ff7f-11f0-982d-cfe0f6300daf";
     }
 
     @Override
@@ -87,12 +87,12 @@ public class SetupMOH105Section1_2024Report extends AggregateReportDataExportMan
     @Override
 
     public ReportDesign buildReportDesign(ReportDefinition reportDefinition) {
-        //ReportDesign rd = createExcelTemplateDesign(getExcelDesignUuid(), reportDefinition, "105OPDAttendancesReferralsAndDiagnosee-2024.xls");
-        return null;
+        ReportDesign rd = createExcelTemplateDesign(getExcelDesignUuid(), reportDefinition, "HMIS105Section1_2024.xls");
+        return rd;
     }
 
     public ReportDesign buildJSONReportDesign(ReportDefinition reportDefinition) {
-        ReportDesign rd = createJSONTemplateDesign(getJSONDesignUuid(), reportDefinition, "105OPDAttendancesReferralsAndDiagnosee-2024.json");
+        ReportDesign rd = createJSONTemplateDesign(getJSONDesignUuid(), reportDefinition, "HMIS105Section1_2024.json");
         return rd;
     }
 
