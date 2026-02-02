@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Set;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured in
@@ -121,4 +120,10 @@ public interface UgandaEMRReportsService extends OpenmrsService {
     List<Concept> getCodedOrderReasons(OrderType orderType);
 
     Map<Integer, Map<String, Object>> getDrugOrderByIndicator(org.openmrs.cohort.Cohort patients,String drugIndication,OrderType orderType);
+
+    public  void addMambaetlProperties();
+
+    public void setupMambaETL();
+
+    public void setUpReports();
 }
