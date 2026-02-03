@@ -4,6 +4,8 @@ import org.openmrs.*;
 import org.openmrs.Concept;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.reporting.report.ReportData;
+import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.ugandaemrreports.model.Dashboard;
 import org.openmrs.module.ugandaemrreports.model.DashboardReportObject;
 import org.openmrs.reporting.PatientSearch;
@@ -126,4 +128,10 @@ public interface UgandaEMRReportsService extends OpenmrsService {
     public void setupMambaETL();
 
     public void setUpReports();
+
+    /** Returns HTML as a string for preview/printing */
+    String renderHtmlFromJsonTemplate(ReportDesign reportDesign);
+
+    /** Returns payload JSON as a string (no JsonNode leaks) */
+    String createPayloadJsonFromTemplate(ReportData reportData, ReportDesign reportDesign, String renderType, Map<String, Object> flatValues, String remapJsonOptional);
 }

@@ -1,38 +1,22 @@
 package org.openmrs.module.ugandaemrreports.web.resources;
 
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.util.Json;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.reporting.common.DateUtil;
-import org.openmrs.module.reporting.common.MessageUtil;
-import org.openmrs.module.reporting.common.ObjectUtil;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetRow;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
-import org.openmrs.module.reporting.evaluation.EvaluationUtil;
-import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.module.reporting.report.ReportDesign;
-import org.openmrs.module.reporting.report.ReportDesignResource;
-import org.openmrs.module.reporting.report.ReportRequest;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
-import org.openmrs.module.reporting.report.renderer.RenderingException;
 import org.openmrs.module.reporting.report.renderer.RenderingMode;
-import org.openmrs.module.reporting.report.renderer.TextTemplateRenderer;
-import org.openmrs.module.reporting.report.renderer.template.TemplateEngine;
-import org.openmrs.module.reporting.report.renderer.template.TemplateEngineManager;
 import org.openmrs.module.reporting.report.service.ReportService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestConstants;
-import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.http.HttpStatus;
@@ -43,18 +27,13 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + EvaluateReportDefinitionRestController.UGANDAEMRREPORTS + EvaluateReportDefinitionRestController.SET)
@@ -74,7 +53,6 @@ public class EvaluateReportDefinitionRestController {
     public ReportService reportService;
 
 
-    @ExceptionHandler(APIAuthenticationException.class)
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Object getReportData(HttpServletRequest request,
@@ -224,124 +202,6 @@ public class EvaluateReportDefinitionRestController {
         }
         return dataList;
     }
-
-    public JsonNode createPayload(ReportData reportData, ReportDesign reportDesign, String renderType) {
-        JsonNode payLoad = null;
-        try {
-
-            File file = new File(OpenmrsUtil.getApplicationDataDirectory() + "/sendReports");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-
-            Writer pw = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-            TextTemplateRenderer textTemplateRenderer = new TextTemplateRenderer();
-            ReportDesignResource reportDesignResource = textTemplateRenderer.getTemplate(reportDesign);
-            String templateContents = new String(reportDesignResource.getContents(), StandardCharsets.UTF_8);
-
-            templateContents = fillTemplateWithReportData(pw, templateContents, reportData, reportDesign, fileOutputStream);
-            String wholePayLoad = fillTemplateWithReportData(pw, templateContents, reportData, reportDesign, fileOutputStream);
-
-            wholePayLoad = removeQuotesFromValues(wholePayLoad);
-            ObjectMapper objectMapper = new ObjectMapper();
-            payLoad = objectMapper.readTree(wholePayLoad);
-
-            JsonNode dataValuesArray = payLoad.at("/json/dataValues");
-            if (dataValuesArray.isArray()) {
-                for (JsonNode node : dataValuesArray) {
-                    // Remove attributes code, dsdm, age, sex
-                    ((ObjectNode) node).remove("dataelementname");
-                    ((ObjectNode) node).remove("code");
-                    ((ObjectNode) node).remove("dsdm");
-                    ((ObjectNode) node).remove("age");
-                    ((ObjectNode) node).remove("sex");
-                    if (node.has("value")) {
-                        String valueStr = node.get("value").asText();
-                        int valueInt = Integer.parseInt(valueStr);
-                        ((ObjectNode) node).put("value", valueInt);
-                    }
-                }
-            }
-
-
-
-
-            pw.close();
-        } catch (Exception e) {
-            e.fillInStackTrace();
-        }
-        return payLoad;
-    }
-
-
-    private String fillTemplateWithReportData(Writer pw, String templateContents, ReportData reportData, ReportDesign reportDesign, FileOutputStream fileOutputStream) throws IOException, RenderingException {
-
-        try {
-            TextTemplateRenderer textTemplateRenderer = new TextTemplateRenderer();
-            Map<String, Object> replacements = textTemplateRenderer.getBaseReplacementData(reportData, reportDesign);
-            String templateEngineName = reportDesign.getPropertyValue("templateType", (String) null);
-            TemplateEngine engine = TemplateEngineManager.getTemplateEngineByName(templateEngineName);
-            if (engine != null) {
-                Map<String, Object> bindings = new HashMap();
-                bindings.put("reportData", reportData);
-                bindings.put("reportDesign", reportDesign);
-                bindings.put("data", replacements);
-                bindings.put("util", new ObjectUtil());
-                bindings.put("dateUtil", new DateUtil());
-                bindings.put("msg", new MessageUtil());
-                templateContents = engine.evaluate(templateContents, bindings);
-            }
-
-            String prefix = textTemplateRenderer.getExpressionPrefix(reportDesign);
-            String suffix = textTemplateRenderer.getExpressionSuffix(reportDesign);
-            templateContents = EvaluationUtil.evaluateExpression(templateContents, replacements, prefix, suffix).toString();
-            pw.write(templateContents.toString());
-            return templateContents;
-
-        } catch (RenderingException var17) {
-            throw var17;
-        } catch (Throwable var18) {
-            throw new RenderingException("Unable to render results due to: " + var18, var18);
-        }
-    }
-
-    public static String removeQuotesFromValues(String input) {
-        // Regular expression to match "value":"0" and similar patterns
-        Pattern pattern = Pattern.compile("\"value\":\"(\\d+)\"");
-        Matcher matcher = pattern.matcher(input);
-
-        StringBuffer result = new StringBuffer();
-        while (matcher.find()) {
-            // Replace "value":"0" with value:0
-            matcher.appendReplacement(result, "\"value\":" + matcher.group(1));
-        }
-        matcher.appendTail(result);
-
-        return result.toString();
-    }
-
-    public static String getYearAndQuarter(String dateStr) {
-        try {
-            // Define the date format
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-            // Parse the date
-            LocalDate date = LocalDate.parse(dateStr, formatter);
-
-            // Get the year
-            int year = date.getYear();
-
-            // Determine the quarter
-            int month = date.getMonthValue();
-            int quarter = (month - 1) / 3 + 1;
-
-            // Return the result in the format "YYYYQX"
-            return year + "Q" + quarter;
-        } catch (DateTimeParseException e) {
-            // Handle invalid date format
-            System.out.println("Invalid date format. Please use yyyy-MM-dd.");
-            return null;
-        }
-    }
-
     public static String getYearAndQuarter(Date date) {
         if (date == null) {
             System.out.println("Date cannot be null.");
@@ -355,23 +215,127 @@ public class EvaluateReportDefinitionRestController {
         return year + "Q" + quarter;
     }
 
-    public String processFinalPayload(ReportData reportData, ReportDesign reportDesign, String rendertype,Date endDate){
-        JsonNode report = createPayload(reportData, reportDesign, rendertype);
-        ObjectNode objectNode = (ObjectNode)report.get("json");
+    public String processFinalPayload(ReportData reportData, ReportDesign reportDesign, String rendertype, Date endDate) {
 
-        String period = getYearAndQuarter(endDate);
-        // Add a new field to the JSON
-        objectNode.put("period", period);
-        return report.toString();
+        // 1) Build values map (for now you can start empty and still get a valid payload with default 0s)
+        Map<String, Object> values = extractValuesFromReportData(reportData); // see method below
+
+        // 2) Build payload JSON string via the new service method (no JsonNode in interface)
+        UgandaEMRReportsService service = Context.getService(UgandaEMRReportsService.class);
+        String payloadJson = service.createPayloadJsonFromTemplate(reportData, reportDesign, "json", values, null);
+
+        // 3) Add period to root.json using Jackson ONLY here in the controller (web layer)
+        try {
+            ObjectMapper om = new ObjectMapper();
+            ObjectNode root = (ObjectNode) om.readTree(payloadJson);
+
+            ObjectNode jsonNode = (ObjectNode) root.get("json");
+            if (jsonNode == null) {
+                jsonNode = om.createObjectNode();
+                root.set("json", jsonNode);
+            }
+
+            String period = getYearAndQuarter(endDate);
+            jsonNode.put("period", period);
+
+            return om.writeValueAsString(root);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to append period to payload JSON", e);
+        }
     }
 
+    private Map<String, Object> extractValuesFromReportData(ReportData reportData) {
+        Map<String, Object> values = new HashMap<String, Object>();
+
+        if (reportData == null || reportData.getDataSets() == null) {
+            return values;
+        }
+
+        Map<String, DataSet> dataSets = reportData.getDataSets();
+        for (String dsName : dataSets.keySet()) {
+            DataSet ds = dataSets.get(dsName);
+            if (ds == null) continue;
+
+            Iterator it = ds.iterator();
+            while (it.hasNext()) {
+                DataSetRow row = (DataSetRow) it.next();
+                Map<String, Object> cols = row.getColumnValuesByKey();
+                if (cols == null || cols.isEmpty()) continue;
+
+                // --- Case A: "tall" dataset: separate code/age/sex columns ---
+                String code = firstString(cols, "code", "dataelement", "dataElement", "data_element");
+                String age  = firstString(cols, "age", "agegroup", "age_group");
+                String sex  = firstString(cols, "sex", "gender");
+                Object valObj = firstObject(cols, "value", "count", "total");
+
+                if (!isBlank(code) && !isBlank(age) && !isBlank(sex) && valObj != null) {
+                    String key = code + "_" + age + "_" + sex;
+                    values.put(key, valObj);
+                    continue;
+                }
+
+                // --- Case B: "wide" dataset: keys already look like CODE_AGE_SEX ---
+                // Example: OR02_29d_4y_F -> 0
+                for (Map.Entry<String, Object> e : cols.entrySet()) {
+                    String k = e.getKey();
+                    Object v = e.getValue();
+
+                    if (isBlank(k)) continue;
+
+                    // Only accept keys that look like our pattern: <something>_<something>_<M|F>
+                    // Works even if code contains letters/numbers like EM01f or CR02b
+                    if (looksLikeIndicatorKey(k)) {
+                        values.put(k.trim(), v);
+                    }
+                }
+            }
+        }
+
+        return values;
+    }
+
+    private boolean looksLikeIndicatorKey(String key) {
+        // Expect last part is sex M/F and at least 2 underscores total.
+        // Example valid: OR02_29d_4y_F, EM01f_20p_M
+        // Reject random stuff like "location" or "period"
+        String k = key.trim();
+        int lastUnderscore = k.lastIndexOf('_');
+        if (lastUnderscore < 0) return false;
+
+        String sex = k.substring(lastUnderscore + 1);
+        if (!("M".equals(sex) || "F".equals(sex))) return false;
+
+        // ensure at least two underscores total (code_age_sex minimum)
+        int firstUnderscore = k.indexOf('_');
+        return firstUnderscore > 0 && firstUnderscore < lastUnderscore;
+    }
+
+
+    private String firstString(Map<String, Object> cols, String... keys) {
+        Object o = firstObject(cols, keys);
+        return o == null ? null : String.valueOf(o).trim();
+    }
+
+    private Object firstObject(Map<String, Object> cols, String... keys) {
+        for (String k : keys) {
+            if (cols.containsKey(k)) {
+                Object v = cols.get(k);
+                if (v != null && String.valueOf(v).trim().length() > 0) {
+                    return v;
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+
+
     private Date tryParseDate(String value) {
-        List<String> patterns = Arrays.asList(
-                "yyyy-MM-dd",                // 2025-11-24 (ISO)
-                "yyyy-MM-dd'T'HH:mm:ss",     // 2025-11-24T14:30:00
-                "dd/MM/yyyy",                // 24/11/2025 (if needed)
-                "MM/dd/yyyy"                 // 11/24/2025 (if needed)
-        );
+        List<String> patterns = Arrays.asList("yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ss", "dd/MM/yyyy", "MM/dd/yyyy");
 
         for (String pattern : patterns) {
             try {
@@ -379,14 +343,9 @@ public class EvaluateReportDefinitionRestController {
                 sdf.setLenient(false);
                 return sdf.parse(value);
             } catch (ParseException ignored) {
-                // try next pattern
             }
         }
 
-        return null; // caller will treat this as invalid
+        return null;
     }
-
-
-
-
 }

@@ -10,6 +10,10 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.logic.op.In;
 import org.openmrs.module.mambacore.api.FlattenDatabaseService;
+import org.openmrs.module.reporting.report.ReportData;
+import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.reporting.report.ReportDesignResource;
+import org.openmrs.module.reporting.report.renderer.TextTemplateRenderer;
 import org.openmrs.module.ugandaemrreports.activator.AppConfigInitializer;
 import org.openmrs.module.ugandaemrreports.activator.Initializer;
 import org.openmrs.module.ugandaemrreports.activator.ReportInitializer;
@@ -17,6 +21,7 @@ import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.ugandaemrreports.api.db.hibernate.HibernateUgandaEMRReportsDAO;
 import org.openmrs.module.ugandaemrreports.model.Dashboard;
 import org.openmrs.module.ugandaemrreports.model.DashboardReportObject;
+import org.openmrs.module.ugandaemrreports.util.JsonTemplateConverter;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.openmrs.util.OpenmrsUtil;
@@ -26,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Set;
 
@@ -35,6 +41,8 @@ import java.util.Set;
 
 
 public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements UgandaEMRReportsService {
+
+    private final JsonTemplateConverter converter = new JsonTemplateConverter();
 
     protected final Log log = LogFactory.getLog(this.getClass());
 
@@ -246,6 +254,28 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         l.add(new AppConfigInitializer());
         l.add(new ReportInitializer());
         return l;
+    }
+
+    @Override
+    public String renderHtmlFromJsonTemplate(ReportDesign reportDesign) {
+        String templateJson = readDesignResource(reportDesign);
+        return converter.renderHtmlOnly(templateJson);
+    }
+
+    @Override
+    public String createPayloadJsonFromTemplate(ReportData reportData, ReportDesign reportDesign, String renderType, Map<String, Object> flatValues, String remapJsonOptional) {
+        String templateJson = readDesignResource(reportDesign);
+        return converter.buildPayloadOnly(templateJson, flatValues, remapJsonOptional);
+    }
+
+    private String readDesignResource(ReportDesign reportDesign) {
+        try {
+            TextTemplateRenderer renderer = new TextTemplateRenderer();
+            ReportDesignResource res = renderer.getTemplate(reportDesign);
+            return new String(res.getContents(), StandardCharsets.UTF_8).trim();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to read report design resource", e);
+        }
     }
 
 }
