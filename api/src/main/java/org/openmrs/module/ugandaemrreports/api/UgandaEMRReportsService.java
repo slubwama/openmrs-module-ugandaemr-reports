@@ -12,6 +12,7 @@ import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,7 +69,7 @@ public interface UgandaEMRReportsService extends OpenmrsService {
 
 
     /**
-     * @param dashboardReportObject to save Dashboard
+     * @param dashboard to save Dashboard
      * @return Dashboard
      */
     @Transactional
@@ -123,9 +124,21 @@ public interface UgandaEMRReportsService extends OpenmrsService {
 
     Map<Integer, Map<String, Object>> getDrugOrderByIndicator(org.openmrs.cohort.Cohort patients,String drugIndication,OrderType orderType);
 
+    public  void addMambaetlProperties();
+
+    public void setupMambaETL();
+
+    public void setUpReports();
+
     /** Returns HTML as a string for preview/printing */
-    String renderHtmlFromJsonTemplate(ReportDesign reportDesign);
+    public String renderHtmlFromJsonTemplate(ReportDesign reportDesign);
 
     /** Returns payload JSON as a string (no JsonNode leaks) */
-    String createPayloadJsonFromTemplate(ReportData reportData, ReportDesign reportDesign, String renderType, Map<String, Object> flatValues, String remapJsonOptional);
+    public String createPayloadJsonFromTemplate(ReportData reportData, ReportDesign reportDesign, String renderType, Map<String, Object> flatValues, String remapJsonOptional);
+
+    public String buildPayloadJson(ReportData reportData, ReportDesign reportDesign, String renderType);
+
+    public String buildFinalPayloadJson(ReportData reportData, ReportDesign reportDesign, String renderType, Date endDate);
+
+    public String buildPreviewHtml(ReportData reportData, ReportDesign reportDesign);
 }
