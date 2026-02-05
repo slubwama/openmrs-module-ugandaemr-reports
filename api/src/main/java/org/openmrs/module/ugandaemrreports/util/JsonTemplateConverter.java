@@ -2,7 +2,8 @@ package org.openmrs.module.ugandaemrreports.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.*;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.*;
 
@@ -22,19 +23,130 @@ public class JsonTemplateConverter {
     public Result convert(String templateJson,
                           Map<String, Object> flatValues,
                           String remapJsonOptional) {
-        String html = renderHtmlOnly(templateJson);
+        String html = renderHtmlFinal(templateJson, flatValues);
         String payload = buildPayloadOnly(templateJson, flatValues, remapJsonOptional);
         return new Result(html, payload);
     }
 
-    public String renderHtmlOnly(String templateJson) {
+    /* -------------------- FINAL HTML (iframe-ready) -------------------- */
+
+    public String renderHtmlFinal(String templateJson, Map<String, Object> flatValues) {
         try {
             JsonTemplate tpl = MAPPER.readValue(templateJson, JsonTemplate.class);
-            return renderHtml(tpl);
+            Map<String, Object> values = (flatValues == null)
+                    ? Collections.<String, Object>emptyMap()
+                    : flatValues;
+            return renderFinalHtmlDocument(tpl, values);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to render HTML from JSON template", e);
+            throw new RuntimeException("Failed to render FINAL HTML from JSON template", e);
         }
     }
+
+    private String renderFinalHtmlDocument(JsonTemplate tpl, Map<String, Object> values) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!doctype html><html><head><meta charset='utf-8'/>");
+        sb.append("<style>")
+                .append("body{font-family:Arial,Helvetica,sans-serif;margin:12px;}")
+                .append("h3{margin:16px 0 6px 0;font-size:14px;}")
+                .append("table{border-collapse:collapse;width:100%;margin-bottom:18px;}")
+                .append("th,td{border:1px solid #ddd;padding:6px;font-size:12px;}")
+                .append("th{background:#f6f6f6;text-align:center;}")
+                .append("td.code{font-weight:bold;white-space:nowrap;}")
+                .append("td.val{text-align:right;}")
+                .append("</style></head><body>");
+
+        if (tpl == null || tpl.mapping == null || tpl.mapping.groups == null) {
+            sb.append("<div>No groups defined in template.</div>");
+            sb.append("</body></html>");
+            return sb.toString();
+        }
+
+        for (Group g : tpl.mapping.groups) {
+            sb.append(renderGroupTable(tpl, g, values));
+        }
+
+        sb.append("</body></html>");
+        return sb.toString();
+    }
+
+    private String renderGroupTable(JsonTemplate tpl, Group g, Map<String, Object> values) {
+        if (g == null) return "";
+
+        if (g.indicatorCodes == null) g.indicatorCodes = new ArrayList<String>();
+        if (g.keyPattern == null || g.keyPattern.trim().length() == 0) g.keyPattern = "{code}_{age}_{sex}";
+
+        List<DimItem> ages = dimsFor(tpl, g, "age", "age");
+        List<DimItem> sexes = dimsFor(tpl, g, "sex", "sex");
+
+        int defaultValue = (tpl.mapping != null && tpl.mapping.defaultValue != null) ? tpl.mapping.defaultValue : 0;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h3>").append(esc(g.title)).append("</h3>");
+        sb.append("<table>");
+
+        // Header
+        sb.append("<thead>");
+        sb.append("<tr>");
+        sb.append("<th rowspan='2'>Indicator</th>");
+
+        if (!ages.isEmpty() && !sexes.isEmpty()) {
+            for (DimItem age : ages) {
+                sb.append("<th colspan='").append(sexes.size()).append("'>")
+                        .append(esc(age.label)).append("</th>");
+            }
+        } else {
+            sb.append("<th>Value</th>");
+        }
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        if (!ages.isEmpty() && !sexes.isEmpty()) {
+            for (int i = 0; i < ages.size(); i++) {
+                for (DimItem sex : sexes) {
+                    sb.append("<th>").append(esc(sex.label)).append("</th>");
+                }
+            }
+        } else {
+            sb.append("<th>&nbsp;</th>");
+        }
+        sb.append("</tr>");
+        sb.append("</thead>");
+
+        // Body
+        sb.append("<tbody>");
+
+        for (String code : g.indicatorCodes) {
+            sb.append("<tr>");
+            sb.append("<td class='code'>").append(esc(code)).append("</td>");
+
+            if (!ages.isEmpty() && !sexes.isEmpty()) {
+                for (DimItem age : ages) {
+                    for (DimItem sex : sexes) {
+                        String key = buildKey(g.keyPattern, code, age.id, sex.id);
+                        Integer v = coerceToInt(values.get(key));
+                        if (v == null) v = defaultValue;
+                        sb.append("<td class='val'>").append(v).append("</td>");
+                    }
+                }
+            } else {
+                Integer v = coerceToInt(values.get(code));
+                if (v == null) v = defaultValue;
+                sb.append("<td class='val'>").append(v).append("</td>");
+            }
+
+            sb.append("</tr>");
+        }
+
+        sb.append("</tbody></table>");
+        return sb.toString();
+    }
+
+    private String esc(String s) {
+        if (s == null) return "";
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    /* -------------------- PAYLOAD JSON -------------------- */
 
     public String buildPayloadOnly(String templateJson,
                                    Map<String, Object> flatValues,
@@ -60,8 +172,6 @@ public class JsonTemplateConverter {
         }
     }
 
-    /* ------------------ Payload building (node internal) ------------------ */
-
     private ObjectNode buildPayloadNode(JsonTemplate tpl, Map<String, Object> values, RemapConfig remap) {
         ObjectNode root = MAPPER.createObjectNode();
         ObjectNode json = MAPPER.createObjectNode();
@@ -69,20 +179,20 @@ public class JsonTemplateConverter {
 
         ArrayNode dataValues = MAPPER.createArrayNode();
 
-        int defaultValue = (tpl.mapping == null || tpl.mapping.defaultValue == null) ? 0 : tpl.mapping.defaultValue;
-
-        if (tpl.mapping == null || tpl.mapping.groups == null) {
+        if (tpl == null || tpl.mapping == null || tpl.mapping.groups == null) {
             json.set("dataValues", dataValues);
             return root;
         }
 
-        for (Group g : tpl.mapping.groups) {
+        int defaultValue = (tpl.mapping.defaultValue == null) ? 0 : tpl.mapping.defaultValue;
 
-            // NEW: resolve dimensions per group (fallback to "age"/"sex")
+        for (Group g : tpl.mapping.groups) {
+            if (g == null) continue;
+            if (g.indicatorCodes == null) continue;
+            if (g.keyPattern == null || g.keyPattern.trim().length() == 0) g.keyPattern = "{code}_{age}_{sex}";
+
             List<DimItem> ages = dimsFor(tpl, g, "age", "age");
             List<DimItem> sexes = dimsFor(tpl, g, "sex", "sex");
-
-            if (g == null || g.indicatorCodes == null || g.keyPattern == null) continue;
 
             for (String code : g.indicatorCodes) {
                 for (DimItem age : ages) {
@@ -123,7 +233,7 @@ public class JsonTemplateConverter {
         return root;
     }
 
-    /* ------------------ NEW: dimension resolution per group ------------------ */
+    /* -------------------- GROUP DIM RESOLUTION -------------------- */
 
     private List<DimItem> dimsFor(JsonTemplate tpl, Group g, String kind, String defaultName) {
         String dimName = defaultName;
@@ -136,8 +246,6 @@ public class JsonTemplateConverter {
         }
         return safeDim(tpl, dimName);
     }
-
-    /* ------------------ Helpers (Java 8 safeDim) ------------------ */
 
     private List<DimItem> safeDim(JsonTemplate tpl, String name) {
         if (tpl == null || tpl.dimensions == null) return Collections.emptyList();
@@ -154,11 +262,14 @@ public class JsonTemplateConverter {
         if (raw instanceof Number) return ((Number) raw).intValue();
         String s = String.valueOf(raw).trim();
         if (s.isEmpty()) return null;
-        try { return (int) Math.round(Double.parseDouble(s)); }
-        catch (Exception ignore) { return null; }
+        try {
+            return (int) Math.round(Double.parseDouble(s));
+        } catch (Exception ignore) {
+            return null;
+        }
     }
 
-    /* ------------------ POJOs ------------------ */
+    /* -------------------- POJOs -------------------- */
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class JsonTemplate {
@@ -186,7 +297,7 @@ public class JsonTemplateConverter {
         public List<String> indicatorCodes = new ArrayList<String>();
         public String keyPattern;
 
-        // NEW: {"age":"age_opd","sex":"sex"} etc.
+        // {"age":"age_opd","sex":"sex"} etc.
         public Map<String, String> dims = new HashMap<String, String>();
     }
 
@@ -219,13 +330,5 @@ public class JsonTemplateConverter {
     public static class Match {
         public String key;
         public String prefix;
-    }
-
-    /* ------------------ HTML generation ------------------ */
-    // Keep your existing renderHtml(...) implementation.
-    // OPTIONAL: to make HTML also respect group-specific dims, use dimsFor(tpl, g, ...) inside renderHtml per group.
-    private String renderHtml(JsonTemplate tpl) {
-        /* keep your existing implementation */
-        return "";
     }
 }
