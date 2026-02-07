@@ -1,836 +1,105 @@
 {
-  "version": 2,
+  "version": 3,
+  "title": "HMIS 105 - Section 1: OPD Attendances, Referrals and Diagnoses",
   "dimensions": {
-    "sex": [
-      {
-        "id": "M",
-        "label": "Male"
-      },
-      {
-        "id": "F",
-        "label": "Female"
-      }
-    ],
-    "age_opd": [
+    "age": [
       {
         "id": "0_28d",
-        "label": "0_28d"
-      },
-      {
-        "id": "10_19",
-        "label": "10_19"
-      },
-      {
-        "id": "20p",
-        "label": "20p"
+        "label": "0-28d"
       },
       {
         "id": "29d_4y",
-        "label": "29d_4y"
+        "label": "29d-4y"
       },
       {
-        "id": "5_9",
-        "label": "5_9"
+        "id": "5_9y",
+        "label": "5-9y"
+      },
+      {
+        "id": "10_19y",
+        "label": "10-19y"
+      },
+      {
+        "id": "20p",
+        "label": "20yrs+"
       }
     ],
-    "age_na01a": [
+    "sex": [
+      {
+        "id": "M",
+        "label": "M"
+      },
+      {
+        "id": "F",
+        "label": "F"
+      }
+    ],
+    "age_nutrition": [
       {
         "id": "0_5m",
-        "label": "0_5m"
-      },
-      {
-        "id": "10_19",
-        "label": "10_19"
-      },
-      {
-        "id": "20_24",
-        "label": "20_24"
-      },
-      {
-        "id": "24_59m",
-        "label": "24_59m"
-      },
-      {
-        "id": "25p",
-        "label": "25p"
-      },
-      {
-        "id": "5_9",
-        "label": "5_9"
+        "label": "0–5m"
       },
       {
         "id": "6_23m",
-        "label": "6_23m"
+        "label": "6–23m"
+      },
+      {
+        "id": "24_59m",
+        "label": "24–59m"
+      },
+      {
+        "id": "5_9y",
+        "label": "5–9yrs"
+      },
+      {
+        "id": "10_19y",
+        "label": "10–19yrs"
+      },
+      {
+        "id": "20_24y",
+        "label": "20–24yrs"
+      },
+      {
+        "id": "25p",
+        "label": "25yrs+"
       }
     ],
-    "age_na01b": [
+    "age_gbv": [
       {
-        "id": "MAM_0_5m",
-        "label": "MAM_0_5m"
+        "id": "10_14y",
+        "label": "10-14 Yrs"
       },
       {
-        "id": "MAM_10_19",
-        "label": "MAM_10_19"
+        "id": "15_19y",
+        "label": "15-19 Yrs"
       },
       {
-        "id": "MAM_20_24",
-        "label": "MAM_20_24"
+        "id": "20_24y",
+        "label": "20-24 Yrs"
       },
       {
-        "id": "MAM_24_59m",
-        "label": "MAM_24_59m"
+        "id": "25_29y",
+        "label": "25-29 Yrs"
       },
       {
-        "id": "MAM_25p",
-        "label": "MAM_25p"
+        "id": "30_34y",
+        "label": "30-34 Yrs"
       },
       {
-        "id": "MAM_5_9",
-        "label": "MAM_5_9"
+        "id": "35_39y",
+        "label": "35-39 Yrs"
       },
       {
-        "id": "MAM_6_23m",
-        "label": "MAM_6_23m"
+        "id": "40_44y",
+        "label": "40-44 Yrs"
       },
       {
-        "id": "Overweight_Obese_0_5m",
-        "label": "Overweight_Obese_0_5m"
+        "id": "45_49y",
+        "label": "45-49 Yrs"
       },
       {
-        "id": "Overweight_Obese_10_19",
-        "label": "Overweight_Obese_10_19"
-      },
-      {
-        "id": "Overweight_Obese_20_24",
-        "label": "Overweight_Obese_20_24"
-      },
-      {
-        "id": "Overweight_Obese_24_59m",
-        "label": "Overweight_Obese_24_59m"
-      },
-      {
-        "id": "Overweight_Obese_25p",
-        "label": "Overweight_Obese_25p"
-      },
-      {
-        "id": "Overweight_Obese_5_9",
-        "label": "Overweight_Obese_5_9"
-      },
-      {
-        "id": "Overweight_Obese_6_23m",
-        "label": "Overweight_Obese_6_23m"
-      },
-      {
-        "id": "SAM_With_Oedema_0_5m",
-        "label": "SAM_With_Oedema_0_5m"
-      },
-      {
-        "id": "SAM_With_Oedema_10_19",
-        "label": "SAM_With_Oedema_10_19"
-      },
-      {
-        "id": "SAM_With_Oedema_20_24",
-        "label": "SAM_With_Oedema_20_24"
-      },
-      {
-        "id": "SAM_With_Oedema_24_59m",
-        "label": "SAM_With_Oedema_24_59m"
-      },
-      {
-        "id": "SAM_With_Oedema_25p",
-        "label": "SAM_With_Oedema_25p"
-      },
-      {
-        "id": "SAM_With_Oedema_5_9",
-        "label": "SAM_With_Oedema_5_9"
-      },
-      {
-        "id": "SAM_With_Oedema_6_23m",
-        "label": "SAM_With_Oedema_6_23m"
-      },
-      {
-        "id": "SAM_Without_Oedema_0_5m",
-        "label": "SAM_Without_Oedema_0_5m"
-      },
-      {
-        "id": "SAM_Without_Oedema_10_19",
-        "label": "SAM_Without_Oedema_10_19"
-      },
-      {
-        "id": "SAM_Without_Oedema_20_24",
-        "label": "SAM_Without_Oedema_20_24"
-      },
-      {
-        "id": "SAM_Without_Oedema_24_59m",
-        "label": "SAM_Without_Oedema_24_59m"
-      },
-      {
-        "id": "SAM_Without_Oedema_25p",
-        "label": "SAM_Without_Oedema_25p"
-      },
-      {
-        "id": "SAM_Without_Oedema_5_9",
-        "label": "SAM_Without_Oedema_5_9"
-      },
-      {
-        "id": "SAM_Without_Oedema_6_23m",
-        "label": "SAM_Without_Oedema_6_23m"
-      },
-      {
-        "id": "Underweight_0_5m",
-        "label": "Underweight_0_5m"
-      },
-      {
-        "id": "Underweight_10_19",
-        "label": "Underweight_10_19"
-      },
-      {
-        "id": "Underweight_20_24",
-        "label": "Underweight_20_24"
-      },
-      {
-        "id": "Underweight_24_59m",
-        "label": "Underweight_24_59m"
-      },
-      {
-        "id": "Underweight_25p",
-        "label": "Underweight_25p"
-      },
-      {
-        "id": "Underweight_5_9",
-        "label": "Underweight_5_9"
-      },
-      {
-        "id": "Underweight_6_23m",
-        "label": "Underweight_6_23m"
-      }
-    ],
-    "age_na02": [
-      {
-        "id": "active_prev_0_5m",
-        "label": "active_prev_0_5m"
-      },
-      {
-        "id": "active_prev_10_19",
-        "label": "active_prev_10_19"
-      },
-      {
-        "id": "active_prev_20_24",
-        "label": "active_prev_20_24"
-      },
-      {
-        "id": "active_prev_24_59m",
-        "label": "active_prev_24_59m"
-      },
-      {
-        "id": "active_prev_25p",
-        "label": "active_prev_25p"
-      },
-      {
-        "id": "active_prev_5_9",
-        "label": "active_prev_5_9"
-      },
-      {
-        "id": "active_prev_6_23m",
-        "label": "active_prev_6_23m"
-      },
-      {
-        "id": "new_admissions_0_5m",
-        "label": "new_admissions_0_5m"
-      },
-      {
-        "id": "new_admissions_10_19",
-        "label": "new_admissions_10_19"
-      },
-      {
-        "id": "new_admissions_20_24",
-        "label": "new_admissions_20_24"
-      },
-      {
-        "id": "new_admissions_24_59m",
-        "label": "new_admissions_24_59m"
-      },
-      {
-        "id": "new_admissions_25p",
-        "label": "new_admissions_25p"
-      },
-      {
-        "id": "new_admissions_5_9",
-        "label": "new_admissions_5_9"
-      },
-      {
-        "id": "new_admissions_6_23m",
-        "label": "new_admissions_6_23m"
-      },
-      {
-        "id": "readm_defaulters_0_5m",
-        "label": "readm_defaulters_0_5m"
-      },
-      {
-        "id": "readm_defaulters_10_19",
-        "label": "readm_defaulters_10_19"
-      },
-      {
-        "id": "readm_defaulters_20_24",
-        "label": "readm_defaulters_20_24"
-      },
-      {
-        "id": "readm_defaulters_24_59m",
-        "label": "readm_defaulters_24_59m"
-      },
-      {
-        "id": "readm_defaulters_25p",
-        "label": "readm_defaulters_25p"
-      },
-      {
-        "id": "readm_defaulters_5_9",
-        "label": "readm_defaulters_5_9"
-      },
-      {
-        "id": "readm_defaulters_6_23m",
-        "label": "readm_defaulters_6_23m"
-      },
-      {
-        "id": "readm_relapse_0_5m",
-        "label": "readm_relapse_0_5m"
-      },
-      {
-        "id": "readm_relapse_10_19",
-        "label": "readm_relapse_10_19"
-      },
-      {
-        "id": "readm_relapse_20_24",
-        "label": "readm_relapse_20_24"
-      },
-      {
-        "id": "readm_relapse_24_59m",
-        "label": "readm_relapse_24_59m"
-      },
-      {
-        "id": "readm_relapse_25p",
-        "label": "readm_relapse_25p"
-      },
-      {
-        "id": "readm_relapse_5_9",
-        "label": "readm_relapse_5_9"
-      },
-      {
-        "id": "readm_relapse_6_23m",
-        "label": "readm_relapse_6_23m"
-      },
-      {
-        "id": "transfer_in_0_5m",
-        "label": "transfer_in_0_5m"
-      },
-      {
-        "id": "transfer_in_10_19",
-        "label": "transfer_in_10_19"
-      },
-      {
-        "id": "transfer_in_20_24",
-        "label": "transfer_in_20_24"
-      },
-      {
-        "id": "transfer_in_24_59m",
-        "label": "transfer_in_24_59m"
-      },
-      {
-        "id": "transfer_in_25p",
-        "label": "transfer_in_25p"
-      },
-      {
-        "id": "transfer_in_5_9",
-        "label": "transfer_in_5_9"
-      },
-      {
-        "id": "transfer_in_6_23m",
-        "label": "transfer_in_6_23m"
-      }
-    ],
-    "age_na03": [
-      {
-        "id": "defaulted_0_5m",
-        "label": "defaulted_0_5m"
-      },
-      {
-        "id": "defaulted_10_19",
-        "label": "defaulted_10_19"
-      },
-      {
-        "id": "defaulted_20_24",
-        "label": "defaulted_20_24"
-      },
-      {
-        "id": "defaulted_24_59m",
-        "label": "defaulted_24_59m"
-      },
-      {
-        "id": "defaulted_25p",
-        "label": "defaulted_25p"
-      },
-      {
-        "id": "defaulted_5_9",
-        "label": "defaulted_5_9"
-      },
-      {
-        "id": "defaulted_6_23m",
-        "label": "defaulted_6_23m"
-      },
-      {
-        "id": "died_0_5m",
-        "label": "died_0_5m"
-      },
-      {
-        "id": "died_10_19",
-        "label": "died_10_19"
-      },
-      {
-        "id": "died_20_24",
-        "label": "died_20_24"
-      },
-      {
-        "id": "died_24_59m",
-        "label": "died_24_59m"
-      },
-      {
-        "id": "died_25p",
-        "label": "died_25p"
-      },
-      {
-        "id": "died_5_9",
-        "label": "died_5_9"
-      },
-      {
-        "id": "died_6_23m",
-        "label": "died_6_23m"
-      },
-      {
-        "id": "discharged_cured_0_5m",
-        "label": "discharged_cured_0_5m"
-      },
-      {
-        "id": "discharged_cured_10_19",
-        "label": "discharged_cured_10_19"
-      },
-      {
-        "id": "discharged_cured_20_24",
-        "label": "discharged_cured_20_24"
-      },
-      {
-        "id": "discharged_cured_24_59m",
-        "label": "discharged_cured_24_59m"
-      },
-      {
-        "id": "discharged_cured_25p",
-        "label": "discharged_cured_25p"
-      },
-      {
-        "id": "discharged_cured_5_9",
-        "label": "discharged_cured_5_9"
-      },
-      {
-        "id": "discharged_cured_6_23m",
-        "label": "discharged_cured_6_23m"
-      },
-      {
-        "id": "non_response_0_5m",
-        "label": "non_response_0_5m"
-      },
-      {
-        "id": "non_response_10_19",
-        "label": "non_response_10_19"
-      },
-      {
-        "id": "non_response_20_24",
-        "label": "non_response_20_24"
-      },
-      {
-        "id": "non_response_24_59m",
-        "label": "non_response_24_59m"
-      },
-      {
-        "id": "non_response_25p",
-        "label": "non_response_25p"
-      },
-      {
-        "id": "non_response_5_9",
-        "label": "non_response_5_9"
-      },
-      {
-        "id": "non_response_6_23m",
-        "label": "non_response_6_23m"
-      },
-      {
-        "id": "transferred_out_0_5m",
-        "label": "transferred_out_0_5m"
-      },
-      {
-        "id": "transferred_out_10_19",
-        "label": "transferred_out_10_19"
-      },
-      {
-        "id": "transferred_out_20_24",
-        "label": "transferred_out_20_24"
-      },
-      {
-        "id": "transferred_out_24_59m",
-        "label": "transferred_out_24_59m"
-      },
-      {
-        "id": "transferred_out_25p",
-        "label": "transferred_out_25p"
-      },
-      {
-        "id": "transferred_out_5_9",
-        "label": "transferred_out_5_9"
-      },
-      {
-        "id": "transferred_out_6_23m",
-        "label": "transferred_out_6_23m"
-      }
-    ],
-    "age_na04": [
-      {
-        "id": "total_days_otc_0_5m",
-        "label": "total_days_otc_0_5m"
-      },
-      {
-        "id": "total_days_otc_10_19",
-        "label": "total_days_otc_10_19"
-      },
-      {
-        "id": "total_days_otc_20_24",
-        "label": "total_days_otc_20_24"
-      },
-      {
-        "id": "total_days_otc_24_59m",
-        "label": "total_days_otc_24_59m"
-      },
-      {
-        "id": "total_days_otc_25p",
-        "label": "total_days_otc_25p"
-      },
-      {
-        "id": "total_days_otc_5_9",
-        "label": "total_days_otc_5_9"
-      },
-      {
-        "id": "total_days_otc_6_23m",
-        "label": "total_days_otc_6_23m"
-      }
-    ],
-    "age_na05": [
-      {
-        "id": "active_prev_0_5m",
-        "label": "active_prev_0_5m"
-      },
-      {
-        "id": "active_prev_10_19",
-        "label": "active_prev_10_19"
-      },
-      {
-        "id": "active_prev_20_24",
-        "label": "active_prev_20_24"
-      },
-      {
-        "id": "active_prev_24_59m",
-        "label": "active_prev_24_59m"
-      },
-      {
-        "id": "active_prev_25p",
-        "label": "active_prev_25p"
-      },
-      {
-        "id": "active_prev_5_9",
-        "label": "active_prev_5_9"
-      },
-      {
-        "id": "active_prev_6_23m",
-        "label": "active_prev_6_23m"
-      },
-      {
-        "id": "new_admissions_0_5m",
-        "label": "new_admissions_0_5m"
-      },
-      {
-        "id": "new_admissions_10_19",
-        "label": "new_admissions_10_19"
-      },
-      {
-        "id": "new_admissions_20_24",
-        "label": "new_admissions_20_24"
-      },
-      {
-        "id": "new_admissions_24_59m",
-        "label": "new_admissions_24_59m"
-      },
-      {
-        "id": "new_admissions_25p",
-        "label": "new_admissions_25p"
-      },
-      {
-        "id": "new_admissions_5_9",
-        "label": "new_admissions_5_9"
-      },
-      {
-        "id": "new_admissions_6_23m",
-        "label": "new_admissions_6_23m"
-      },
-      {
-        "id": "readm_defaulters_0_5m",
-        "label": "readm_defaulters_0_5m"
-      },
-      {
-        "id": "readm_defaulters_10_19",
-        "label": "readm_defaulters_10_19"
-      },
-      {
-        "id": "readm_defaulters_20_24",
-        "label": "readm_defaulters_20_24"
-      },
-      {
-        "id": "readm_defaulters_24_59m",
-        "label": "readm_defaulters_24_59m"
-      },
-      {
-        "id": "readm_defaulters_25p",
-        "label": "readm_defaulters_25p"
-      },
-      {
-        "id": "readm_defaulters_5_9",
-        "label": "readm_defaulters_5_9"
-      },
-      {
-        "id": "readm_defaulters_6_23m",
-        "label": "readm_defaulters_6_23m"
-      },
-      {
-        "id": "readm_relapse_0_5m",
-        "label": "readm_relapse_0_5m"
-      },
-      {
-        "id": "readm_relapse_10_19",
-        "label": "readm_relapse_10_19"
-      },
-      {
-        "id": "readm_relapse_20_24",
-        "label": "readm_relapse_20_24"
-      },
-      {
-        "id": "readm_relapse_24_59m",
-        "label": "readm_relapse_24_59m"
-      },
-      {
-        "id": "readm_relapse_25p",
-        "label": "readm_relapse_25p"
-      },
-      {
-        "id": "readm_relapse_5_9",
-        "label": "readm_relapse_5_9"
-      },
-      {
-        "id": "readm_relapse_6_23m",
-        "label": "readm_relapse_6_23m"
-      },
-      {
-        "id": "transfer_in_0_5m",
-        "label": "transfer_in_0_5m"
-      },
-      {
-        "id": "transfer_in_10_19",
-        "label": "transfer_in_10_19"
-      },
-      {
-        "id": "transfer_in_20_24",
-        "label": "transfer_in_20_24"
-      },
-      {
-        "id": "transfer_in_24_59m",
-        "label": "transfer_in_24_59m"
-      },
-      {
-        "id": "transfer_in_25p",
-        "label": "transfer_in_25p"
-      },
-      {
-        "id": "transfer_in_5_9",
-        "label": "transfer_in_5_9"
-      },
-      {
-        "id": "transfer_in_6_23m",
-        "label": "transfer_in_6_23m"
-      }
-    ],
-    "age_na06": [
-      {
-        "id": "defaulted_0_5m",
-        "label": "defaulted_0_5m"
-      },
-      {
-        "id": "defaulted_10_19",
-        "label": "defaulted_10_19"
-      },
-      {
-        "id": "defaulted_20_24",
-        "label": "defaulted_20_24"
-      },
-      {
-        "id": "defaulted_24_59m",
-        "label": "defaulted_24_59m"
-      },
-      {
-        "id": "defaulted_25p",
-        "label": "defaulted_25p"
-      },
-      {
-        "id": "defaulted_5_9",
-        "label": "defaulted_5_9"
-      },
-      {
-        "id": "defaulted_6_23m",
-        "label": "defaulted_6_23m"
-      },
-      {
-        "id": "died_0_5m",
-        "label": "died_0_5m"
-      },
-      {
-        "id": "died_10_19",
-        "label": "died_10_19"
-      },
-      {
-        "id": "died_20_24",
-        "label": "died_20_24"
-      },
-      {
-        "id": "died_24_59m",
-        "label": "died_24_59m"
-      },
-      {
-        "id": "died_25p",
-        "label": "died_25p"
-      },
-      {
-        "id": "died_5_9",
-        "label": "died_5_9"
-      },
-      {
-        "id": "died_6_23m",
-        "label": "died_6_23m"
-      },
-      {
-        "id": "discharged_cured_0_5m",
-        "label": "discharged_cured_0_5m"
-      },
-      {
-        "id": "discharged_cured_10_19",
-        "label": "discharged_cured_10_19"
-      },
-      {
-        "id": "discharged_cured_20_24",
-        "label": "discharged_cured_20_24"
-      },
-      {
-        "id": "discharged_cured_24_59m",
-        "label": "discharged_cured_24_59m"
-      },
-      {
-        "id": "discharged_cured_25p",
-        "label": "discharged_cured_25p"
-      },
-      {
-        "id": "discharged_cured_5_9",
-        "label": "discharged_cured_5_9"
-      },
-      {
-        "id": "discharged_cured_6_23m",
-        "label": "discharged_cured_6_23m"
-      },
-      {
-        "id": "non_response_0_5m",
-        "label": "non_response_0_5m"
-      },
-      {
-        "id": "non_response_10_19",
-        "label": "non_response_10_19"
-      },
-      {
-        "id": "non_response_20_24",
-        "label": "non_response_20_24"
-      },
-      {
-        "id": "non_response_24_59m",
-        "label": "non_response_24_59m"
-      },
-      {
-        "id": "non_response_25p",
-        "label": "non_response_25p"
-      },
-      {
-        "id": "non_response_5_9",
-        "label": "non_response_5_9"
-      },
-      {
-        "id": "non_response_6_23m",
-        "label": "non_response_6_23m"
-      },
-      {
-        "id": "transferred_out_0_5m",
-        "label": "transferred_out_0_5m"
-      },
-      {
-        "id": "transferred_out_10_19",
-        "label": "transferred_out_10_19"
-      },
-      {
-        "id": "transferred_out_20_24",
-        "label": "transferred_out_20_24"
-      },
-      {
-        "id": "transferred_out_24_59m",
-        "label": "transferred_out_24_59m"
-      },
-      {
-        "id": "transferred_out_25p",
-        "label": "transferred_out_25p"
-      },
-      {
-        "id": "transferred_out_5_9",
-        "label": "transferred_out_5_9"
-      },
-      {
-        "id": "transferred_out_6_23m",
-        "label": "transferred_out_6_23m"
-      }
-    ],
-    "age_na07": [
-      {
-        "id": "total_days_sfc_0_5m",
-        "label": "total_days_sfc_0_5m"
-      },
-      {
-        "id": "total_days_sfc_10_19",
-        "label": "total_days_sfc_10_19"
-      },
-      {
-        "id": "total_days_sfc_20_24",
-        "label": "total_days_sfc_20_24"
-      },
-      {
-        "id": "total_days_sfc_24_59m",
-        "label": "total_days_sfc_24_59m"
-      },
-      {
-        "id": "total_days_sfc_25p",
-        "label": "total_days_sfc_25p"
-      },
-      {
-        "id": "total_days_sfc_5_9",
-        "label": "total_days_sfc_5_9"
-      },
-      {
-        "id": "total_days_sfc_6_23m",
-        "label": "total_days_sfc_6_23m"
+        "id": "50p",
+        "label": "50+ Yrs"
       }
     ]
   },
@@ -839,37 +108,62 @@
     "defaultValue": 0,
     "groups": [
       {
-        "title": "1.1 Outpatient Attendance",
+        "title": "1.1 OUTPATIENT ATTENDANCE",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "OA01",
           "OA02"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "OA01. New attendance",
+            "code": "OA01"
+          },
+          {
+            "label": "OA02. Reattendance",
+            "code": "OA02"
+          }
+        ]
       },
       {
-        "title": "1.2 Outpatient Referrals",
+        "title": "1.2 OUTPATIENT REFERRALS",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "OR01",
           "OR02"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "OR01. Referrals to unit",
+            "code": "OR01"
+          },
+          {
+            "label": "OR02. Referrals from unit",
+            "code": "OR02"
+          }
+        ]
       },
       {
         "title": "1.3.1 Epidemic-Prone Diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
-          "EP01",
           "EP01a",
           "EP01b",
           "EP01c",
           "EP01d",
+          "EP01e",
           "EP02",
           "EP03",
           "EP04",
@@ -882,28 +176,140 @@
           "EP11",
           "EP12",
           "EP13",
-          "EP14",
+          "EP14a",
+          "EP14b",
           "EP15",
           "EP16",
           "EP17",
           "EP18"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "EP01. Malaria",
+            "code": "EP01",
+            "type": "group",
+            "children": [
+              {
+                "label": "EP01a. Suspected Malaria (fever)",
+                "code": "EP01a"
+              },
+              {
+                "label": "EP01b. Malaria Tested (B/s & RDT )",
+                "code": "EP01b"
+              },
+              {
+                "label": "EP01c. Malaria confirmed (B/s & RDT)",
+                "code": "EP01c"
+              },
+              {
+                "label": "EP01d. Confirmed Malaria cases treated",
+                "code": "EP01d"
+              },
+              {
+                "label": "EP01e. Total malaria cases treated",
+                "code": "EP01e"
+              }
+            ]
+          },
+          {
+            "label": "EP02. Acute Flaccid Paralysis",
+            "code": "EP02"
+          },
+          {
+            "label": "EP03. Animal Bites (suspected rabies)",
+            "code": "EP03"
+          },
+          {
+            "label": "EP04. Cholera",
+            "code": "EP04"
+          },
+          {
+            "label": "EP05. Dysentery",
+            "code": "EP05"
+          },
+          {
+            "label": "EP06. Guinea Worm",
+            "code": "EP06"
+          },
+          {
+            "label": "EP07. Measles",
+            "code": "EP07"
+          },
+          {
+            "label": "EP08. Bacterial Meningitis",
+            "code": "EP08"
+          },
+          {
+            "label": "EP09. Neonatal tetanus",
+            "code": "EP09"
+          },
+          {
+            "label": "EP10. Plague",
+            "code": "EP10"
+          },
+          {
+            "label": "EP11. Yellow Fever",
+            "code": "EP11"
+          },
+          {
+            "label": "EP12. Other Viral Haemorrhagic Fevers",
+            "code": "EP12"
+          },
+          {
+            "label": "EP13. Severe Acute Respiratory Infection (SARI)",
+            "code": "EP13"
+          },
+          {
+            "label": "EP14. Adverse Events Following Immunization (AEFI)",
+            "code": "EP14",
+            "type": "group",
+            "children": [
+              {
+                "label": "EP14a. Serious",
+                "code": "EP14a"
+              },
+              {
+                "label": "EP14b. Non Serious",
+                "code": "EP14b"
+              }
+            ]
+          },
+          {
+            "label": "EP15. Typhoid Fever",
+            "code": "EP15"
+          },
+          {
+            "label": "EP16. Refampicin resistant TB cases",
+            "code": "EP16"
+          },
+          {
+            "label": "EP17. Other Emerging infectious Diseases e.g. Influenza like illness (ILI), SARS",
+            "code": "EP17"
+          },
+          {
+            "label": "EP18. Covid-19",
+            "code": "EP18"
+          }
+        ]
       },
       {
         "title": "1.3.2 Other Infectious/Communicable Diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "CD01",
           "CD02",
           "CD03",
           "CD04",
+          "CD05",
           "CD06",
           "CD07",
           "CD08",
+          "CD09",
+          "CD10",
           "CD11",
           "CD12",
           "CD13",
@@ -914,14 +320,92 @@
           "CD18",
           "CD19"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "CD01. Diarrhoea - Acute",
+            "code": "CD01"
+          },
+          {
+            "label": "CD02. Diarrhoea - Persistent",
+            "code": "CD02"
+          },
+          {
+            "label": "CD03. Urethral discharges",
+            "code": "CD03"
+          },
+          {
+            "label": "CD04. Genital ulcers",
+            "code": "CD04"
+          },
+          {
+            "label": "CD05. Sexually Transmitted Infection due to Sexual/Gender Based Violence",
+            "code": "CD05"
+          },
+          {
+            "label": "CD06. Other Sexually Transmitted Infections",
+            "code": "CD06"
+          },
+          {
+            "label": "CD07. Urinary Tract Infections (UTI)",
+            "code": "CD07"
+          },
+          {
+            "label": "CD08. Intestinal Worms",
+            "code": "CD08"
+          },
+          {
+            "label": "CD09. Haematological Meningitis",
+            "code": "CD09"
+          },
+          {
+            "label": "CD10. Other types of meningitis",
+            "code": "CD10"
+          },
+          {
+            "label": "CD11. Cough or cold - No pneumonia",
+            "code": "CD11"
+          },
+          {
+            "label": "CD12. Pneumonia",
+            "code": "CD12"
+          },
+          {
+            "label": "CD13. Severe Pneumonia",
+            "code": "CD13"
+          },
+          {
+            "label": "CD14. Skin Diseases",
+            "code": "CD14"
+          },
+          {
+            "label": "CD15. Tetanus (over 28 days)",
+            "code": "CD15"
+          },
+          {
+            "label": "CD16. Sleeping sickness",
+            "code": "CD16"
+          },
+          {
+            "label": "CD17. Pelvic Inflammatory Disease (PID)",
+            "code": "CD17"
+          },
+          {
+            "label": "CD18. Brucellosis",
+            "code": "CD18"
+          },
+          {
+            "label": "CD19. Surgical Site Infections (SSI)",
+            "code": "CD19"
+          }
+        ]
       },
       {
         "title": "1.3.3 Neonatal Diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "ND01",
           "ND02",
@@ -931,30 +415,98 @@
           "ND06",
           "ND07"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "ND01. Neonatal Sepsis (0-7days)",
+            "code": "ND01"
+          },
+          {
+            "label": "ND02. Neonatal Sepsis (8-28days)",
+            "code": "ND02"
+          },
+          {
+            "label": "ND03. Neonatal Pneumonia (0-7days)",
+            "code": "ND03"
+          },
+          {
+            "label": "ND04. Neonatal Pneumonia (8-28days)",
+            "code": "ND04"
+          },
+          {
+            "label": "ND05. Neonatal Meningitis",
+            "code": "ND05"
+          },
+          {
+            "label": "ND06. Neonatal Jaundice",
+            "code": "ND06"
+          },
+          {
+            "label": "ND07. Other Neonatal Conditions",
+            "code": "ND07"
+          }
+        ]
       },
       {
         "title": "1.3.4 Non Communicable Diseases/Conditions",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
-          "NC01",
+          "NC01a",
+          "NC01b",
           "NC02",
           "NC03",
           "NC04",
           "NC05",
           "NC06"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "NC01. Sickle Cell Anaemia",
+            "code": "NC01",
+            "type": "group",
+            "children": [
+              {
+                "label": "NC01a. New",
+                "code": "NC01a"
+              },
+              {
+                "label": "NC01b. Known",
+                "code": "NC01b"
+              }
+            ]
+          },
+          {
+            "label": "NC02. Other Haemoglobinopathies",
+            "code": "NC02"
+          },
+          {
+            "label": "NC03. Gastro-Intestinal Disorders (non-Infective)",
+            "code": "NC03"
+          },
+          {
+            "label": "NC04. Pain Requiring Palliative Care",
+            "code": "NC04"
+          },
+          {
+            "label": "NC05. Haemophilia",
+            "code": "NC05"
+          },
+          {
+            "label": "NC06. Deep Vein Thrombosis (DVT)",
+            "code": "NC06"
+          }
+        ]
       },
       {
-        "title": "1.3.5 Oral Diseases",
+        "title": "1.3.5 Oral diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "OD01",
           "OD02",
@@ -962,14 +514,36 @@
           "OD04",
           "OD05"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "OD01. Dental Caries",
+            "code": "OD01"
+          },
+          {
+            "label": "OD02. Gingivitis",
+            "code": "OD02"
+          },
+          {
+            "label": "OD03. HIV-Oral lesions",
+            "code": "OD03"
+          },
+          {
+            "label": "OD04. Oral Cancers",
+            "code": "OD04"
+          },
+          {
+            "label": "OD05. Other Oral Conditions",
+            "code": "OD05"
+          }
+        ]
       },
       {
         "title": "1.3.6 ENT Conditions",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "EN01",
           "EN02",
@@ -989,14 +563,84 @@
           "EN16",
           "EN17"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "EN01. Otitis media acute and chronic",
+            "code": "EN01"
+          },
+          {
+            "label": "EN02. Mastoiditis",
+            "code": "EN02"
+          },
+          {
+            "label": "EN03. Hearing loss",
+            "code": "EN03"
+          },
+          {
+            "label": "EN04. Rhinitis",
+            "code": "EN04"
+          },
+          {
+            "label": "EN05. Sinusitis",
+            "code": "EN05"
+          },
+          {
+            "label": "EN06. Epistaxis",
+            "code": "EN06"
+          },
+          {
+            "label": "EN07. Adenoid Hypertrophy",
+            "code": "EN07"
+          },
+          {
+            "label": "EN08. Foreign Body in nose/ear/aero-digestive system",
+            "code": "EN08"
+          },
+          {
+            "label": "EN09. Infected pre-auricular sinuses and abscess",
+            "code": "EN09"
+          },
+          {
+            "label": "EN10. Otitis external",
+            "code": "EN10"
+          },
+          {
+            "label": "EN11. Mastoid abscess",
+            "code": "EN11"
+          },
+          {
+            "label": "EN12. Vertigo",
+            "code": "EN12"
+          },
+          {
+            "label": "EN13. Tonsillitis",
+            "code": "EN13"
+          },
+          {
+            "label": "EN14. Tonsillar hypertrophy",
+            "code": "EN14"
+          },
+          {
+            "label": "EN15. Tinnitus",
+            "code": "EN15"
+          },
+          {
+            "label": "EN16. Head and neck cancers",
+            "code": "EN16"
+          },
+          {
+            "label": "EN17. Other ENT conditions",
+            "code": "EN17"
+          }
+        ]
       },
       {
-        "title": "1.3.7 Eye Conditions",
+        "title": "1.3.7 Eye conditions",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "EC01",
           "EC02",
@@ -1015,14 +659,80 @@
           "EC24",
           "EC25"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "EC01. Allergic conjunctivitis",
+            "code": "EC01"
+          },
+          {
+            "label": "EC02. Bacterial Conjunctivitis",
+            "code": "EC02"
+          },
+          {
+            "label": "EC03. Ophthalmia neonatorum",
+            "code": "EC03"
+          },
+          {
+            "label": "EC04. Corneal Ulcers/ Keratitis",
+            "code": "EC04"
+          },
+          {
+            "label": "EC05. Un Operable Cataract (>6/60)",
+            "code": "EC05"
+          },
+          {
+            "label": "EC06. Operable Cataract (<6/60)",
+            "code": "EC06"
+          },
+          {
+            "label": "EC07. Refractive errors",
+            "code": "EC07"
+          },
+          {
+            "label": "EC08. Glaucoma",
+            "code": "EC08"
+          },
+          {
+            "label": "EC09. Trachoma",
+            "code": "EC09"
+          },
+          {
+            "label": "EC10. Vitamin A Deficiency",
+            "code": "EC10"
+          },
+          {
+            "label": "EC12. Diabetic Retinopathy (All stages)",
+            "code": "EC12"
+          },
+          {
+            "label": "EC13. Chorioretinal, Macular & Vitreous Disorders",
+            "code": "EC13"
+          },
+          {
+            "label": "EC16. Corneal scars (Non trachomatous)",
+            "code": "EC16"
+          },
+          {
+            "label": "EC17. Tumours",
+            "code": "EC17"
+          },
+          {
+            "label": "EC24. Blindness",
+            "code": "EC24"
+          },
+          {
+            "label": "EC25. Other eye conditions",
+            "code": "EC25"
+          }
+        ]
       },
       {
         "title": "1.3.8 Mental Health",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "MH05",
           "MH07",
@@ -1033,20 +743,80 @@
           "MH12",
           "MH13",
           "MH26",
-          "MH33",
           "MH33a",
           "MH33b",
           "MH45",
           "MH46"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "MH05. Brief Psychotic Disorder",
+            "code": "MH05"
+          },
+          {
+            "label": "MH07. Schizophrenia",
+            "code": "MH07"
+          },
+          {
+            "label": "MH08. Bipolar Affective Disorder",
+            "code": "MH08"
+          },
+          {
+            "label": "MH09. Major Depressive Disorder",
+            "code": "MH09"
+          },
+          {
+            "label": "MH10. Anxiety - Phobic Disorders",
+            "code": "MH10"
+          },
+          {
+            "label": "MH11. Anxiety - Social anxiety Disorders",
+            "code": "MH11"
+          },
+          {
+            "label": "MH12. Anxiety - Panic Disorder",
+            "code": "MH12"
+          },
+          {
+            "label": "MH13. Anxiety - Generalized anxiety Disorder",
+            "code": "MH13"
+          },
+          {
+            "label": "MH26. Alcohol Use Disorders",
+            "code": "MH26"
+          },
+          {
+            "label": "MH33. Epilepsy",
+            "code": "MH33",
+            "type": "group",
+            "children": [
+              {
+                "label": "MH33a. New",
+                "code": "MH33a"
+              },
+              {
+                "label": "MH33b. Known",
+                "code": "MH33b"
+              }
+            ]
+          },
+          {
+            "label": "MH45. Other Childhood Mental Disorders",
+            "code": "MH45"
+          },
+          {
+            "label": "MH46. Other Adult Mental Disorders",
+            "code": "MH46"
+          }
+        ]
       },
       {
         "title": "1.3.9 Neurological Disorders",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "NE03",
           "NE04",
@@ -1057,31 +827,99 @@
           "NE12",
           "NE15"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "NE03. Parkinson’s disease",
+            "code": "NE03"
+          },
+          {
+            "label": "NE04. Dementia",
+            "code": "NE04"
+          },
+          {
+            "label": "NE07. Persons in Coma / Emergency Care",
+            "code": "NE07"
+          },
+          {
+            "label": "NE08. Down Syndrome (DS)",
+            "code": "NE08"
+          },
+          {
+            "label": "NE09. CP/PMLD",
+            "code": "NE09"
+          },
+          {
+            "label": "NE11. Learning Disability",
+            "code": "NE11"
+          },
+          {
+            "label": "NE12. Eating disorders (anorexia, bulimia, other feeding)",
+            "code": "NE12"
+          },
+          {
+            "label": "NE15. Others Neurological Disorders",
+            "code": "NE15"
+          }
+        ]
       },
       {
-        "title": "1.3.10 Chronic Respiratory Diseases",
+        "title": "1.3.10 Chronic respiratory diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
-          "CR01",
           "CR01a",
           "CR01b",
-          "CR02",
           "CR02a",
           "CR02b",
           "CR03"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "CR01. Asthma",
+            "code": "CR01",
+            "type": "group",
+            "children": [
+              {
+                "label": "CR01a. New",
+                "code": "CR01a"
+              },
+              {
+                "label": "CR01b. Known",
+                "code": "CR01b"
+              }
+            ]
+          },
+          {
+            "label": "CR02. Chronic Obstructive Pulmonary Disease (COPD)",
+            "code": "CR02",
+            "type": "group",
+            "children": [
+              {
+                "label": "CR02a. New",
+                "code": "CR02a"
+              },
+              {
+                "label": "CR02b. Known",
+                "code": "CR02b"
+              }
+            ]
+          },
+          {
+            "label": "CR03. Other Chronic Respiratory diseases",
+            "code": "CR03"
+          }
+        ]
       },
       {
         "title": "1.3.11 Cancers",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "CA01",
           "CA02",
@@ -1092,14 +930,48 @@
           "CA08",
           "CA19"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "CA01. Cervical Cancer",
+            "code": "CA01"
+          },
+          {
+            "label": "CA02. Prostate Cancer",
+            "code": "CA02"
+          },
+          {
+            "label": "CA03. Breast Cancer",
+            "code": "CA03"
+          },
+          {
+            "label": "CA04. Lung Cancer",
+            "code": "CA04"
+          },
+          {
+            "label": "CA05. Liver Cancer",
+            "code": "CA05"
+          },
+          {
+            "label": "CA07. Colon Cancer",
+            "code": "CA07"
+          },
+          {
+            "label": "CA08. Kaposis Sarcoma",
+            "code": "CA08"
+          },
+          {
+            "label": "CA19. Other Cancers",
+            "code": "CA19"
+          }
+        ]
       },
       {
         "title": "1.3.14 Disabilities",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "DS01",
           "DS02",
@@ -1115,17 +987,70 @@
           "DS12",
           "DS13"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "DS01. Individuals with Difficulty in seeing",
+            "code": "DS01"
+          },
+          {
+            "label": "DS02. Individuals with Albinism",
+            "code": "DS02"
+          },
+          {
+            "label": "DS03. Individuals with Difficulty in hearing",
+            "code": "DS03"
+          },
+          {
+            "label": "DS04. Individuals with Speech Difficulties",
+            "code": "DS04"
+          },
+          {
+            "label": "DS05. Individuals with delayed age specific motor development",
+            "code": "DS05"
+          },
+          {
+            "label": "DS06. Individuals with Dwarfism",
+            "code": "DS06"
+          },
+          {
+            "label": "DS07. Individuals with Difficulty understanding",
+            "code": "DS07"
+          },
+          {
+            "label": "DS08. Individuals with Difficulty in remembering",
+            "code": "DS08"
+          },
+          {
+            "label": "DS09. Individuals with Difficulty in reading",
+            "code": "DS09"
+          },
+          {
+            "label": "DS10. Individuals with Difficulty in writing",
+            "code": "DS10"
+          },
+          {
+            "label": "DS11. Individuals with Difficulty in self-care",
+            "code": "DS11"
+          },
+          {
+            "label": "DS12. Individuals with Mental impairment",
+            "code": "DS12"
+          },
+          {
+            "label": "DS13. Individuals with Emotional impairment",
+            "code": "DS13"
+          }
+        ]
       },
       {
-        "title": "1.3.15 Cardiovascular Diseases",
+        "title": "1.3.15 Cardiovascular diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "CV01",
-          "CV02",
           "CV02a",
           "CV02b",
           "CV03",
@@ -1134,14 +1059,55 @@
           "CV06",
           "CV07"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "CV01. Stroke/ Cardiovascular Accident (CVA)",
+            "code": "CV01"
+          },
+          {
+            "label": "CV02. Hypertension",
+            "code": "CV02",
+            "type": "group",
+            "children": [
+              {
+                "label": "CV02a. New",
+                "code": "CV02a"
+              },
+              {
+                "label": "CV02b. Known",
+                "code": "CV02b"
+              }
+            ]
+          },
+          {
+            "label": "CV03. Heart failure",
+            "code": "CV03"
+          },
+          {
+            "label": "CV04. Ischemic Heart Diseases",
+            "code": "CV04"
+          },
+          {
+            "label": "CV05. Rheumatic Heart Diseases",
+            "code": "CV05"
+          },
+          {
+            "label": "CV06. Congenital Heart Diseases",
+            "code": "CV06"
+          },
+          {
+            "label": "CV07. Other Cardiovascular Diseases",
+            "code": "CV07"
+          }
+        ]
       },
       {
         "title": "1.3.16 Renal Diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "RD01",
           "RD02",
@@ -1149,14 +1115,36 @@
           "RD08",
           "RD09"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "RD01. Acute Kidney Injury",
+            "code": "RD01"
+          },
+          {
+            "label": "RD02. Acute glomerulonephritis",
+            "code": "RD02"
+          },
+          {
+            "label": "RD03. Nephrotic syndrome",
+            "code": "RD03"
+          },
+          {
+            "label": "RD08. Uncomplicated UTI",
+            "code": "RD08"
+          },
+          {
+            "label": "RD09. Complicated UTI",
+            "code": "RD09"
+          }
+        ]
       },
       {
         "title": "1.3.17 Liver Diseases",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "LD01",
           "LD02",
@@ -1166,64 +1154,198 @@
           "LD09",
           "LD10"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "LD01. Liver Cirrhosis",
+            "code": "LD01"
+          },
+          {
+            "label": "LD02. Liver Abscess",
+            "code": "LD02"
+          },
+          {
+            "label": "LD06. Hepatitis A",
+            "code": "LD06"
+          },
+          {
+            "label": "LD07. Hepatitis B",
+            "code": "LD07"
+          },
+          {
+            "label": "LD08. Hepatitis C",
+            "code": "LD08"
+          },
+          {
+            "label": "LD09. Hepatitis D",
+            "code": "LD09"
+          },
+          {
+            "label": "LD10. Hepatitis E",
+            "code": "LD10"
+          }
+        ]
       },
       {
         "title": "1.3.18 Endocrine and Metabolic Disorders",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
-          "EM01",
-          "EM01a",
-          "EM01b",
-          "EM01c",
-          "EM01d",
-          "EM01e",
-          "EM01f",
+          "EM01N1",
+          "EM01N2",
+          "EM01N3",
+          "EM01K1",
+          "EM01K2",
+          "EM01K3",
           "EM02",
           "EM03"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "EM01. Diabetes mellitus",
+            "code": "EM01",
+            "type": "group",
+            "children": [
+              {
+                "label": "New",
+                "code": "EM01N",
+                "type": "group",
+                "children": [
+                  {
+                    "label": "Type 1",
+                    "code": "EM01N1"
+                  },
+                  {
+                    "label": "Type 2",
+                    "code": "EM01N2"
+                  },
+                  {
+                    "label": "Other Forms",
+                    "code": "EM01N3"
+                  }
+                ]
+              },
+              {
+                "label": "Known",
+                "code": "EM01K",
+                "type": "group",
+                "children": [
+                  {
+                    "label": "Type 1",
+                    "code": "EM01K1"
+                  },
+                  {
+                    "label": "Type 2",
+                    "code": "EM01K2"
+                  },
+                  {
+                    "label": "Other Forms",
+                    "code": "EM01K3"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "EM02. Thyroid Disease",
+            "code": "EM02"
+          },
+          {
+            "label": "EM03. Other Endocrine and Metabolic Diseases",
+            "code": "EM03"
+          }
+        ]
       },
       {
         "title": "1.3.19 Injuries",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "IN01",
           "IN02",
           "IN03",
-          "IN04",
           "IN04a",
           "IN04b",
           "IN05",
           "IN06"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "IN01. Jaw injuries",
+            "code": "IN01"
+          },
+          {
+            "label": "IN02. Injuries due to Gender based violence",
+            "code": "IN02"
+          },
+          {
+            "label": "IN03. Injuries (Trauma due to other causes)",
+            "code": "IN03"
+          },
+          {
+            "label": "IN04. Animal bites",
+            "code": "IN04",
+            "type": "group",
+            "children": [
+              {
+                "label": "IN04a. Domestic",
+                "code": "IN04a"
+              },
+              {
+                "label": "IN04b. Wild",
+                "code": "IN04b"
+              }
+            ]
+          },
+          {
+            "label": "IN05. Snake bites",
+            "code": "IN05"
+          },
+          {
+            "label": "IN06. Insect bites",
+            "code": "IN06"
+          }
+        ]
       },
       {
         "title": "1.3.20 Minor Operations in OPD",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "MN01",
           "MN02",
           "MN03"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "MN01. Tooth extractions",
+            "code": "MN01"
+          },
+          {
+            "label": "MN02. Dental Fillings",
+            "code": "MN02"
+          },
+          {
+            "label": "MN03. Other Minor Operations",
+            "code": "MN03"
+          }
+        ]
       },
       {
-        "title": "1.3.21 Neglected Tropical Diseases",
+        "title": "1.3.21 Neglected Tropical Diseases (NTDs)",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "NT01",
           "NT02",
@@ -1232,14 +1354,40 @@
           "NT05",
           "NT06"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "NT01. Leishmaniasis",
+            "code": "NT01"
+          },
+          {
+            "label": "NT02. Lymphatic Filariasis (hydrocele)",
+            "code": "NT02"
+          },
+          {
+            "label": "NT03. Lymphatic Filariasis (Lympoedema)",
+            "code": "NT03"
+          },
+          {
+            "label": "NT04. Urinary Schistosomiasis",
+            "code": "NT04"
+          },
+          {
+            "label": "NT05. Intestinal Schistosomiasis",
+            "code": "NT05"
+          },
+          {
+            "label": "NT06. Onchocerciasis",
+            "code": "NT06"
+          }
+        ]
       },
       {
-        "title": "1.3.22 Maternal Conditions",
+        "title": "1.3.22 Maternal conditions",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "MC01",
           "MC02",
@@ -1251,90 +1399,130 @@
           "MC08",
           "MC09",
           "MC10",
-          "MC11"
+          "MC11",
+          "MC12a",
+          "MC12b",
+          "MC13a",
+          "MC13b"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "MC01. Abortions due to Gender-Based Violence (GBV)",
+            "code": "MC01"
+          },
+          {
+            "label": "MC02. Abortions due to other causes",
+            "code": "MC02"
+          },
+          {
+            "label": "MC03. Malaria in pregnancy",
+            "code": "MC03"
+          },
+          {
+            "label": "MC04. High blood pressure in pregnancy",
+            "code": "MC04"
+          },
+          {
+            "label": "MC05. Diabetes in Pregnancy",
+            "code": "MC05"
+          },
+          {
+            "label": "MC06. Obstructed labour",
+            "code": "MC06"
+          },
+          {
+            "label": "MC07. Puerperal sepsis",
+            "code": "MC07"
+          },
+          {
+            "label": "MC08. Psychosis of Postpartum onset",
+            "code": "MC08"
+          },
+          {
+            "label": "MC09. Post Traumatic Stress Disorder of Postpartum onset",
+            "code": "MC09"
+          },
+          {
+            "label": "MC10. Haemorrhage related to pregnancy (APH)",
+            "code": "MC10"
+          },
+          {
+            "label": "MC11. Haemorrhage related to pregnancy (PPH)",
+            "code": "MC11"
+          },
+          {
+            "label": "MC12. Breast cancer",
+            "code": "MC12",
+            "type": "group",
+            "children": [
+              {
+                "label": "MC12a. Total Screened",
+                "code": "MC12a"
+              },
+              {
+                "label": "MC12b. No. with breast cancer",
+                "code": "MC12b"
+              }
+            ]
+          },
+          {
+            "label": "MC13. Cervical cancer",
+            "code": "MC13",
+            "type": "group",
+            "children": [
+              {
+                "label": "MC13a. Total Screened",
+                "code": "MC13a"
+              },
+              {
+                "label": "MC13b. No. with Cervical cancer",
+                "code": "MC13b"
+              }
+            ]
+          }
+        ]
       },
       {
-        "title": "1.3.23 Other OPD Conditions",
+        "title": "1.3.23 Other OPD conditions",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "OP01"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "OP01. All others",
+            "code": "OP01"
+          }
+        ]
       },
       {
         "title": "1.3.24 Deaths in OPD",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
         "indicatorCodes": [
           "DT01"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "DT01. Deaths in OPD",
+            "code": "DT01"
+          }
+        ]
       },
       {
-        "title": "1.3.12 Palliative Care",
-        "indicatorCodes": [
-          "PC01",
-          "PC01a",
-          "PC01b",
-          "PC01c",
-          "PC01d",
-          "PC02",
-          "PC02a",
-          "PC02b",
-          "PC02c",
-          "PC02d",
-          "PC03",
-          "PC03a",
-          "PC03b",
-          "PC03c",
-          "PC03d",
-          "PC04",
-          "PC04a",
-          "PC04b",
-          "PC04c",
-          "PC04d",
-          "PC05",
-          "PC06"
-        ],
+        "title": "1.3.26 TB Screening",
         "keyPattern": "{code}_{age}_{sex}",
         "dims": {
-          "age": "age_opd",
+          "age": "age",
           "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.25 Emergency Medical Services",
-        "indicatorCodes": [
-          "ES01",
-          "ES02",
-          "ES03",
-          "ES04",
-          "ES05",
-          "ES06",
-          "ES07",
-          "ES08",
-          "ES09",
-          "ES10"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "TB / Leprosy / Screening",
+        },
         "indicatorCodes": [
           "TP01a",
           "TP01b",
@@ -1344,117 +1532,684 @@
           "TP02c",
           "TP03a",
           "TP03b",
-          "TP03c",
-          "TP04"
+          "TP03c"
         ],
+        "indicatorTree": [
+          {
+            "label": "TP01. OPD",
+            "code": "TP01",
+            "type": "group",
+            "children": [
+              {
+                "label": "TP01a. No. screened for TB",
+                "code": "TP01a"
+              },
+              {
+                "label": "TP01b. No. of presumptive TB cases identified",
+                "code": "TP01b"
+              },
+              {
+                "label": "TP01c. No. of presumptive diagnosed with TB",
+                "code": "TP01c"
+              }
+            ]
+          },
+          {
+            "label": "TP02. ART",
+            "code": "TP02",
+            "type": "group",
+            "children": [
+              {
+                "label": "TP02a. No. screened for TB",
+                "code": "TP02a"
+              },
+              {
+                "label": "TP02b. No. of presumptive TB cases identified",
+                "code": "TP02b"
+              },
+              {
+                "label": "TP02c. No. of presumptive diagnosed with TB",
+                "code": "TP02c"
+              }
+            ]
+          },
+          {
+            "label": "TP03. Out Reaches",
+            "code": "TP03",
+            "type": "group",
+            "children": [
+              {
+                "label": "TP03a. No. screened for TB",
+                "code": "TP03a"
+              },
+              {
+                "label": "TP03b. No. of presumptive TB cases identified",
+                "code": "TP03b"
+              },
+              {
+                "label": "TP03c. No. of presumptive diagnosed with TB",
+                "code": "TP03c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "1.3.12 Palliative",
         "keyPattern": "{code}_{age}_{sex}",
         "dims": {
-          "age": "age_opd",
+          "age": "age",
           "sex": "sex"
-        }
+        },
+        "indicatorCodes": [
+          "PC01a",
+          "PC01b",
+          "PC01c",
+          "PC01d",
+          "PC02a",
+          "PC02b",
+          "PC02c",
+          "PC02d",
+          "PC03a",
+          "PC03b",
+          "PC03c",
+          "PC03d",
+          "PC04a",
+          "PC04b",
+          "PC04c",
+          "PC04d",
+          "PC05",
+          "PC06"
+        ],
+        "indicatorTree": [
+          {
+            "label": "PC01. No. of patients that need palliative care",
+            "code": "PC01",
+            "type": "group",
+            "children": [
+              {
+                "label": "PC01a. Cancer",
+                "code": "PC01a"
+              },
+              {
+                "label": "PC01b. HIV/AIDS",
+                "code": "PC01b"
+              },
+              {
+                "label": "PC01c. Sickle Cell Anemia (SCA)",
+                "code": "PC01c"
+              },
+              {
+                "label": "PC01d. Others",
+                "code": "PC01d"
+              }
+            ]
+          },
+          {
+            "label": "PC02. No. of new patients that received palliative care during the month",
+            "code": "PC02",
+            "type": "group",
+            "children": [
+              {
+                "label": "PC02a. Cancer",
+                "code": "PC02a"
+              },
+              {
+                "label": "PC02b. HIV/AIDS",
+                "code": "PC02b"
+              },
+              {
+                "label": "PC02c. Sickle Cell Anemia (SCA)",
+                "code": "PC02c"
+              },
+              {
+                "label": "PC02d. Others",
+                "code": "PC02d"
+              }
+            ]
+          },
+          {
+            "label": "PC03. No. of patients that received palliative care during the month",
+            "code": "PC03",
+            "type": "group",
+            "children": [
+              {
+                "label": "PC03a. Cancer",
+                "code": "PC03a"
+              },
+              {
+                "label": "PC03b. HIV/AIDS",
+                "code": "PC03b"
+              },
+              {
+                "label": "PC03c. Sickle Cell Anemia (SCA)",
+                "code": "PC03c"
+              },
+              {
+                "label": "PC03d. Others",
+                "code": "PC03d"
+              }
+            ]
+          },
+          {
+            "label": "PC04. No. of patients that received palliative care with a documented WHO performance status during the month",
+            "code": "PC04",
+            "type": "group",
+            "children": [
+              {
+                "label": "PC04a. Working (Adults)",
+                "code": "PC04a"
+              },
+              {
+                "label": "PC04b. Playing (Children)",
+                "code": "PC04b"
+              },
+              {
+                "label": "PC04c. Ambulant",
+                "code": "PC04c"
+              },
+              {
+                "label": "PC04d. Bedridden",
+                "code": "PC04d"
+              }
+            ]
+          },
+          {
+            "label": "PC05. No. of patients that received palliative care and are on oral liquid morphine",
+            "code": "PC05"
+          },
+          {
+            "label": "PC06. No. of patients on palliative care who died during the month",
+            "code": "PC06"
+          }
+        ]
+      },
+      {
+        "title": "1.3.25 Emergency Medical Services",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
+        "indicatorCodes": [
+          "ES01a",
+          "ES01b",
+          "ES01c",
+          "ES01d",
+          "ES03a",
+          "ES03b",
+          "ES03c",
+          "ES02",
+          "ES04",
+          "ES05",
+          "ES06a",
+          "ES06b",
+          "ES07a",
+          "ES07b",
+          "ES08a",
+          "ES08b",
+          "ES08c",
+          "ES08d",
+          "ES08e",
+          "ES09a",
+          "ES09b",
+          "ES09c",
+          "ES09d",
+          "ES10a",
+          "ES10b",
+          "ES10c"
+        ],
+        "indicatorTree": [
+          {
+            "label": "ES01. No. of emergency cases at the facility",
+            "code": "ES01",
+            "type": "group",
+            "children": [
+              {
+                "label": "ES01a. Medical",
+                "code": "ES01a"
+              },
+              {
+                "label": "ES01b. Obstetrics/ gynaecology",
+                "code": "ES01b"
+              },
+              {
+                "label": "ES01c. Surgical",
+                "code": "ES01c"
+              },
+              {
+                "label": "ES01d. Road Traffic Injuries",
+                "code": "ES01d"
+              }
+            ]
+          },
+          {
+            "label": "ES03. No. of emergency cases that arrived at the facility by",
+            "code": "ES03",
+            "type": "group",
+            "children": [
+              {
+                "label": "ES03a. Ambulance",
+                "code": "ES03a"
+              },
+              {
+                "label": "ES03b. Police Vehicle",
+                "code": "ES03b"
+              },
+              {
+                "label": "ES03c. Private Transportation",
+                "code": "ES03c"
+              }
+            ]
+          },
+          {
+            "label": "ES02. No. of Patients that received care at the scene of emergency",
+            "code": "ES02"
+          },
+          {
+            "label": "ES04. No. of patients accessing care within 1hr in an emergency unit",
+            "code": "ES04"
+          },
+          {
+            "label": "ES05. No. of patients who developed complications within 24 hours of care",
+            "code": "ES05"
+          },
+          {
+            "label": "ES06. No. of patients with hypoxemia",
+            "code": "ES06",
+            "type": "group",
+            "children": [
+              {
+                "label": "ES06a. Total",
+                "code": "ES06a"
+              },
+              {
+                "label": "ES06b. Administered with Oxygen",
+                "code": "ES06b"
+              }
+            ]
+          },
+          {
+            "label": "ES07. No. of patients with external haemorrhages",
+            "code": "ES07",
+            "type": "group",
+            "children": [
+              {
+                "label": "ES07a. Total",
+                "code": "ES07a"
+              },
+              {
+                "label": "ES07b. Controlled",
+                "code": "ES07b"
+              }
+            ]
+          },
+          {
+            "label": "ES08. Road Traffic Injuries",
+            "code": "ES08",
+            "type": "group",
+            "children": [
+              {
+                "label": "ES08a. Motor Vehicle",
+                "code": "ES08a"
+              },
+              {
+                "label": "ES08b. Motor Cycle",
+                "code": "ES08b"
+              },
+              {
+                "label": "ES08c. Bicycle",
+                "code": "ES08c"
+              },
+              {
+                "label": "ES08d. Pedestrian",
+                "code": "ES08d"
+              },
+              {
+                "label": "ES08e. Others",
+                "code": "ES08e"
+              }
+            ]
+          },
+          {
+            "label": "ES09. No. of deaths at the emergency unit",
+            "code": "ES09",
+            "type": "group",
+            "children": [
+              {
+                "label": "ES09a. Medical",
+                "code": "ES09a"
+              },
+              {
+                "label": "ES09b. Obstetrics / gynaecology",
+                "code": "ES09b"
+              },
+              {
+                "label": "ES09c. Surgical",
+                "code": "ES09c"
+              },
+              {
+                "label": "ES09d. Road traffic injuries",
+                "code": "ES09d"
+              }
+            ]
+          },
+          {
+            "label": "ES10. No. of Patients who received vaccination for",
+            "code": "ES10",
+            "type": "group",
+            "children": [
+              {
+                "label": "ES10a. Tetanus",
+                "code": "ES10a"
+              },
+              {
+                "label": "ES10b. Rabies",
+                "code": "ES10b"
+              },
+              {
+                "label": "ES10c. Anti venom",
+                "code": "ES10c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "1.3.27 Leprosy services",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age",
+          "sex": "sex"
+        },
+        "indicatorCodes": [
+          "TP04a",
+          "TP04b",
+          "TP04c"
+        ],
+        "indicatorTree": [
+          {
+            "label": "TP04. New and relapse leprosy cases registered",
+            "code": "TP04",
+            "type": "group",
+            "children": [
+              {
+                "label": "TP04a. Screened",
+                "code": "TP04a"
+              },
+              {
+                "label": "TP04b. Presumed",
+                "code": "TP04b"
+              },
+              {
+                "label": "TP04c. Diagnosed",
+                "code": "TP04c"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "1.3.26 Nutrition Services",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age_nutrition",
+          "sex": "sex"
+        },
+        "indicatorCodes": [
+          "NA01a",
+          "NA01b1a",
+          "NA01b1b",
+          "NA01b2",
+          "NA01b3",
+          "NA01b4",
+          "NA02a",
+          "NA02b",
+          "NA02c",
+          "NA02d",
+          "NA02e",
+          "NA03a",
+          "NA03b",
+          "NA03c",
+          "NA03d",
+          "NA03e",
+          "NA04",
+          "NA05a",
+          "NA05b",
+          "NA05c",
+          "NA05d",
+          "NA06a",
+          "NA06b",
+          "NA06c",
+          "NA06d",
+          "NA06e",
+          "NA07"
+        ],
+        "indicatorTree": [
+          {
+            "label": "NA01. No. of clients who received nutrition assessment and categorized",
+            "code": "NA01",
+            "type": "group",
+            "children": [
+              {
+                "label": "NA01a. Total assessed for nutrition status",
+                "code": "NA01a"
+              },
+              {
+                "label": "NA01b. Identified malnourished",
+                "code": "NA01b",
+                "type": "group",
+                "children": [
+                  {
+                    "label": "SAM",
+                    "code": "NA01b1",
+                    "type": "group",
+                    "children": [
+                      {
+                        "label": "With Oedema",
+                        "code": "NA01b1a"
+                      },
+                      {
+                        "label": "Without Oedema",
+                        "code": "NA01b1b"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "MAM",
+                    "code": "NA01b2"
+                  },
+                  {
+                    "label": "Underweight",
+                    "code": "NA01b3"
+                  },
+                  {
+                    "label": "Overweight / Obese",
+                    "code": "NA01b4"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "NA02. No. of SAM clients in OTC",
+            "code": "NA02",
+            "type": "group",
+            "children": [
+              {
+                "label": "No of active clients from previous months",
+                "code": "NA02a"
+              },
+              {
+                "label": "New Admissions",
+                "code": "NA02b"
+              },
+              {
+                "label": "Re-Admissions (Relapse)",
+                "code": "NA02c"
+              },
+              {
+                "label": "Re-Admissions (Defaulters)",
+                "code": "NA02d"
+              },
+              {
+                "label": "Transfer in OTC",
+                "code": "NA02e"
+              }
+            ]
+          },
+          {
+            "label": "NA03. No. of clients with SAM admitted into OTC",
+            "code": "NA03",
+            "type": "group",
+            "children": [
+              {
+                "label": "Discharged as cured",
+                "code": "NA03a"
+              },
+              {
+                "label": "Non-response",
+                "code": "NA03b"
+              },
+              {
+                "label": "Defaulted from care",
+                "code": "NA03c"
+              },
+              {
+                "label": "Died during treatment",
+                "code": "NA03d"
+              },
+              {
+                "label": "Transferred out of OTC",
+                "code": "NA03e"
+              }
+            ]
+          },
+          {
+            "label": "NA04. Total number of days spent at OTC for all clients discharged as cured",
+            "code": "NA04"
+          },
+          {
+            "label": "NA05. No. of MAM Clients in SFC this month",
+            "code": "NA05",
+            "type": "group",
+            "children": [
+              {
+                "label": "New Admissions",
+                "code": "NA05a"
+              },
+              {
+                "label": "Re-Admissions (Relapse)",
+                "code": "NA05b"
+              },
+              {
+                "label": "Re-Admissions (Defaulters)",
+                "code": "NA05c"
+              },
+              {
+                "label": "Transfer in SFC",
+                "code": "NA05d"
+              }
+            ]
+          },
+          {
+            "label": "NA06. No. of clients with MAM admitted into SFC",
+            "code": "NA06",
+            "type": "group",
+            "children": [
+              {
+                "label": "Discharged as cured",
+                "code": "NA06a"
+              },
+              {
+                "label": "Non-response",
+                "code": "NA06b"
+              },
+              {
+                "label": "Defaulted from care",
+                "code": "NA06c"
+              },
+              {
+                "label": "Died during treatment",
+                "code": "NA06d"
+              },
+              {
+                "label": "Transferred out of SFC",
+                "code": "NA06e"
+              }
+            ]
+          },
+          {
+            "label": "NA07. Total number of days spent at SFC for all clients discharged as cured",
+            "code": "NA07"
+          }
+        ]
       },
       {
         "title": "1.3.29 Gender Based Violence Services",
+        "keyPattern": "{code}_{age}_{sex}",
+        "dims": {
+          "age": "age_gbv",
+          "sex": "sex"
+        },
         "indicatorCodes": [
-          "GBV01",
+          "GBV01a",
+          "GBV01b",
           "GBV02",
           "GBV03",
           "GBV04",
-          "GBV05"
+          "GBV05a",
+          "GBV05b",
+          "GBV05c"
         ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_opd",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA01a",
-        "indicatorCodes": [
-          "NA01a"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na01a",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA01b",
-        "indicatorCodes": [
-          "NA01b"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na01b",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA02",
-        "indicatorCodes": [
-          "NA02"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na02",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA03",
-        "indicatorCodes": [
-          "NA03"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na03",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA04",
-        "indicatorCodes": [
-          "NA04"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na04",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA05",
-        "indicatorCodes": [
-          "NA05"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na05",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA06",
-        "indicatorCodes": [
-          "NA06"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na06",
-          "sex": "sex"
-        }
-      },
-      {
-        "title": "1.3.26 Nutrition Services - NA07",
-        "indicatorCodes": [
-          "NA07"
-        ],
-        "keyPattern": "{code}_{age}_{sex}",
-        "dims": {
-          "age": "age_na07",
-          "sex": "sex"
-        }
+        "indicatorTree": [
+          {
+            "label": "GBV01. No. of clients receiving post GBV clinical care (minimum package) by violence type",
+            "code": "GBV01",
+            "type": "group",
+            "children": [
+              {
+                "label": "GBV01a. Sexual Violence",
+                "code": "GBV01a"
+              },
+              {
+                "label": "GBV01b. Physical/ Emotional Violence",
+                "code": "GBV01b"
+              }
+            ]
+          },
+          {
+            "label": "GBV02. No. SGBV survivors eligible for PEP",
+            "code": "GBV02"
+          },
+          {
+            "label": "GBV03. No. SGBV survivors initiated on PEP",
+            "code": "GBV03"
+          },
+          {
+            "label": "GBV04. No. SGBV survivors who completed the PEP dose",
+            "code": "GBV04"
+          },
+          {
+            "label": "GBV05. No. SGBV survivors who initiated PEP with documented outcome",
+            "code": "GBV05",
+            "type": "group",
+            "children": [
+              {
+                "label": "GBV05a. Negative",
+                "code": "GBV05a"
+              },
+              {
+                "label": "GBV05b. Positive",
+                "code": "GBV05b"
+              },
+              {
+                "label": "GBV05c. Lost To Followup",
+                "code": "GBV05c"
+              }
+            ]
+          }
+        ]
       }
     ]
   }
