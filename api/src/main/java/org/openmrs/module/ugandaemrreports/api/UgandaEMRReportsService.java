@@ -6,8 +6,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.module.reporting.report.ReportDesign;
-import org.openmrs.module.ugandaemrreports.model.Dashboard;
-import org.openmrs.module.ugandaemrreports.model.DashboardReportObject;
+import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -141,4 +140,111 @@ public interface UgandaEMRReportsService extends OpenmrsService {
     public String buildFinalPayloadJson(ReportData reportData, ReportDesign reportDesign, String renderType, Date endDate);
 
     public String buildPreviewHtml(ReportData reportData, ReportDesign reportDesign);
+
+
+    // =========================
+    // MambaIndicator
+    // =========================
+    MambaIndicator saveMambaIndicator(MambaIndicator indicator);
+
+    MambaIndicator getMambaIndicatorById(Integer id);
+
+    MambaIndicator getMambaIndicatorByUuid(String uuid);
+
+    MambaIndicator getMambaIndicatorByCode(String code);
+
+    List<MambaIndicator> getMambaIndicators(String q,
+                                            MambaIndicator.Kind kind,
+                                            boolean includeRetired,
+                                            Integer startIndex,
+                                            Integer limit);
+
+    long getMambaIndicatorsCount(String q, MambaIndicator.Kind kind, boolean includeRetired);
+
+    void retireMambaIndicator(MambaIndicator indicator, String reason);
+
+    void unretireMambaIndicator(MambaIndicator indicator);
+
+    void purgeMambaIndicator(MambaIndicator indicator);
+
+    // =========================
+    // MambaSection
+    // =========================
+    MambaSection saveMambaSection(MambaSection section);
+
+    MambaSection getMambaSectionById(Integer id);
+
+    MambaSection getMambaSectionByUuid(String uuid);
+
+    MambaSection getMambaSectionByCode(String code);
+
+    List<MambaSection> getMambaSections(String q,
+                                        boolean includeRetired,
+                                        Integer startIndex,
+                                        Integer limit);
+
+    long getMambaSectionsCount(String q, boolean includeRetired);
+
+    void retireMambaSection(MambaSection section, String reason);
+
+    void unretireMambaSection(MambaSection section);
+
+    void purgeMambaSection(MambaSection section);
+
+    // =========================
+    // MambaDataTheme
+    // =========================
+    MambaDataTheme saveMambaDataTheme(MambaDataTheme theme);
+
+    MambaDataTheme getMambaDataThemeById(Integer id);
+
+    MambaDataTheme getMambaDataThemeByUuid(String uuid);
+
+    MambaDataTheme getMambaDataThemeByCode(String code);
+
+    List<MambaDataTheme> getMambaDataThemes(String q,
+                                            boolean includeRetired,
+                                            Integer startIndex,
+                                            Integer limit);
+
+    long getMambaDataThemesCount(String q, boolean includeRetired);
+
+    void retireMambaDataTheme(MambaDataTheme theme, String reason);
+
+    void unretireMambaDataTheme(MambaDataTheme theme);
+
+    void purgeMambaDataTheme(MambaDataTheme theme);
+
+    List<String> getMambaTables();
+
+    public List<Map> getMambaTableColumns(String tableName);
+
+    // Categories
+    MambaAgeCategory saveAgeCategory(MambaAgeCategory category);
+
+    MambaAgeCategory getAgeCategoryByUuid(String uuid);
+
+    MambaAgeCategory getAgeCategoryByCode(String code);
+
+    List<MambaAgeCategory> getAgeCategories(String q, boolean includeRetired, Boolean activeOnly,
+                                            Integer startIndex, Integer limit);
+
+    long getAgeCategoriesCount(String q, boolean includeRetired, Boolean activeOnly);
+
+    void retireAgeCategory(MambaAgeCategory category, String reason);
+
+    void unretireAgeCategory(MambaAgeCategory category);
+
+    void purgeAgeCategory(MambaAgeCategory category);
+
+    // Groups
+    MambaAgeGroup saveAgeGroup(MambaAgeGroup group);
+
+    MambaAgeGroup getAgeGroupById(Integer id);
+
+    List<MambaAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly);
+
+    List<MambaAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly);
+
+    void purgeAgeGroup(MambaAgeGroup group);
 }

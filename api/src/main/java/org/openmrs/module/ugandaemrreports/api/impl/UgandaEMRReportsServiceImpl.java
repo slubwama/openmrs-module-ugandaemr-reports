@@ -28,12 +28,12 @@ import org.openmrs.module.ugandaemrreports.activator.Initializer;
 import org.openmrs.module.ugandaemrreports.activator.ReportInitializer;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.ugandaemrreports.api.db.hibernate.HibernateUgandaEMRReportsDAO;
-import org.openmrs.module.ugandaemrreports.model.Dashboard;
-import org.openmrs.module.ugandaemrreports.model.DashboardReportObject;
+import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.module.ugandaemrreports.util.JsonTemplateConverter;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.openmrs.util.OpenmrsUtil;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -533,6 +533,276 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
             // fail-safe: return original if period append fails
             return payloadJson;
         }
+    }
+
+
+
+    // =========================
+    // MambaIndicator
+    // =========================
+
+    @Override
+    public MambaIndicator saveMambaIndicator(MambaIndicator indicator) {
+        return dao.saveMambaIndicator(indicator);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaIndicator getMambaIndicatorById(Integer id) {
+        return dao.getMambaIndicatorById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaIndicator getMambaIndicatorByUuid(String uuid) {
+        return dao.getMambaIndicatorByUuid(uuid);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaIndicator getMambaIndicatorByCode(String code) {
+        return dao.getMambaIndicatorByCode(code);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaIndicator> getMambaIndicators(String q, MambaIndicator.Kind kind, boolean includeRetired,
+                                                   Integer startIndex, Integer limit) {
+        return dao.getMambaIndicators(q, kind, includeRetired, startIndex, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long getMambaIndicatorsCount(String q, MambaIndicator.Kind kind, boolean includeRetired) {
+        return dao.getMambaIndicatorsCount(q, kind, includeRetired);
+    }
+
+    @Override
+    public void retireMambaIndicator(MambaIndicator indicator, String reason) {
+        indicator.setRetired(true);
+        indicator.setRetireReason(reason);
+        dao.saveMambaIndicator(indicator);
+    }
+
+    @Override
+    public void unretireMambaIndicator(MambaIndicator indicator) {
+        indicator.setRetired(false);
+        indicator.setRetireReason(null);
+        dao.saveMambaIndicator(indicator);
+    }
+
+    @Override
+    public void purgeMambaIndicator(MambaIndicator indicator) {
+        dao.purgeMambaIndicator(indicator);
+    }
+
+    // =========================
+    // MambaSection
+    // =========================
+
+    @Override
+    public MambaSection saveMambaSection(MambaSection section) {
+        return dao.saveMambaSection(section);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaSection getMambaSectionById(Integer id) {
+        return dao.getMambaSectionById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaSection getMambaSectionByUuid(String uuid) {
+        return dao.getMambaSectionByUuid(uuid);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaSection getMambaSectionByCode(String code) {
+        return dao.getMambaSectionByCode(code);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaSection> getMambaSections(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+        return dao.getMambaSections(q, includeRetired, startIndex, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long getMambaSectionsCount(String q, boolean includeRetired) {
+        return dao.getMambaSectionsCount(q, includeRetired);
+    }
+
+    @Override
+    public void retireMambaSection(MambaSection section, String reason) {
+        section.setRetired(true);
+        section.setRetireReason(reason);
+        dao.saveMambaSection(section);
+    }
+
+    @Override
+    public void unretireMambaSection(MambaSection section) {
+        section.setRetired(false);
+        section.setRetireReason(null);
+        dao.saveMambaSection(section);
+    }
+
+    @Override
+    public void purgeMambaSection(MambaSection section) {
+        dao.purgeMambaSection(section);
+    }
+
+    // =========================
+    // MambaDataTheme
+    // =========================
+
+    @Override
+    public MambaDataTheme saveMambaDataTheme(MambaDataTheme theme) {
+        return dao.saveMambaDataTheme(theme);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaDataTheme getMambaDataThemeById(Integer id) {
+        return dao.getMambaDataThemeById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaDataTheme getMambaDataThemeByUuid(String uuid) {
+        return dao.getMambaDataThemeByUuid(uuid);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaDataTheme getMambaDataThemeByCode(String code) {
+        return dao.getMambaDataThemeByCode(code);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaDataTheme> getMambaDataThemes(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+        return dao.getMambaDataThemes(q, includeRetired, startIndex, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long getMambaDataThemesCount(String q, boolean includeRetired) {
+        return dao.getMambaDataThemesCount(q, includeRetired);
+    }
+
+    @Override
+    public void retireMambaDataTheme(MambaDataTheme theme, String reason) {
+        theme.setRetired(true);
+        theme.setRetireReason(reason);
+        dao.saveMambaDataTheme(theme);
+    }
+
+    @Override
+    public void unretireMambaDataTheme(MambaDataTheme theme) {
+        theme.setRetired(false);
+        theme.setRetireReason(null);
+        dao.saveMambaDataTheme(theme);
+    }
+
+    @Override
+    public void purgeMambaDataTheme(MambaDataTheme theme) {
+        dao.purgeMambaDataTheme(theme);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getMambaTables() {
+        return dao.getMambaTables();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map> getMambaTableColumns(String tableName) {
+        return dao.getMambaTableColumns(tableName);
+    }
+
+    // Categories
+
+    @Override
+    public MambaAgeCategory saveAgeCategory(MambaAgeCategory category) {
+        return dao.saveAgeCategory(category);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaAgeCategory getAgeCategoryByUuid(String uuid) {
+        return dao.getAgeCategoryByUuid(uuid);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaAgeCategory getAgeCategoryByCode(String code) {
+        return dao.getAgeCategoryByCode(code);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaAgeCategory> getAgeCategories(String q, boolean includeRetired, Boolean activeOnly,
+                                                   Integer startIndex, Integer limit) {
+        return dao.getAgeCategories(q, includeRetired, activeOnly, startIndex, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long getAgeCategoriesCount(String q, boolean includeRetired, Boolean activeOnly) {
+        return dao.getAgeCategoriesCount(q, includeRetired, activeOnly);
+    }
+
+    @Override
+    public void retireAgeCategory(MambaAgeCategory category, String reason) {
+        category.setRetired(true);
+        category.setRetireReason(reason);
+        dao.saveAgeCategory(category);
+    }
+
+    @Override
+    public void unretireAgeCategory(MambaAgeCategory category) {
+        category.setRetired(false);
+        category.setRetireReason(null);
+        dao.saveAgeCategory(category);
+    }
+
+    @Override
+    public void purgeAgeCategory(MambaAgeCategory category) {
+        dao.purgeAgeCategory(category);
+    }
+
+    // Groups
+
+    @Override
+    public MambaAgeGroup saveAgeGroup(MambaAgeGroup group) {
+        return dao.saveAgeGroup(group);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MambaAgeGroup getAgeGroupById(Integer id) {
+        return dao.getAgeGroupById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly) {
+        return dao.getAgeGroupsByCategoryUuid(categoryUuid, activeOnly);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly) {
+        return dao.getAgeGroupsByCategoryCode(categoryCode, activeOnly);
+    }
+
+    @Override
+    public void purgeAgeGroup(MambaAgeGroup group) {
+        dao.purgeAgeGroup(group);
     }
 
 }

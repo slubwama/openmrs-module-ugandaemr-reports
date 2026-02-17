@@ -223,4 +223,221 @@
             <column name="uuid" value="fe894978-f68b-11f0-a6c2-5ced8ca7b726" />
         </insert>
     </changeSet>
+
+
+
+    <!-- ========================================================= -->
+    <!-- Mamba Indicator Table                                     -->
+    <!-- ========================================================= -->
+
+    <changeSet id="ugandaemrreports-20260215-01"
+               author="slubwama">
+
+        <createTable tableName="mamba_indicator">
+
+            <column name="mamba_indicator_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <!-- OpenMRS Metadata Fields -->
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="TEXT"/>
+
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="retire_reason" type="VARCHAR(255)"/>
+            <column name="retired_by" type="INT"/>
+            <column name="date_retired" type="DATETIME"/>
+
+            <column name="creator" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+
+            <!-- Business Fields -->
+            <column name="code" type="VARCHAR(100)"/>
+            <column name="kind" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="default_value_type" type="VARCHAR(20)"/>
+
+            <column name="config_json" type="LONGTEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="meta_json" type="LONGTEXT"/>
+
+        </createTable>
+
+        <createIndex indexName="idx_mamba_indicator_uuid"
+                     tableName="mamba_indicator">
+            <column name="uuid"/>
+        </createIndex>
+
+        <createIndex indexName="idx_mamba_indicator_code"
+                     tableName="mamba_indicator">
+            <column name="code"/>
+        </createIndex>
+
+        <createIndex indexName="idx_mamba_indicator_kind"
+                     tableName="mamba_indicator">
+            <column name="kind"/>
+        </createIndex>
+
+    </changeSet>
+
+
+    <!-- ========================================================= -->
+    <!-- Mamba Section Table                                       -->
+    <!-- ========================================================= -->
+
+    <changeSet id="ugandaemrreports-20260215-02"
+               author="slubwama">
+
+        <createTable tableName="mamba_section">
+
+            <column name="mamba_section_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <!-- Metadata -->
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="TEXT"/>
+
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="retire_reason" type="VARCHAR(255)"/>
+            <column name="retired_by" type="INT"/>
+            <column name="date_retired" type="DATETIME"/>
+
+            <column name="creator" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+
+            <!-- Business -->
+            <column name="code" type="VARCHAR(100)"/>
+
+            <column name="config_json" type="LONGTEXT"/>
+            <column name="meta_json" type="LONGTEXT"/>
+
+        </createTable>
+
+        <createIndex indexName="idx_mamba_section_uuid"
+                     tableName="mamba_section">
+            <column name="uuid"/>
+        </createIndex>
+
+        <createIndex indexName="idx_mamba_section_code"
+                     tableName="mamba_section">
+            <column name="code"/>
+        </createIndex>
+
+    </changeSet>
+
+
+    <!-- ========================================================= -->
+    <!-- Mamba Data Theme Table                                    -->
+    <!-- ========================================================= -->
+
+    <changeSet id="ugandaemrreports-20260215-03"
+               author="slubwama">
+
+        <createTable tableName="mamba_data_theme">
+
+            <column name="mamba_data_theme_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <!-- Metadata -->
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="TEXT"/>
+
+            <column name="retired" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="retire_reason" type="VARCHAR(255)"/>
+            <column name="retired_by" type="INT"/>
+            <column name="date_retired" type="DATETIME"/>
+
+            <column name="creator" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+
+            <!-- Business -->
+            <column name="code" type="VARCHAR(100)"/>
+
+            <column name="config_json" type="LONGTEXT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="meta_json" type="LONGTEXT"/>
+
+        </createTable>
+
+        <createIndex indexName="idx_mamba_data_theme_uuid"
+                     tableName="mamba_data_theme">
+            <column name="uuid"/>
+        </createIndex>
+
+        <createIndex indexName="idx_mamba_data_theme_code"
+                     tableName="mamba_data_theme">
+            <column name="code"/>
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet id="ugandaemrreports-20260216-03-add-domain-column" author="slubwama">
+        <addColumn tableName="mamba_data_theme">
+            <column name="domain" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

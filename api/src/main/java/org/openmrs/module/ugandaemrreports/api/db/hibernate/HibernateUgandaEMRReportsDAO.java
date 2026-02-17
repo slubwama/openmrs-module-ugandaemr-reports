@@ -7,14 +7,14 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.openmrs.*;
 import org.openmrs.Concept;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.ugandaemrreports.api.db.UgandaEMRReportsDAO;
-import org.openmrs.module.ugandaemrreports.model.Dashboard;
-import org.openmrs.module.ugandaemrreports.model.DashboardReportObject;
+import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.report.ReportConstants;
 import org.openmrs.reporting.AbstractReportObject;
 import org.openmrs.reporting.PatientSearch;
@@ -339,5 +339,408 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
 		query.setParameter("uuid", encounterType.getUuid());
 		List<Integer> conceptIds = query.list();
 		return conceptIds;
+	}
+
+
+	private String like(String q) {
+		return "%" + q.trim().toLowerCase() + "%";
+	}
+
+	// =========================================================
+	// MambaIndicator
+	// =========================================================
+
+	@Override
+	public MambaIndicator saveMambaIndicator(MambaIndicator indicator) {
+		getSession().saveOrUpdate(indicator);
+		return indicator;
+	}
+
+	@Override
+	public MambaIndicator getMambaIndicatorById(Integer id) {
+		return (MambaIndicator) getSession().get(MambaIndicator.class, id);
+	}
+
+	@Override
+	public MambaIndicator getMambaIndicatorByUuid(String uuid) {
+		Criteria c = getSession().createCriteria(MambaIndicator.class);
+		c.add(Restrictions.eq("uuid", uuid));
+		return (MambaIndicator) c.uniqueResult();
+	}
+
+	@Override
+	public MambaIndicator getMambaIndicatorByCode(String code) {
+		if (code == null) return null;
+		Criteria c = getSession().createCriteria(MambaIndicator.class);
+		c.add(Restrictions.eq("code", code));
+		return (MambaIndicator) c.uniqueResult();
+	}
+
+	@Override
+	public List<MambaIndicator> getMambaIndicators(String qStr, MambaIndicator.Kind kind, boolean includeRetired,
+												   Integer startIndex, Integer limit) {
+
+		Criteria c = getSession().createCriteria(MambaIndicator.class);
+		c.setCacheMode(CacheMode.IGNORE);
+
+		if (!includeRetired) c.add(Restrictions.eq("retired", false));
+		if (kind != null) c.add(Restrictions.eq("kind", kind));
+
+		if (qStr != null && qStr.trim().length() > 0) {
+			String q = like(qStr);
+			c.add(Restrictions.or(
+					Restrictions.ilike("name", q),
+					Restrictions.ilike("description", q),
+					Restrictions.ilike("code", q)
+			));
+		}
+
+		if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
+		if (limit != null) c.setMaxResults(Math.max(1, limit));
+
+		return (List<MambaIndicator>) c.list();
+	}
+
+	@Override
+	public long getMambaIndicatorsCount(String qStr, MambaIndicator.Kind kind, boolean includeRetired) {
+		// simplest: HQL count
+		StringBuilder hql = new StringBuilder("select count(i) from MambaIndicator i where 1=1 ");
+		if (!includeRetired) hql.append("and i.retired = false ");
+		if (kind != null) hql.append("and i.kind = :kind ");
+		if (qStr != null && qStr.trim().length() > 0) {
+			hql.append("and (lower(i.name) like :q or lower(i.description) like :q or lower(i.code) like :q) ");
+		}
+
+		Query q = getSession().createQuery(hql.toString());
+		if (kind != null) q.setParameter("kind", kind);
+		if (qStr != null && qStr.trim().length() > 0) q.setString("q", like(qStr));
+
+		Number n = (Number) q.uniqueResult();
+		return n == null ? 0L : n.longValue();
+	}
+
+	@Override
+	public void purgeMambaIndicator(MambaIndicator indicator) {
+		getSession().delete(indicator);
+	}
+
+	// =========================================================
+	// MambaSection
+	// =========================================================
+
+	@Override
+	public MambaSection saveMambaSection(MambaSection section) {
+		getSession().saveOrUpdate(section);
+		return section;
+	}
+
+	@Override
+	public MambaSection getMambaSectionById(Integer id) {
+		return (MambaSection) getSession().get(MambaSection.class, id);
+	}
+
+	@Override
+	public MambaSection getMambaSectionByUuid(String uuid) {
+		Criteria c = getSession().createCriteria(MambaSection.class);
+		c.add(Restrictions.eq("uuid", uuid));
+		return (MambaSection) c.uniqueResult();
+	}
+
+	@Override
+	public MambaSection getMambaSectionByCode(String code) {
+		if (code == null) return null;
+		Criteria c = getSession().createCriteria(MambaSection.class);
+		c.add(Restrictions.eq("code", code));
+		return (MambaSection) c.uniqueResult();
+	}
+
+	@Override
+	public List<MambaSection> getMambaSections(String qStr, boolean includeRetired,
+											   Integer startIndex, Integer limit) {
+		Criteria c = getSession().createCriteria(MambaSection.class);
+		c.setCacheMode(CacheMode.IGNORE);
+
+		if (!includeRetired) c.add(Restrictions.eq("retired", false));
+
+		if (qStr != null && qStr.trim().length() > 0) {
+			String q = like(qStr);
+			c.add(Restrictions.or(
+					Restrictions.ilike("name", q),
+					Restrictions.ilike("description", q),
+					Restrictions.ilike("code", q)
+			));
+		}
+
+		if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
+		if (limit != null) c.setMaxResults(Math.max(1, limit));
+
+		return (List<MambaSection>) c.list();
+	}
+
+	@Override
+	public long getMambaSectionsCount(String qStr, boolean includeRetired) {
+		StringBuilder hql = new StringBuilder("select count(s) from MambaSection s where 1=1 ");
+		if (!includeRetired) hql.append("and s.retired = false ");
+		if (qStr != null && qStr.trim().length() > 0) {
+			hql.append("and (lower(s.name) like :q or lower(s.description) like :q or lower(s.code) like :q) ");
+		}
+
+		Query q = getSession().createQuery(hql.toString());
+		if (qStr != null && qStr.trim().length() > 0) q.setString("q", like(qStr));
+
+		Number n = (Number) q.uniqueResult();
+		return n == null ? 0L : n.longValue();
+	}
+
+	@Override
+	public void purgeMambaSection(MambaSection section) {
+		getSession().delete(section);
+	}
+
+	// =========================================================
+	// MambaDataTheme
+	// =========================================================
+
+	@Override
+	public MambaDataTheme saveMambaDataTheme(MambaDataTheme theme) {
+		getSession().saveOrUpdate(theme);
+		return theme;
+	}
+
+	@Override
+	public MambaDataTheme getMambaDataThemeById(Integer id) {
+		return (MambaDataTheme) getSession().get(MambaDataTheme.class, id);
+	}
+
+	@Override
+	public MambaDataTheme getMambaDataThemeByUuid(String uuid) {
+		Criteria c = getSession().createCriteria(MambaDataTheme.class);
+		c.add(Restrictions.eq("uuid", uuid));
+		return (MambaDataTheme) c.uniqueResult();
+	}
+
+	@Override
+	public MambaDataTheme getMambaDataThemeByCode(String code) {
+		if (code == null) return null;
+		Criteria c = getSession().createCriteria(MambaDataTheme.class);
+		c.add(Restrictions.eq("code", code));
+		return (MambaDataTheme) c.uniqueResult();
+	}
+
+	@Override
+	public List<MambaDataTheme> getMambaDataThemes(String qStr, boolean includeRetired,
+												   Integer startIndex, Integer limit) {
+
+		Criteria c = getSession().createCriteria(MambaDataTheme.class);
+		c.setCacheMode(CacheMode.IGNORE);
+
+		if (!includeRetired) c.add(Restrictions.eq("retired", false));
+
+		if (qStr != null && qStr.trim().length() > 0) {
+			String q = like(qStr);
+			c.add(Restrictions.or(
+					Restrictions.ilike("name", q),
+					Restrictions.ilike("description", q),
+					Restrictions.ilike("code", q)
+			));
+		}
+
+		if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
+		if (limit != null) c.setMaxResults(Math.max(1, limit));
+
+		return (List<MambaDataTheme>) c.list();
+	}
+
+	@Override
+	public long getMambaDataThemesCount(String qStr, boolean includeRetired) {
+		StringBuilder hql = new StringBuilder("select count(t) from MambaDataTheme t where 1=1 ");
+		if (!includeRetired) hql.append("and t.retired = false ");
+		if (qStr != null && qStr.trim().length() > 0) {
+			hql.append("and (lower(t.name) like :q or lower(t.description) like :q or lower(t.code) like :q) ");
+		}
+
+		Query q = getSession().createQuery(hql.toString());
+		if (qStr != null && qStr.trim().length() > 0) q.setString("q", like(qStr));
+
+		Number n = (Number) q.uniqueResult();
+		return n == null ? 0L : n.longValue();
+	}
+
+	@Override
+	public void purgeMambaDataTheme(MambaDataTheme theme) {
+		getSession().delete(theme);
+	}
+
+	// =========================================================
+	// Age Categories
+	// =========================================================
+
+	@Override
+	public MambaAgeCategory saveAgeCategory(MambaAgeCategory category) {
+		getSession().saveOrUpdate(category);
+		return category;
+	}
+
+	@Override
+	public MambaAgeCategory getAgeCategoryById(Integer id) {
+		return (MambaAgeCategory) getSession().get(MambaAgeCategory.class, id);
+	}
+
+	@Override
+	public MambaAgeCategory getAgeCategoryByUuid(String uuid) {
+		Criteria c = getSession().createCriteria(MambaAgeCategory.class);
+		c.add(Restrictions.eq("uuid", uuid));
+		return (MambaAgeCategory) c.uniqueResult();
+	}
+
+	@Override
+	public MambaAgeCategory getAgeCategoryByCode(String code) {
+		Criteria c = getSession().createCriteria(MambaAgeCategory.class);
+		c.add(Restrictions.eq("code", code));
+		return (MambaAgeCategory) c.uniqueResult();
+	}
+
+	@Override
+	public List<MambaAgeCategory> getAgeCategories(String qStr, boolean includeRetired, Boolean activeOnly,
+												   Integer startIndex, Integer limit) {
+
+		Criteria c = getSession().createCriteria(MambaAgeCategory.class);
+		c.setCacheMode(CacheMode.IGNORE);
+
+		if (!includeRetired) c.add(Restrictions.eq("retired", false));
+		if (activeOnly != null && activeOnly) c.add(Restrictions.eq("active", true));
+
+		if (qStr != null && qStr.trim().length() > 0) {
+			String q = like(qStr);
+			c.add(Restrictions.or(
+					Restrictions.ilike("name", q),
+					Restrictions.ilike("description", q),
+					Restrictions.ilike("code", q)
+			));
+		}
+
+		if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
+		if (limit != null) c.setMaxResults(Math.max(1, limit));
+
+		return (List<MambaAgeCategory>) c.list();
+	}
+
+	@Override
+	public long getAgeCategoriesCount(String qStr, boolean includeRetired, Boolean activeOnly) {
+		StringBuilder hql = new StringBuilder("select count(c) from MambaAgeCategory c where 1=1 ");
+		if (!includeRetired) hql.append("and c.retired = false ");
+		if (activeOnly != null && activeOnly) hql.append("and c.active = true ");
+		if (qStr != null && qStr.trim().length() > 0) {
+			hql.append("and (lower(c.name) like :q or lower(c.description) like :q or lower(c.code) like :q) ");
+		}
+
+		Query q = getSession().createQuery(hql.toString());
+		if (qStr != null && qStr.trim().length() > 0) q.setString("q", like(qStr));
+
+		Number n = (Number) q.uniqueResult();
+		return n == null ? 0L : n.longValue();
+	}
+
+	@Override
+	public void purgeAgeCategory(MambaAgeCategory category) {
+		getSession().delete(category);
+	}
+
+	// =========================================================
+	// Age Groups
+	// =========================================================
+
+	@Override
+	public MambaAgeGroup saveAgeGroup(MambaAgeGroup group) {
+		getSession().saveOrUpdate(group);
+		return group;
+	}
+
+	@Override
+	public MambaAgeGroup getAgeGroupById(Integer id) {
+		return (MambaAgeGroup) getSession().get(MambaAgeGroup.class, id);
+	}
+
+	@Override
+	public List<MambaAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly) {
+		StringBuilder hql = new StringBuilder(
+				"select g from MambaAgeGroup g where g.ageCategory.uuid = :uuid "
+		);
+		if (activeOnly != null && activeOnly) hql.append("and g.active = true ");
+		hql.append("order by g.sortOrder asc");
+
+		Query q = getSession().createQuery(hql.toString());
+		q.setString("uuid", categoryUuid);
+		return (List<MambaAgeGroup>) q.list();
+	}
+
+	@Override
+	public List<MambaAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly) {
+		StringBuilder hql = new StringBuilder(
+				"select g from MambaAgeGroup g where g.ageCategory.code = :code "
+		);
+		if (activeOnly != null && activeOnly) hql.append("and g.active = true ");
+		hql.append("order by g.sortOrder asc");
+
+		Query q = getSession().createQuery(hql.toString());
+		q.setString("code", categoryCode);
+		return (List<MambaAgeGroup>) q.list();
+	}
+
+	@Override
+	public void purgeAgeGroup(MambaAgeGroup group) {
+		getSession().delete(group);
+	}
+
+	// =========================================================
+	// Utility: list mamba_* tables for Theme Builder UI
+	// =========================================================
+
+	@Override
+	public List<String> getMambaTables() {
+		// MySQL/MariaDB: list tables & views in current schema
+		// escape '_' because it's a LIKE wildcard
+		String sql =
+				"select t.TABLE_NAME " +
+						"from INFORMATION_SCHEMA.TABLES t " +
+						"where t.TABLE_SCHEMA = database() " +
+						"and t.TABLE_NAME like 'mamba\\_%' escape '\\\\' " +
+						"and t.TABLE_TYPE in ('BASE TABLE','VIEW') " +
+						"order by t.TABLE_NAME asc";
+
+		Query q = getSession().createSQLQuery(sql);
+		return (List<String>) q.list();
+	}
+
+	@SuppressWarnings({"unchecked", "deprecation"})
+	public List<Map> getMambaTableColumns(String tableName) {
+
+		if (tableName == null || tableName.trim().isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		tableName = tableName.trim();
+
+		// Optional: restrict to mamba_* tables only
+		if (!tableName.startsWith("mamba_")) {
+			throw new IllegalArgumentException("Only mamba_* tables are allowed: " + tableName);
+		}
+
+		String sql =
+				"SELECT " +
+						"  c.COLUMN_NAME AS columnName, " +
+						"  c.DATA_TYPE   AS dataType " +
+						"FROM INFORMATION_SCHEMA.COLUMNS c " +
+						"WHERE c.TABLE_SCHEMA = DATABASE() " +
+						"  AND c.TABLE_NAME = :tableName " +
+						"ORDER BY c.ORDINAL_POSITION";
+
+		Query q = getSession().createSQLQuery(sql);
+		q.setString("tableName", tableName);
+
+		// This makes q.list() return List<Map> instead of List<Object[]>
+		q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+		return (List<Map>) q.list();
 	}
 }
