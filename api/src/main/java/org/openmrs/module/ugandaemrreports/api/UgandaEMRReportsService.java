@@ -153,11 +153,11 @@ public interface UgandaEMRReportsService extends OpenmrsService {
 
     MambaIndicator getMambaIndicatorByCode(String code);
 
-    List<MambaIndicator> getMambaIndicators(String q,
-                                            MambaIndicator.Kind kind,
-                                            boolean includeRetired,
-                                            Integer startIndex,
-                                            Integer limit);
+    List<MambaIndicator> searchMambaIndicators(String q, MambaIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit);
+
+    public List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit);
+
+    public List<MambaIndicator> getMambaIndicators(MambaIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit);
 
     long getMambaIndicatorsCount(String q, MambaIndicator.Kind kind, boolean includeRetired);
 

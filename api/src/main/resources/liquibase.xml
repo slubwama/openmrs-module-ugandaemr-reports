@@ -230,8 +230,7 @@
     <!-- Mamba Indicator Table                                     -->
     <!-- ========================================================= -->
 
-    <changeSet id="ugandaemrreports-20260215-01"
-               author="slubwama">
+    <changeSet id="ugandaemrreports-20260220-01-indicator-recreate" author="slubwama">
 
         <createTable tableName="mamba_indicator">
 
@@ -275,31 +274,45 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="default_value_type" type="VARCHAR(20)"/>
+            <column name="default_value_type" type="VARCHAR(20)" defaultValue="NUMBER">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- New fields -->
+            <column name="theme_uuid" type="VARCHAR(38)"/>
 
             <column name="config_json" type="LONGTEXT">
                 <constraints nullable="false"/>
             </column>
 
+            <!-- Store executable SQL explicitly -->
+            <column name="sql_template" type="LONGTEXT"/>
+
+            <!-- Optional denominator SQL -->
+            <column name="denominator_sql_template" type="LONGTEXT"/>
+
             <column name="meta_json" type="LONGTEXT"/>
 
         </createTable>
 
-        <createIndex indexName="idx_mamba_indicator_uuid"
-                     tableName="mamba_indicator">
+        <!-- Indexes -->
+        <createIndex indexName="idx_mamba_indicator_uuid" tableName="mamba_indicator">
             <column name="uuid"/>
         </createIndex>
 
-        <createIndex indexName="idx_mamba_indicator_code"
-                     tableName="mamba_indicator">
+        <createIndex indexName="idx_mamba_indicator_code" tableName="mamba_indicator">
             <column name="code"/>
         </createIndex>
 
-        <createIndex indexName="idx_mamba_indicator_kind"
-                     tableName="mamba_indicator">
+        <createIndex indexName="idx_mamba_indicator_kind" tableName="mamba_indicator">
             <column name="kind"/>
         </createIndex>
 
+        <createIndex indexName="idx_mamba_indicator_theme_uuid" tableName="mamba_indicator">
+            <column name="theme_uuid"/>
+        </createIndex>
+
+        <addUniqueConstraint tableName="mamba_indicator" columnNames="code" constraintName="uq_mamba_indicator_code"/>
     </changeSet>
 
 

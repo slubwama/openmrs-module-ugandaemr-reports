@@ -402,6 +402,33 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
 	}
 
 	@Override
+	public List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit) {
+
+		Criteria c = getSession().createCriteria(MambaIndicator.class);
+		c.setCacheMode(CacheMode.IGNORE);
+
+		if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
+		if (limit != null) c.setMaxResults(Math.max(1, limit));
+
+		return (List<MambaIndicator>) c.list();
+	}
+
+	public List<MambaIndicator> getMambaIndicators(MambaIndicator.Kind kind, boolean includeRetired,
+												   Integer startIndex, Integer limit) {
+
+		Criteria c = getSession().createCriteria(MambaIndicator.class);
+		c.setCacheMode(CacheMode.IGNORE);
+
+		if (!includeRetired) c.add(Restrictions.eq("retired", false));
+		if (kind != null) c.add(Restrictions.eq("kind", kind));
+
+		if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
+		if (limit != null) c.setMaxResults(Math.max(1, limit));
+
+		return (List<MambaIndicator>) c.list();
+	}
+
+	@Override
 	public long getMambaIndicatorsCount(String qStr, MambaIndicator.Kind kind, boolean includeRetired) {
 		// simplest: HQL count
 		StringBuilder hql = new StringBuilder("select count(i) from MambaIndicator i where 1=1 ");

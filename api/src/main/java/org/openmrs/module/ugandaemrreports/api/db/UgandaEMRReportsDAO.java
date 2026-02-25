@@ -127,4 +127,6 @@ public interface UgandaEMRReportsDAO {
     public List<String> getMambaTables();
 
     public List<Map> getMambaTableColumns(String tableName);
+
+    List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit);
 }

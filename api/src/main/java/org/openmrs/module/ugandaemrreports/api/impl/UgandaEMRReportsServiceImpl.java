@@ -30,6 +30,8 @@ import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.ugandaemrreports.api.db.hibernate.HibernateUgandaEMRReportsDAO;
 import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.module.ugandaemrreports.util.JsonTemplateConverter;
+import org.openmrs.module.ugandaemrreports.util.MambaIndicatorValidator;
+import org.openmrs.module.ugandaemrreports.util.MambaIndicatorSqlSync;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.openmrs.util.OpenmrsUtil;
@@ -290,7 +292,7 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
      * Extract values into Map<String,Object> in a GENERIC way:
      * - Supports rows that already provide flat keys like OR02_29d_4y_F -> 0
      * - Also supports rows with code/age/sex/value columns.
-     *
+     * <p>
      * NOTE: Add to interface if controller calls through interface.
      */
     public Map<String, Object> extractFlatValues(ReportData reportData) {
@@ -388,7 +390,7 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     /**
      * Legacy payload builder (old HTML-template approach), returns STRING.
      * Use this when renderType=legacy.
-     *
+     * <p>
      * NOTE: Add to interface if you want controller to call via interface.
      */
     public String createLegacyPayloadJson(ReportData reportData, ReportDesign reportDesign) {
@@ -536,14 +538,23 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     }
 
 
-
     // =========================
     // MambaIndicator
     // =========================
 
     @Override
     public MambaIndicator saveMambaIndicator(MambaIndicator indicator) {
-        return dao.saveMambaIndicator(indicator);
+        try {
+            MambaIndicatorValidator.validate(indicator);
+
+            if (indicator.getKind() == MambaIndicator.Kind.BASE) {
+                MambaIndicatorSqlSync.normalizeBaseSql(indicator);
+            }
+
+            return dao.saveMambaIndicator(indicator);
+        } catch (IllegalArgumentException e) {
+            throw new APIException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -566,9 +577,22 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
     @Override
     @Transactional(readOnly = true)
-    public List<MambaIndicator> getMambaIndicators(String q, MambaIndicator.Kind kind, boolean includeRetired,
+    public List<MambaIndicator> searchMambaIndicators(String q, MambaIndicator.Kind kind, boolean includeRetired,
                                                    Integer startIndex, Integer limit) {
         return dao.getMambaIndicators(q, kind, includeRetired, startIndex, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit) {
+        return dao.getAllMambaIndicator(startIndex, limit);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MambaIndicator> getMambaIndicators(MambaIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit) {
+        return dao.getMambaIndicators(kind, includeRetired, startIndex, limit);
     }
 
     @Override
