@@ -189,4 +189,12 @@ public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup>
     public DelegatingResourceDescription getUpdatableProperties() {
         return getCreatableProperties();
     }
+
+    public String getDisplayString(MambaAgeGroup g) {
+        if (g == null) return "";
+        String label = g.getLabel() != null ? g.getLabel() : "";
+        String code = g.getCode() != null ? g.getCode() : "";
+        if (!code.isEmpty()) return label + " (" + code + ")";
+        return label;
+    }
 }

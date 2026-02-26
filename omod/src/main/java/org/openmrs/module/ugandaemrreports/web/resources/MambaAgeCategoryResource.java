@@ -85,9 +85,18 @@ public class MambaAgeCategoryResource extends DelegatingCrudResource<MambaAgeCat
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
 
+        // ✅ REQUIRED so nested ageCategory can serialize as REF
+        if (rep instanceof RefRepresentation) {
+            DelegatingResourceDescription d = new DelegatingResourceDescription();
+            d.addProperty("uuid");
+            d.addProperty("display", findMethod("getDisplayString"));
+            return d;
+        }
+
         if (rep instanceof DefaultRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
+            d.addProperty("display", findMethod("getDisplayString"));
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
@@ -102,6 +111,7 @@ public class MambaAgeCategoryResource extends DelegatingCrudResource<MambaAgeCat
         if (rep instanceof FullRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
+            d.addProperty("display", findMethod("getDisplayString"));
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
@@ -109,7 +119,7 @@ public class MambaAgeCategoryResource extends DelegatingCrudResource<MambaAgeCat
             d.addProperty("effectiveFrom");
             d.addProperty("effectiveTo");
             d.addProperty("active");
-            d.addProperty("ageGroups"); // careful: may be lazy; see note below
+            d.addProperty("ageGroups"); // careful: may be lazy
             d.addProperty("retired");
             d.addProperty("retireReason");
             d.addProperty("auditInfo", findMethod("getAuditInfo"));
@@ -137,4 +147,7 @@ public class MambaAgeCategoryResource extends DelegatingCrudResource<MambaAgeCat
         return getCreatableProperties();
     }
 
+    public String getDisplayString(MambaAgeCategory c) {
+        return c.getName() != null ? c.getName() : c.getUuid();
+    }
 }
