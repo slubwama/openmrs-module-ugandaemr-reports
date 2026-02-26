@@ -829,4 +829,9 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         dao.purgeAgeGroup(group);
     }
 
+    @Override
+    public List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit) {
+        return dao.getAgeGroups(q,category,activeOnly,startIndex,limit);
+    }
+
 }

@@ -3,15 +3,22 @@ package org.openmrs.module.ugandaemrreports.model;
 import javax.persistence.*;
 
 /**
- * Maps to: mamba_dim_age_group
+ * Maps to: report_builder_dim_age_group
  */
 @Entity
 @Table(
-        name = "mamba_dim_age_group",
+        name = "report_builder_dim_age_group",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uq_rb_dim_age_group_cat_label",
+                        columnNames = {"age_category_id", "label"}
+                )
+        },
         indexes = {
-                @Index(name = "idx_mamba_age_group_category", columnList = "age_category_id"),
-                @Index(name = "idx_mamba_age_group_active", columnList = "is_active"),
-                @Index(name = "idx_mamba_age_group_sort", columnList = "sort_order")
+                @Index(name = "idx_rb_dim_age_group_category", columnList = "age_category_id"),
+                @Index(name = "idx_rb_dim_age_group_active", columnList = "is_active"),
+                @Index(name = "idx_rb_dim_age_group_sort", columnList = "sort_order"),
+                @Index(name = "idx_rb_dim_age_group_label", columnList = "label")
         }
 )
 public class MambaAgeGroup {
@@ -21,7 +28,7 @@ public class MambaAgeGroup {
     @Column(name = "age_group_id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "age_category_id", nullable = false)
     private MambaAgeCategory ageCategory;
 

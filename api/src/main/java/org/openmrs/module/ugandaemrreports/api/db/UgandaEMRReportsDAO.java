@@ -129,4 +129,6 @@ public interface UgandaEMRReportsDAO {
     public List<Map> getMambaTableColumns(String tableName);
 
     List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit);
+
+    List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
 }

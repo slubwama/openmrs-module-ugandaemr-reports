@@ -247,4 +247,6 @@ public interface UgandaEMRReportsService extends OpenmrsService {
     List<MambaAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly);
 
     void purgeAgeGroup(MambaAgeGroup group);
+
+    List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
 }

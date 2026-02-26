@@ -413,6 +413,43 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
 		return (List<MambaIndicator>) c.list();
 	}
 
+	@Override
+	public List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit) {
+
+		Criteria c = getSession().createCriteria(MambaAgeGroup.class);
+		c.setCacheMode(CacheMode.IGNORE);
+
+		// filters
+		if (category != null) {
+			c.add(Restrictions.eq("ageCategory", category));
+		}
+
+		if (activeOnly != null) {
+			// activeOnly=true -> active=true
+			// activeOnly=false -> active=false
+			c.add(Restrictions.eq("active", activeOnly));
+		}
+
+		if (q != null && !q.trim().isEmpty()) {
+			String like = "%" + q.trim() + "%";
+			c.add(
+					Restrictions.or(
+							Restrictions.ilike("label", like),
+							Restrictions.ilike("code", like)
+					)
+			);
+		}
+
+		// ordering: category then sort order then label
+		c.createAlias("ageCategory", "ac"); // safe for ordering
+
+		// paging
+		if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
+		if (limit != null) c.setMaxResults(Math.max(1, limit));
+
+		return (List<MambaAgeGroup>) c.list();
+	}
+
 	public List<MambaIndicator> getMambaIndicators(MambaIndicator.Kind kind, boolean includeRetired,
 												   Integer startIndex, Integer limit) {
 

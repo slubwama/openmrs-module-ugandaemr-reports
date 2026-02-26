@@ -453,4 +453,144 @@
             </column>
         </addColumn>
     </changeSet>
+
+        <!-- =========================================================
+             report_builder_dim_age_category
+             ========================================================= -->
+        <changeSet id="20260226-01-create-report-builder-dim-age-category" author="lubwama.samuel">
+            <createTable tableName="report_builder_dim_age_category">
+                <column name="age_category_id" type="INT" autoIncrement="true">
+                    <constraints primaryKey="true" nullable="false"/>
+                </column>
+
+                <!-- OpenMRS BaseOpenmrsMetadata fields -->
+                <column name="uuid" type="VARCHAR(38)">
+                    <constraints nullable="false" unique="true"/>
+                </column>
+
+                <column name="name" type="VARCHAR(255)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="description" type="TEXT"/>
+
+                <column name="creator" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="date_created" type="DATETIME">
+                    <constraints nullable="false"/>
+                </column>
+
+                <column name="changed_by" type="INT"/>
+                <column name="date_changed" type="DATETIME"/>
+
+                <column name="retired" type="BIT" defaultValueNumeric="0">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="retired_by" type="INT"/>
+                <column name="date_retired" type="DATETIME"/>
+                <column name="retire_reason" type="VARCHAR(255)"/>
+
+                <!-- Model-specific -->
+                <column name="code" type="VARCHAR(50)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="version" type="VARCHAR(20)" defaultValue="v1"/>
+                <column name="effective_from" type="DATE"/>
+                <column name="effective_to" type="DATE"/>
+                <column name="is_active" type="BIT" defaultValueNumeric="1">
+                    <constraints nullable="false"/>
+                </column>
+            </createTable>
+
+            <addUniqueConstraint
+                    tableName="report_builder_dim_age_category"
+                    columnNames="code"
+                    constraintName="uq_rb_dim_age_category_code"/>
+
+            <createIndex tableName="report_builder_dim_age_category" indexName="idx_rb_dim_age_category_uuid">
+                <column name="uuid"/>
+            </createIndex>
+
+            <createIndex tableName="report_builder_dim_age_category" indexName="idx_rb_dim_age_category_code">
+                <column name="code"/>
+            </createIndex>
+
+            <createIndex tableName="report_builder_dim_age_category" indexName="idx_rb_dim_age_category_active">
+                <column name="is_active"/>
+            </createIndex>
+
+            <createIndex tableName="report_builder_dim_age_category" indexName="idx_rb_dim_age_category_retired">
+                <column name="retired"/>
+            </createIndex>
+
+            <createIndex tableName="report_builder_dim_age_category" indexName="idx_rb_dim_age_category_name">
+                <column name="name"/>
+            </createIndex>
+        </changeSet>
+
+        <!-- =========================================================
+             report_builder_dim_age_group
+             ========================================================= -->
+        <changeSet id="20260226-02-create-report-builder-dim-age-group" author="lubwama.samuel">
+            <createTable tableName="report_builder_dim_age_group">
+                <column name="age_group_id" type="INT" autoIncrement="true">
+                    <constraints primaryKey="true" nullable="false"/>
+                </column>
+
+                <column name="age_category_id" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+
+                <column name="code" type="VARCHAR(50)"/>
+                <column name="label" type="VARCHAR(100)">
+                    <constraints nullable="false"/>
+                </column>
+
+                <column name="min_age_days" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+
+                <column name="max_age_days" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+
+                <column name="sort_order" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+
+                <column name="is_active" type="BIT" defaultValueNumeric="1">
+                    <constraints nullable="false"/>
+                </column>
+            </createTable>
+
+            <addForeignKeyConstraint
+                    baseTableName="report_builder_dim_age_group"
+                    baseColumnNames="age_category_id"
+                    referencedTableName="report_builder_dim_age_category"
+                    referencedColumnNames="age_category_id"
+                    constraintName="fk_rb_dim_age_group_category"
+                    onDelete="RESTRICT"
+                    onUpdate="RESTRICT"/>
+
+            <createIndex tableName="report_builder_dim_age_group" indexName="idx_rb_dim_age_group_category">
+                <column name="age_category_id"/>
+            </createIndex>
+
+            <createIndex tableName="report_builder_dim_age_group" indexName="idx_rb_dim_age_group_active">
+                <column name="is_active"/>
+            </createIndex>
+
+            <createIndex tableName="report_builder_dim_age_group" indexName="idx_rb_dim_age_group_sort">
+                <column name="sort_order"/>
+            </createIndex>
+
+            <createIndex tableName="report_builder_dim_age_group" indexName="idx_rb_dim_age_group_label">
+                <column name="label"/>
+            </createIndex>
+
+            <addUniqueConstraint
+                    tableName="report_builder_dim_age_group"
+                    columnNames="age_category_id,label"
+                    constraintName="uq_rb_dim_age_group_cat_label"/>
+        </changeSet>
 </databaseChangeLog>

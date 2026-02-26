@@ -7,16 +7,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Maps to: mamba_dim_age_category
+ * Maps to: report_builder_dim_age_category
  */
 @Entity
 @Table(
-        name = "mamba_dim_age_category",
-        uniqueConstraints = @UniqueConstraint(name = "uq_mamba_age_category_code", columnNames = {"code"}),
+        name = "report_builder_dim_age_category",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_rb_dim_age_category_code",
+                columnNames = {"code"}
+        ),
         indexes = {
-                @Index(name = "idx_mamba_age_category_uuid", columnList = "uuid"),
-                @Index(name = "idx_mamba_age_category_code", columnList = "code"),
-                @Index(name = "idx_mamba_age_category_active", columnList = "is_active")
+                @Index(name = "idx_rb_dim_age_category_uuid", columnList = "uuid"),
+                @Index(name = "idx_rb_dim_age_category_code", columnList = "code"),
+                @Index(name = "idx_rb_dim_age_category_active", columnList = "is_active"),
+                @Index(name = "idx_rb_dim_age_category_retired", columnList = "retired")
         }
 )
 public class MambaAgeCategory extends BaseOpenmrsMetadata {

@@ -88,7 +88,6 @@ public class MambaAgeCategoryResource extends DelegatingCrudResource<MambaAgeCat
         if (rep instanceof DefaultRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
-            d.addProperty("display");
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
@@ -103,7 +102,6 @@ public class MambaAgeCategoryResource extends DelegatingCrudResource<MambaAgeCat
         if (rep instanceof FullRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
-            d.addProperty("display");
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
@@ -139,7 +137,4 @@ public class MambaAgeCategoryResource extends DelegatingCrudResource<MambaAgeCat
         return getCreatableProperties();
     }
 
-    public String getDisplayString(MambaAgeCategory c) {
-        return c.getName() != null ? c.getName() : c.getUuid();
-    }
 }
