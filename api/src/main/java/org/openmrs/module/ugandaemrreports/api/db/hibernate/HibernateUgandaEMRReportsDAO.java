@@ -5,8 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.openmrs.*;
 import org.openmrs.Concept;
@@ -14,6 +16,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.ugandaemrreports.api.db.UgandaEMRReportsDAO;
+import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
 import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.report.ReportConstants;
 import org.openmrs.reporting.AbstractReportObject;
@@ -22,6 +25,7 @@ import org.openmrs.reporting.PatientSearchReportObject;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import java.util.regex.Pattern;
 
 import java.util.*;
 import java.util.List;
@@ -806,5 +810,103 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
 		q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 
 		return (List<Map>) q.list();
+	}
+
+	@Override
+	public SqlPreviewResult previewSql(String rawSql, Map<String, Object> params, Integer maxRows) {
+
+		if (rawSql == null || rawSql.trim().isEmpty()) {
+			throw new IllegalArgumentException("sql is required");
+		}
+
+		int rowsLimit = maxRows != null ? maxRows : 200;
+		rowsLimit = Math.max(1, Math.min(rowsLimit, 1000));
+
+		String sql = normalizeSql(rawSql);
+		validateSql(sql);
+
+		// UI SQL uses quoted params like ':startDate' - convert to bindable named params
+		sql = normalizeQuotedParams(sql);
+
+		// Enforce row limit for both SELECT and WITH (MySQL/MariaDB)
+		String limitedSql = wrapWithLimit(sql);
+
+		// DbSession supports createSQLQuery
+		SQLQuery q = getSession().createSQLQuery(limitedSql);
+		q.setCacheMode(CacheMode.IGNORE);
+
+		// bind request params
+		Map<String, Object> safeParams = (params != null) ? params : Collections.emptyMap();
+		for (Map.Entry<String, Object> e : safeParams.entrySet()) {
+			q.setParameter(e.getKey(), e.getValue());
+		}
+		q.setParameter("__maxRows", rowsLimit);
+
+		// result rows as Map<alias, value>
+		@SuppressWarnings("deprecation")
+		SQLQuery mapQuery = (SQLQuery) q.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+		@SuppressWarnings("unchecked")
+		List<Map<String, Object>> result = (List<Map<String, Object>>) mapQuery.list();
+
+		List<String> columns = new ArrayList<>();
+		if (!result.isEmpty()) {
+			// Often LinkedHashMap - preserves column order from SQL
+			columns.addAll(result.get(0).keySet());
+		}
+
+		List<List<Object>> rows = new ArrayList<>();
+		for (Map<String, Object> rowMap : result) {
+			List<Object> row = new ArrayList<>(columns.size());
+			for (String c : columns) {
+				row.add(rowMap.get(c));
+			}
+			rows.add(row);
+		}
+
+		boolean truncated = rows.size() >= rowsLimit;
+		return new SqlPreviewResult(columns, rows, rows.size(), truncated);
+	}
+
+// -------------------- helpers --------------------
+
+	private static final Pattern FORBIDDEN =
+			Pattern.compile("\\b(INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE)\\b", Pattern.CASE_INSENSITIVE);
+
+	private static String normalizeSql(String sql) {
+		String s = sql.trim();
+		// remove one trailing semicolon only
+		if (s.endsWith(";")) s = s.substring(0, s.length() - 1).trim();
+		return s;
+	}
+
+	private static void validateSql(String sql) {
+		String upper = sql.trim().toUpperCase(Locale.ROOT);
+
+		if (!(upper.startsWith("SELECT") || upper.startsWith("WITH"))) {
+			throw new IllegalArgumentException("Only SELECT/WITH queries are allowed");
+		}
+
+		// block multiple statements: any remaining ';' is suspicious
+		if (sql.contains(";")) {
+			throw new IllegalArgumentException("Multiple statements are not allowed");
+		}
+
+		if (FORBIDDEN.matcher(sql).find()) {
+			throw new IllegalArgumentException("Only read-only queries are allowed");
+		}
+	}
+
+	/**
+	 * Converts quoted params ':startDate' => :startDate so Hibernate can bind them.
+	 */
+	private static String normalizeQuotedParams(String sql) {
+		return sql
+				.replace("':startDate'", ":startDate")
+				.replace("':endDate'", ":endDate");
+	}
+
+	private static String wrapWithLimit(String sql) {
+		return "SELECT * FROM (" + sql + ") _rb_preview LIMIT :__maxRows";
 	}
 }

@@ -4,6 +4,7 @@ import org.openmrs.*;
 import org.openmrs.Concept;
 import org.openmrs.logic.op.In;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
+import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
 import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
@@ -131,4 +132,7 @@ public interface UgandaEMRReportsDAO {
     List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit);
 
     List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
+
+
+    SqlPreviewResult previewSql(String sql, Map<String, Object> params, Integer maxRows);
 }

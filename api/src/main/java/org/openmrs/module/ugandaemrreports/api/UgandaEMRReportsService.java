@@ -6,6 +6,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
 import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
@@ -249,4 +250,6 @@ public interface UgandaEMRReportsService extends OpenmrsService {
     void purgeAgeGroup(MambaAgeGroup group);
 
     List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
+
+    SqlPreviewResult previewSql(String sql, Map<String, Object> params, Integer maxRows);
 }

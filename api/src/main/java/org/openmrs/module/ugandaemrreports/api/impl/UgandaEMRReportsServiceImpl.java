@@ -28,6 +28,7 @@ import org.openmrs.module.ugandaemrreports.activator.Initializer;
 import org.openmrs.module.ugandaemrreports.activator.ReportInitializer;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.ugandaemrreports.api.db.hibernate.HibernateUgandaEMRReportsDAO;
+import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
 import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.module.ugandaemrreports.util.JsonTemplateConverter;
 import org.openmrs.module.ugandaemrreports.util.MambaIndicatorValidator;
@@ -51,6 +52,8 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     protected final Log log = LogFactory.getLog(this.getClass());
 
     private HibernateUgandaEMRReportsDAO dao;
+
+
 
     private final JsonTemplateConverter converter = new JsonTemplateConverter();
 
@@ -832,6 +835,11 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     @Override
     public List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit) {
         return dao.getAgeGroups(q,category,activeOnly,startIndex,limit);
+    }
+
+    @Override
+    public SqlPreviewResult previewSql(String sql, Map<String, Object> params, Integer maxRows) {
+        return dao.previewSql(sql, params, maxRows);
     }
 
 }
