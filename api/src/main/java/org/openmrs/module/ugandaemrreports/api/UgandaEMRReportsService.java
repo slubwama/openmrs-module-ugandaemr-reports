@@ -252,4 +252,19 @@ public interface UgandaEMRReportsService extends OpenmrsService {
     List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
 
     SqlPreviewResult previewSql(String sql, Map<String, Object> params, Integer maxRows);
+
+    @Transactional
+    public MambaReport saveMambaReport(MambaReport report);
+
+    @Transactional(readOnly = true)
+    public MambaReport getMambaReportByUuid(String uuid);
+
+    @Transactional(readOnly = true)
+    public List<MambaReport> getMambaReports(String q, boolean includeRetired, Integer startIndex, Integer limit);
+
+    @Transactional
+    public void retireMambaReport(MambaReport report, String reason);
+
+    @Transactional
+    public void purgeMambaReport(MambaReport report);
 }

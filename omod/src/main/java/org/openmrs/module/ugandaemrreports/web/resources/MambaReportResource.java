@@ -2,11 +2,13 @@ package org.openmrs.module.ugandaemrreports.web.resources;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
-import org.openmrs.module.ugandaemrreports.model.MambaSection;
+import org.openmrs.module.ugandaemrreports.model.MambaReport;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
-import org.openmrs.module.webservices.rest.web.representation.*;
+import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
@@ -15,57 +17,56 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/mambasection", supportedClass = MambaSection.class, supportedOpenmrsVersions = {"1.8 - 9.0.*"})
-public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
+@Resource(name = RestConstants.VERSION_1 + "/mambareport", supportedClass = MambaReport.class, supportedOpenmrsVersions = { "1.8 - 9.0.*" })
+public class MambaReportResource extends DelegatingCrudResource<MambaReport> {
 
     private UgandaEMRReportsService service() {
         return Context.getService(UgandaEMRReportsService.class);
     }
 
     @Override
-    public MambaSection getByUniqueId(String uuid) {
-        return service().getMambaSectionByUuid(uuid);
+    public MambaReport getByUniqueId(String uuid) {
+        return service().getMambaReportByUuid(uuid);
     }
 
     @Override
-    protected void delete(MambaSection section, String reason, RequestContext context) throws ResponseException {
+    protected void delete(MambaReport report, String reason, RequestContext context) throws ResponseException {
         if (reason == null || reason.trim().isEmpty()) {
             reason = "Retired via REST";
         }
-        service().retireMambaSection(section, reason);
+        service().retireMambaReport(report, reason);
     }
 
     @Override
-    public void purge(MambaSection section, RequestContext context) throws ResponseException {
-        service().purgeMambaSection(section);
+    public void purge(MambaReport report, RequestContext context) throws ResponseException {
+        service().purgeMambaReport(report);
     }
 
     @Override
-    public MambaSection newDelegate() {
-        return new MambaSection();
+    public MambaReport newDelegate() {
+        return new MambaReport();
     }
 
     @Override
-    public MambaSection save(MambaSection section) {
-        return service().saveMambaSection(section);
+    public MambaReport save(MambaReport report) {
+        return service().saveMambaReport(report);
     }
 
     @Override
     public PageableResult doGetAll(RequestContext context) throws ResponseException {
-
         String q = context.getParameter("q");
         boolean includeRetired = Boolean.parseBoolean(
                 context.getParameter("includeRetired") != null ? context.getParameter("includeRetired") : "false"
         );
 
-        List<MambaSection> results = service().getMambaSections(
+        List<MambaReport> results = service().getMambaReports(
                 q,
                 includeRetired,
                 context.getStartIndex(),
                 context.getLimit()
         );
 
-        return new NeedsPaging<>(results, context);
+        return new NeedsPaging<MambaReport>(results, context);
     }
 
     @Override
@@ -75,23 +76,19 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
 
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
-
         if (rep instanceof DefaultRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
-            d.addProperty("display",findMethod("getDisplayString"));
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
             d.addProperty("retired");
-            d.addProperty("auditInfo", findMethod("getAuditInfo"));
             return d;
         }
 
         if (rep instanceof FullRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
-            d.addProperty("display", findMethod("getDisplayString"));
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
@@ -99,7 +96,6 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
             d.addProperty("metaJson");
             d.addProperty("retired");
             d.addProperty("retireReason");
-            d.addProperty("auditInfo", findMethod("getAuditInfo"));
             return d;
         }
 
@@ -122,10 +118,10 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
         return getCreatableProperties();
     }
 
-    public String getDisplayString(MambaSection section) {
-        if (section.getName() != null && section.getCode() != null) {
-            return section.getName() + " (" + section.getCode() + ")";
+    public String getDisplayString(MambaReport report) {
+        if (report.getName() != null && report.getCode() != null) {
+            return report.getName() + " (" + report.getCode() + ")";
         }
-        return section.getName() != null ? section.getName() : section.getUuid();
+        return report.getName() != null ? report.getName() : report.getUuid();
     }
 }

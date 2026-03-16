@@ -842,4 +842,32 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return dao.previewSql(sql, params, maxRows);
     }
 
+
+    @Override
+    public MambaReport saveMambaReport(MambaReport report) {
+        if (report.getUuid() == null) {
+            report.setUuid(java.util.UUID.randomUUID().toString());
+        }
+        return dao.saveMambaReport(report);
+    }
+
+    @Override
+    public MambaReport getMambaReportByUuid(String uuid) {
+        return dao.getMambaReportByUuid(uuid);
+    }
+
+    @Override
+    public List<MambaReport> getMambaReports(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+        return dao.getMambaReports(q, includeRetired, startIndex, limit);
+    }
+
+    @Override
+    public void retireMambaReport(MambaReport report, String reason) {
+        dao.retireMambaReport(report, reason);
+    }
+
+    @Override
+    public void purgeMambaReport(MambaReport report) {
+        dao.purgeMambaReport(report);
+    }
 }

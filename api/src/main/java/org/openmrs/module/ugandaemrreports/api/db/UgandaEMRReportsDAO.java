@@ -135,4 +135,17 @@ public interface UgandaEMRReportsDAO {
 
 
     SqlPreviewResult previewSql(String sql, Map<String, Object> params, Integer maxRows);
+
+
+    MambaReport saveMambaReport(MambaReport report);
+
+   MambaReport getMambaReportByUuid(String uuid);
+
+   List<MambaReport> getMambaReports(String q, boolean includeRetired, Integer startIndex, Integer limit);
+
+   void deleteMambaReport(MambaReport report);
+
+   void retireMambaReport(MambaReport report, String reason);
+
+    void purgeMambaReport(MambaReport report);
 }
