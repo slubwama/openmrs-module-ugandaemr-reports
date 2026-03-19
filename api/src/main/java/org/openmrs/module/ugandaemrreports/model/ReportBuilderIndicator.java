@@ -21,20 +21,20 @@ import java.util.Locale;
  */
 @Entity
 @Table(
-        name = "mamba_indicator",
+        name = "report_builder_indicator",
         indexes = {
-                @Index(name = "idx_mamba_indicator_uuid", columnList = "uuid"),
-                @Index(name = "idx_mamba_indicator_kind", columnList = "kind"),
-                @Index(name = "idx_mamba_indicator_code", columnList = "code"),
-                @Index(name = "idx_mamba_indicator_theme_uuid", columnList = "theme_uuid"),
-                @Index(name = "idx_mamba_indicator_retired", columnList = "retired")
+                @Index(name = "idx_report_builder_indicator_uuid", columnList = "uuid"),
+                @Index(name = "idx_report_builder_indicator_kind", columnList = "kind"),
+                @Index(name = "idx_report_builder_indicator_code", columnList = "code"),
+                @Index(name = "idx_report_builder_indicator_theme_uuid", columnList = "theme_uuid"),
+                @Index(name = "idx_report_builder_indicator_retired", columnList = "retired")
         }
 )
-public class MambaIndicator extends BaseOpenmrsMetadata {
+public class ReportBuilderIndicator extends BaseOpenmrsMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mamba_indicator_id")
+    @Column(name = "report_builder_indicator_id")
     private Integer id;
 
     /**

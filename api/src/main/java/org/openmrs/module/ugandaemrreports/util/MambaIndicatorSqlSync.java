@@ -2,7 +2,7 @@ package org.openmrs.module.ugandaemrreports.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openmrs.module.ugandaemrreports.model.MambaIndicator;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderIndicator;
 
 public final class MambaIndicatorSqlSync {
 
@@ -10,8 +10,8 @@ public final class MambaIndicatorSqlSync {
 
     private MambaIndicatorSqlSync() {}
 
-    public static void normalizeBaseSql(MambaIndicator ind) {
-        if (ind == null || ind.getKind() != MambaIndicator.Kind.BASE) return;
+    public static void normalizeBaseSql(ReportBuilderIndicator ind) {
+        if (ind == null || ind.getKind() != ReportBuilderIndicator.Kind.BASE) return;
 
         // If sqlTemplate already set, trust it.
         if (notBlank(ind.getSqlTemplate())) return;

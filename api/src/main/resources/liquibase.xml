@@ -232,9 +232,9 @@
 
     <changeSet id="ugandaemrreports-20260220-01-indicator-recreate" author="slubwama">
 
-        <createTable tableName="mamba_indicator">
+        <createTable tableName="report_builder_indicator">
 
-            <column name="mamba_indicator_id" type="INT" autoIncrement="true">
+            <column name="report_builder_indicator_id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
@@ -296,23 +296,23 @@
         </createTable>
 
         <!-- Indexes -->
-        <createIndex indexName="idx_mamba_indicator_uuid" tableName="mamba_indicator">
+        <createIndex indexName="idx_report_builder_indicator_uuid" tableName="report_builder_indicator">
             <column name="uuid"/>
         </createIndex>
 
-        <createIndex indexName="idx_mamba_indicator_code" tableName="mamba_indicator">
+        <createIndex indexName="idx_report_builder_indicator_code" tableName="report_builder_indicator">
             <column name="code"/>
         </createIndex>
 
-        <createIndex indexName="idx_mamba_indicator_kind" tableName="mamba_indicator">
+        <createIndex indexName="idx_report_builder_indicator_kind" tableName="report_builder_indicator">
             <column name="kind"/>
         </createIndex>
 
-        <createIndex indexName="idx_mamba_indicator_theme_uuid" tableName="mamba_indicator">
+        <createIndex indexName="idx_report_builder_indicator_theme_uuid" tableName="report_builder_indicator">
             <column name="theme_uuid"/>
         </createIndex>
 
-        <addUniqueConstraint tableName="mamba_indicator" columnNames="code" constraintName="uq_mamba_indicator_code"/>
+        <addUniqueConstraint tableName="report_builder_indicator" columnNames="code" constraintName="uq_report_builder_indicator_code"/>
     </changeSet>
 
 
@@ -323,9 +323,9 @@
     <changeSet id="ugandaemrreports-20260215-02"
                author="slubwama">
 
-        <createTable tableName="mamba_section">
+        <createTable tableName="report_builder_section">
 
-            <column name="mamba_section_id" type="INT" autoIncrement="true">
+            <column name="report_builder_section_id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
@@ -367,13 +367,13 @@
 
         </createTable>
 
-        <createIndex indexName="idx_mamba_section_uuid"
-                     tableName="mamba_section">
+        <createIndex indexName="idx_report_builder_section_uuid"
+                     tableName="report_builder_section">
             <column name="uuid"/>
         </createIndex>
 
-        <createIndex indexName="idx_mamba_section_code"
-                     tableName="mamba_section">
+        <createIndex indexName="idx_report_builder_section_code"
+                     tableName="report_builder_section">
             <column name="code"/>
         </createIndex>
 
@@ -387,9 +387,9 @@
     <changeSet id="ugandaemrreports-20260215-03"
                author="slubwama">
 
-        <createTable tableName="mamba_data_theme">
+        <createTable tableName="report_builder_data_theme">
 
-            <column name="mamba_data_theme_id" type="INT" autoIncrement="true">
+            <column name="report_builder_data_theme_id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
@@ -434,20 +434,20 @@
 
         </createTable>
 
-        <createIndex indexName="idx_mamba_data_theme_uuid"
-                     tableName="mamba_data_theme">
+        <createIndex indexName="idx_report_builder_data_theme_uuid"
+                     tableName="report_builder_data_theme">
             <column name="uuid"/>
         </createIndex>
 
-        <createIndex indexName="idx_mamba_data_theme_code"
-                     tableName="mamba_data_theme">
+        <createIndex indexName="idx_report_builder_data_theme_code"
+                     tableName="report_builder_data_theme">
             <column name="code"/>
         </createIndex>
 
     </changeSet>
 
     <changeSet id="ugandaemrreports-20260216-03-add-domain-column" author="slubwama">
-        <addColumn tableName="mamba_data_theme">
+        <addColumn tableName="report_builder_data_theme">
             <column name="domain" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
@@ -595,17 +595,17 @@
         </changeSet>
 
 
-        <changeSet id="ugandaemrreports-20260316-01-create-mamba-report" author="slubwama">
-            <preConditions onFail="MARK_RAN">
-                <not>
-                    <tableExists tableName="mamba_report"/>
-                </not>
-            </preConditions>
+    <changeSet id="ugandaemrreports-20260316-01-create-mamba-report" author="slubwama">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="report_builder_report"/>
+            </not>
+        </preConditions>
 
-            <createTable tableName="mamba_report">
-                <column name="mamba_report_id" type="INT" autoIncrement="true">
-                    <constraints primaryKey="true" nullable="false"/>
-                </column>
+        <createTable tableName="report_builder_report">
+            <column name="report_builder_report_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
 
                 <column name="uuid" type="CHAR(38)">
                     <constraints nullable="false" unique="true"/>
@@ -643,41 +643,41 @@
                 <column name="retire_reason" type="VARCHAR(255)"/>
             </createTable>
 
-            <addForeignKeyConstraint
-                    baseTableName="mamba_report"
-                    baseColumnNames="creator"
-                    referencedTableName="users"
-                    referencedColumnNames="user_id"
-                    constraintName="fk_mamba_report_creator"/>
+        <addForeignKeyConstraint
+                baseTableName="report_builder_report"
+                baseColumnNames="creator"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_report_builder_report_creator"/>
 
-            <addForeignKeyConstraint
-                    baseTableName="mamba_report"
-                    baseColumnNames="changed_by"
-                    referencedTableName="users"
-                    referencedColumnNames="user_id"
-                    constraintName="fk_mamba_report_changed_by"/>
+        <addForeignKeyConstraint
+                baseTableName="report_builder_report"
+                baseColumnNames="changed_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_report_builder_report_changed_by"/>
 
-            <addForeignKeyConstraint
-                    baseTableName="mamba_report"
-                    baseColumnNames="retired_by"
-                    referencedTableName="users"
-                    referencedColumnNames="user_id"
-                    constraintName="fk_mamba_report_retired_by"/>
+        <addForeignKeyConstraint
+                baseTableName="report_builder_report"
+                baseColumnNames="retired_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_report_builder_report_retired_by"/>
 
-            <createIndex tableName="mamba_report" indexName="idx_mamba_report_uuid" unique="true">
-                <column name="uuid"/>
-            </createIndex>
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_uuid" unique="true">
+            <column name="uuid"/>
+        </createIndex>
 
-            <createIndex tableName="mamba_report" indexName="idx_mamba_report_name">
-                <column name="name"/>
-            </createIndex>
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_name">
+            <column name="name"/>
+        </createIndex>
 
-            <createIndex tableName="mamba_report" indexName="idx_mamba_report_code">
-                <column name="code"/>
-            </createIndex>
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_code">
+            <column name="code"/>
+        </createIndex>
 
-            <createIndex tableName="mamba_report" indexName="idx_mamba_report_retired">
-                <column name="retired"/>
-            </createIndex>
-        </changeSet>
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_retired">
+            <column name="retired"/>
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>

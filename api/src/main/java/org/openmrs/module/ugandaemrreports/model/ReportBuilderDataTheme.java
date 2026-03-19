@@ -20,17 +20,17 @@ import javax.persistence.*;
  */
 @Entity
 @Table(
-        name = "mamba_data_theme",
+        name = "report_builder_data_theme",
         indexes = {
-                @Index(name = "idx_mamba_data_theme_uuid", columnList = "uuid"),
-                @Index(name = "idx_mamba_data_theme_code", columnList = "code")
+                @Index(name = "idx_report_builder_data_theme_uuid", columnList = "uuid"),
+                @Index(name = "idx_report_builder_data_theme_code", columnList = "code")
         }
 )
-public class MambaDataTheme extends BaseOpenmrsMetadata {
+public class ReportBuilderDataTheme extends BaseOpenmrsMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mamba_data_theme_id")
+    @Column(name = "report_builder_data_theme_id")
     private Integer id;
 
     /**

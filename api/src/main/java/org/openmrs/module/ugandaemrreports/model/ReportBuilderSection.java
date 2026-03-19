@@ -15,17 +15,17 @@ import javax.persistence.*;
  */
 @Entity
 @Table(
-        name = "mamba_section",
+        name = "report_builder_section",
         indexes = {
-                @Index(name = "idx_mamba_section_uuid", columnList = "uuid"),
-                @Index(name = "idx_mamba_section_code", columnList = "code")
+                @Index(name = "idx_report_builder_section_uuid", columnList = "uuid"),
+                @Index(name = "idx_report_builder_section_code", columnList = "code")
         }
 )
-public class MambaSection extends BaseOpenmrsMetadata {
+public class ReportBuilderSection extends BaseOpenmrsMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mamba_section_id")
+    @Column(name = "report_builder_section_id")
     private Integer id;
 
     /**

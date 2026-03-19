@@ -7,11 +7,16 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.openmrs.*;
 import org.openmrs.Concept;
+import org.openmrs.OrderType;
+import org.openmrs.Cohort;
+import org.openmrs.Condition;
+import org.openmrs.EncounterType;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
@@ -353,40 +358,40 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     }
 
     // =========================================================
-    // MambaIndicator
+    // ReportBuilderIndicator
     // =========================================================
 
     @Override
-    public MambaIndicator saveMambaIndicator(MambaIndicator indicator) {
+    public ReportBuilderIndicator saveReportBuilderIndicator(ReportBuilderIndicator indicator) {
         getSession().saveOrUpdate(indicator);
         return indicator;
     }
 
     @Override
-    public MambaIndicator getMambaIndicatorById(Integer id) {
-        return (MambaIndicator) getSession().get(MambaIndicator.class, id);
+    public ReportBuilderIndicator getReportBuilderIndicatorById(Integer id) {
+        return (ReportBuilderIndicator) getSession().get(ReportBuilderIndicator.class, id);
     }
 
     @Override
-    public MambaIndicator getMambaIndicatorByUuid(String uuid) {
-        Criteria c = getSession().createCriteria(MambaIndicator.class);
+    public ReportBuilderIndicator getReportBuilderIndicatorByUuid(String uuid) {
+        Criteria c = getSession().createCriteria(ReportBuilderIndicator.class);
         c.add(Restrictions.eq("uuid", uuid));
-        return (MambaIndicator) c.uniqueResult();
+        return (ReportBuilderIndicator) c.uniqueResult();
     }
 
     @Override
-    public MambaIndicator getMambaIndicatorByCode(String code) {
+    public ReportBuilderIndicator getReportBuilderIndicatorByCode(String code) {
         if (code == null) return null;
-        Criteria c = getSession().createCriteria(MambaIndicator.class);
+        Criteria c = getSession().createCriteria(ReportBuilderIndicator.class);
         c.add(Restrictions.eq("code", code));
-        return (MambaIndicator) c.uniqueResult();
+        return (ReportBuilderIndicator) c.uniqueResult();
     }
 
     @Override
-    public List<MambaIndicator> getMambaIndicators(String qStr, MambaIndicator.Kind kind, boolean includeRetired,
-                                                   Integer startIndex, Integer limit) {
+    public List<ReportBuilderIndicator> getReportBuilderIndicators(String qStr, ReportBuilderIndicator.Kind kind, boolean includeRetired,
+                                                                   Integer startIndex, Integer limit) {
 
-        Criteria c = getSession().createCriteria(MambaIndicator.class);
+        Criteria c = getSession().createCriteria(ReportBuilderIndicator.class);
         c.setCacheMode(CacheMode.IGNORE);
 
         if (!includeRetired) c.add(Restrictions.eq("retired", false));
@@ -404,25 +409,25 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
         if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
         if (limit != null) c.setMaxResults(Math.max(1, limit));
 
-        return (List<MambaIndicator>) c.list();
+        return (List<ReportBuilderIndicator>) c.list();
     }
 
     @Override
-    public List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit) {
+    public List<ReportBuilderIndicator> getAllReportBuilderaIndicator(Integer startIndex, Integer limit) {
 
-        Criteria c = getSession().createCriteria(MambaIndicator.class);
+        Criteria c = getSession().createCriteria(ReportBuilderIndicator.class);
         c.setCacheMode(CacheMode.IGNORE);
 
         if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
         if (limit != null) c.setMaxResults(Math.max(1, limit));
 
-        return (List<MambaIndicator>) c.list();
+        return (List<ReportBuilderIndicator>) c.list();
     }
 
     @Override
-    public List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit) {
+    public List<ReportBuilderAgeGroup> getAgeGroups(String q, ReportBuilderAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit) {
 
-        Criteria c = getSession().createCriteria(MambaAgeGroup.class);
+        Criteria c = getSession().createCriteria(ReportBuilderAgeGroup.class);
         c.setCacheMode(CacheMode.IGNORE);
 
         // filters
@@ -453,13 +458,13 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
         if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
         if (limit != null) c.setMaxResults(Math.max(1, limit));
 
-        return (List<MambaAgeGroup>) c.list();
+        return (List<ReportBuilderAgeGroup>) c.list();
     }
 
-    public List<MambaIndicator> getMambaIndicators(MambaIndicator.Kind kind, boolean includeRetired,
-                                                   Integer startIndex, Integer limit) {
+    public List<ReportBuilderIndicator> getReportBuilderIndicators(ReportBuilderIndicator.Kind kind, boolean includeRetired,
+                                                                   Integer startIndex, Integer limit) {
 
-        Criteria c = getSession().createCriteria(MambaIndicator.class);
+        Criteria c = getSession().createCriteria(ReportBuilderIndicator.class);
         c.setCacheMode(CacheMode.IGNORE);
 
         if (!includeRetired) c.add(Restrictions.eq("retired", false));
@@ -468,13 +473,13 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
         if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
         if (limit != null) c.setMaxResults(Math.max(1, limit));
 
-        return (List<MambaIndicator>) c.list();
+        return (List<ReportBuilderIndicator>) c.list();
     }
 
     @Override
-    public long getMambaIndicatorsCount(String qStr, MambaIndicator.Kind kind, boolean includeRetired) {
+    public long getReportBuilderIndicatorsCount(String qStr, ReportBuilderIndicator.Kind kind, boolean includeRetired) {
         // simplest: HQL count
-        StringBuilder hql = new StringBuilder("select count(i) from MambaIndicator i where 1=1 ");
+        StringBuilder hql = new StringBuilder("select count(i) from ReportBuilderIndicator i where 1=1 ");
         if (!includeRetired) hql.append("and i.retired = false ");
         if (kind != null) hql.append("and i.kind = :kind ");
         if (qStr != null && qStr.trim().length() > 0) {
@@ -490,44 +495,44 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     }
 
     @Override
-    public void purgeMambaIndicator(MambaIndicator indicator) {
+    public void purgeReportBuilderIndicator(ReportBuilderIndicator indicator) {
         getSession().delete(indicator);
     }
 
     // =========================================================
-    // MambaSection
+    // ReportBuilderSection
     // =========================================================
 
     @Override
-    public MambaSection saveMambaSection(MambaSection section) {
+    public ReportBuilderSection saveReportBuilderSection(ReportBuilderSection section) {
         getSession().saveOrUpdate(section);
         return section;
     }
 
     @Override
-    public MambaSection getMambaSectionById(Integer id) {
-        return (MambaSection) getSession().get(MambaSection.class, id);
+    public ReportBuilderSection getReportBuilderSectionById(Integer id) {
+        return (ReportBuilderSection) getSession().get(ReportBuilderSection.class, id);
     }
 
     @Override
-    public MambaSection getMambaSectionByUuid(String uuid) {
-        Criteria c = getSession().createCriteria(MambaSection.class);
+    public ReportBuilderSection getReportBuilderSectionByUuid(String uuid) {
+        Criteria c = getSession().createCriteria(ReportBuilderSection.class);
         c.add(Restrictions.eq("uuid", uuid));
-        return (MambaSection) c.uniqueResult();
+        return (ReportBuilderSection) c.uniqueResult();
     }
 
     @Override
-    public MambaSection getMambaSectionByCode(String code) {
+    public ReportBuilderSection getReportBuilderSectionByCode(String code) {
         if (code == null) return null;
-        Criteria c = getSession().createCriteria(MambaSection.class);
+        Criteria c = getSession().createCriteria(ReportBuilderSection.class);
         c.add(Restrictions.eq("code", code));
-        return (MambaSection) c.uniqueResult();
+        return (ReportBuilderSection) c.uniqueResult();
     }
 
     @Override
-    public List<MambaSection> getMambaSections(String qStr, boolean includeRetired,
-                                               Integer startIndex, Integer limit) {
-        Criteria c = getSession().createCriteria(MambaSection.class);
+    public List<ReportBuilderSection> getReportBuilderSections(String qStr, boolean includeRetired,
+                                                               Integer startIndex, Integer limit) {
+        Criteria c = getSession().createCriteria(ReportBuilderSection.class);
         c.setCacheMode(CacheMode.IGNORE);
 
         if (!includeRetired) c.add(Restrictions.eq("retired", false));
@@ -544,12 +549,12 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
         if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
         if (limit != null) c.setMaxResults(Math.max(1, limit));
 
-        return (List<MambaSection>) c.list();
+        return (List<ReportBuilderSection>) c.list();
     }
 
     @Override
-    public long getMambaSectionsCount(String qStr, boolean includeRetired) {
-        StringBuilder hql = new StringBuilder("select count(s) from MambaSection s where 1=1 ");
+    public long getReportBuilderSectionsCount(String qStr, boolean includeRetired) {
+        StringBuilder hql = new StringBuilder("select count(s) from ReportBuilderSection s where 1=1 ");
         if (!includeRetired) hql.append("and s.retired = false ");
         if (qStr != null && qStr.trim().length() > 0) {
             hql.append("and (lower(s.name) like :q or lower(s.description) like :q or lower(s.code) like :q) ");
@@ -563,45 +568,45 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     }
 
     @Override
-    public void purgeMambaSection(MambaSection section) {
+    public void purgeReportBuilderSection(ReportBuilderSection section) {
         getSession().delete(section);
     }
 
     // =========================================================
-    // MambaDataTheme
+    // ReportBuilderDataTheme
     // =========================================================
 
     @Override
-    public MambaDataTheme saveMambaDataTheme(MambaDataTheme theme) {
+    public ReportBuilderDataTheme saveReportBuilderDataTheme(ReportBuilderDataTheme theme) {
         getSession().saveOrUpdate(theme);
         return theme;
     }
 
     @Override
-    public MambaDataTheme getMambaDataThemeById(Integer id) {
-        return (MambaDataTheme) getSession().get(MambaDataTheme.class, id);
+    public ReportBuilderDataTheme getReportBuilderDataThemeById(Integer id) {
+        return (ReportBuilderDataTheme) getSession().get(ReportBuilderDataTheme.class, id);
     }
 
     @Override
-    public MambaDataTheme getMambaDataThemeByUuid(String uuid) {
-        Criteria c = getSession().createCriteria(MambaDataTheme.class);
+    public ReportBuilderDataTheme getReportBuilderDataThemeByUuid(String uuid) {
+        Criteria c = getSession().createCriteria(ReportBuilderDataTheme.class);
         c.add(Restrictions.eq("uuid", uuid));
-        return (MambaDataTheme) c.uniqueResult();
+        return (ReportBuilderDataTheme) c.uniqueResult();
     }
 
     @Override
-    public MambaDataTheme getMambaDataThemeByCode(String code) {
+    public ReportBuilderDataTheme getReportBuilderDataThemeByCode(String code) {
         if (code == null) return null;
-        Criteria c = getSession().createCriteria(MambaDataTheme.class);
+        Criteria c = getSession().createCriteria(ReportBuilderDataTheme.class);
         c.add(Restrictions.eq("code", code));
-        return (MambaDataTheme) c.uniqueResult();
+        return (ReportBuilderDataTheme) c.uniqueResult();
     }
 
     @Override
-    public List<MambaDataTheme> getMambaDataThemes(String qStr, boolean includeRetired,
-                                                   Integer startIndex, Integer limit) {
+    public List<ReportBuilderDataTheme> getReportBuilderDataThemes(String qStr, boolean includeRetired,
+                                                                   Integer startIndex, Integer limit) {
 
-        Criteria c = getSession().createCriteria(MambaDataTheme.class);
+        Criteria c = getSession().createCriteria(ReportBuilderDataTheme.class);
         c.setCacheMode(CacheMode.IGNORE);
 
         if (!includeRetired) c.add(Restrictions.eq("retired", false));
@@ -618,12 +623,12 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
         if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
         if (limit != null) c.setMaxResults(Math.max(1, limit));
 
-        return (List<MambaDataTheme>) c.list();
+        return (List<ReportBuilderDataTheme>) c.list();
     }
 
     @Override
-    public long getMambaDataThemesCount(String qStr, boolean includeRetired) {
-        StringBuilder hql = new StringBuilder("select count(t) from MambaDataTheme t where 1=1 ");
+    public long getReportBuilderThemesCount(String qStr, boolean includeRetired) {
+        StringBuilder hql = new StringBuilder("select count(t) from ReportBuilderDataTheme t where 1=1 ");
         if (!includeRetired) hql.append("and t.retired = false ");
         if (qStr != null && qStr.trim().length() > 0) {
             hql.append("and (lower(t.name) like :q or lower(t.description) like :q or lower(t.code) like :q) ");
@@ -637,7 +642,7 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     }
 
     @Override
-    public void purgeMambaDataTheme(MambaDataTheme theme) {
+    public void purgeReportBuilderDataTheme(ReportBuilderDataTheme theme) {
         getSession().delete(theme);
     }
 
@@ -646,35 +651,35 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     // =========================================================
 
     @Override
-    public MambaAgeCategory saveAgeCategory(MambaAgeCategory category) {
+    public ReportBuilderAgeCategory saveAgeCategory(ReportBuilderAgeCategory category) {
         getSession().saveOrUpdate(category);
         return category;
     }
 
     @Override
-    public MambaAgeCategory getAgeCategoryById(Integer id) {
-        return (MambaAgeCategory) getSession().get(MambaAgeCategory.class, id);
+    public ReportBuilderAgeCategory getAgeCategoryById(Integer id) {
+        return (ReportBuilderAgeCategory) getSession().get(ReportBuilderAgeCategory.class, id);
     }
 
     @Override
-    public MambaAgeCategory getAgeCategoryByUuid(String uuid) {
-        Criteria c = getSession().createCriteria(MambaAgeCategory.class);
+    public ReportBuilderAgeCategory getAgeCategoryByUuid(String uuid) {
+        Criteria c = getSession().createCriteria(ReportBuilderAgeCategory.class);
         c.add(Restrictions.eq("uuid", uuid));
-        return (MambaAgeCategory) c.uniqueResult();
+        return (ReportBuilderAgeCategory) c.uniqueResult();
     }
 
     @Override
-    public MambaAgeCategory getAgeCategoryByCode(String code) {
-        Criteria c = getSession().createCriteria(MambaAgeCategory.class);
+    public ReportBuilderAgeCategory getAgeCategoryByCode(String code) {
+        Criteria c = getSession().createCriteria(ReportBuilderAgeCategory.class);
         c.add(Restrictions.eq("code", code));
-        return (MambaAgeCategory) c.uniqueResult();
+        return (ReportBuilderAgeCategory) c.uniqueResult();
     }
 
     @Override
-    public List<MambaAgeCategory> getAgeCategories(String qStr, boolean includeRetired, Boolean activeOnly,
-                                                   Integer startIndex, Integer limit) {
+    public List<ReportBuilderAgeCategory> getAgeCategories(String qStr, boolean includeRetired, Boolean activeOnly,
+                                                           Integer startIndex, Integer limit) {
 
-        Criteria c = getSession().createCriteria(MambaAgeCategory.class);
+        Criteria c = getSession().createCriteria(ReportBuilderAgeCategory.class);
         c.setCacheMode(CacheMode.IGNORE);
 
         if (!includeRetired) c.add(Restrictions.eq("retired", false));
@@ -692,12 +697,12 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
         if (startIndex != null) c.setFirstResult(Math.max(0, startIndex));
         if (limit != null) c.setMaxResults(Math.max(1, limit));
 
-        return (List<MambaAgeCategory>) c.list();
+        return (List<ReportBuilderAgeCategory>) c.list();
     }
 
     @Override
     public long getAgeCategoriesCount(String qStr, boolean includeRetired, Boolean activeOnly) {
-        StringBuilder hql = new StringBuilder("select count(c) from MambaAgeCategory c where 1=1 ");
+        StringBuilder hql = new StringBuilder("select count(c) from ReportBuilderAgeCategory c where 1=1 ");
         if (!includeRetired) hql.append("and c.retired = false ");
         if (activeOnly != null && activeOnly) hql.append("and c.active = true ");
         if (qStr != null && qStr.trim().length() > 0) {
@@ -712,7 +717,7 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     }
 
     @Override
-    public void purgeAgeCategory(MambaAgeCategory category) {
+    public void purgeAgeCategory(ReportBuilderAgeCategory category) {
         getSession().delete(category);
     }
 
@@ -721,44 +726,44 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     // =========================================================
 
     @Override
-    public MambaAgeGroup saveAgeGroup(MambaAgeGroup group) {
+    public ReportBuilderAgeGroup saveAgeGroup(ReportBuilderAgeGroup group) {
         getSession().saveOrUpdate(group);
         return group;
     }
 
     @Override
-    public MambaAgeGroup getAgeGroupById(Integer id) {
-        return (MambaAgeGroup) getSession().get(MambaAgeGroup.class, id);
+    public ReportBuilderAgeGroup getAgeGroupById(Integer id) {
+        return (ReportBuilderAgeGroup) getSession().get(ReportBuilderAgeGroup.class, id);
     }
 
     @Override
-    public List<MambaAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly) {
+    public List<ReportBuilderAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly) {
         StringBuilder hql = new StringBuilder(
-                "select g from MambaAgeGroup g where g.ageCategory.uuid = :uuid "
+                "select g from ReportBuilderAgeGroup g where g.ageCategory.uuid = :uuid "
         );
         if (activeOnly != null && activeOnly) hql.append("and g.active = true ");
         hql.append("order by g.sortOrder asc");
 
         Query q = getSession().createQuery(hql.toString());
         q.setString("uuid", categoryUuid);
-        return (List<MambaAgeGroup>) q.list();
+        return (List<ReportBuilderAgeGroup>) q.list();
     }
 
     @Override
-    public List<MambaAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly) {
+    public List<ReportBuilderAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly) {
         StringBuilder hql = new StringBuilder(
-                "select g from MambaAgeGroup g where g.ageCategory.code = :code "
+                "select g from ReportBuilderAgeGroup g where g.ageCategory.code = :code "
         );
         if (activeOnly != null && activeOnly) hql.append("and g.active = true ");
         hql.append("order by g.sortOrder asc");
 
         Query q = getSession().createQuery(hql.toString());
         q.setString("code", categoryCode);
-        return (List<MambaAgeGroup>) q.list();
+        return (List<ReportBuilderAgeGroup>) q.list();
     }
 
     @Override
-    public void purgeAgeGroup(MambaAgeGroup group) {
+    public void purgeAgeGroup(ReportBuilderAgeGroup group) {
         getSession().delete(group);
     }
 
@@ -913,66 +918,66 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     }
 
     @Override
-    public MambaReport saveMambaReport(MambaReport report) {
-        sessionFactory.getCurrentSession().saveOrUpdate(report);
+    public ReportBuilderReport saveReportBuilderReport(ReportBuilderReport report) {
+        getSession().saveOrUpdate(report);
         return report;
     }
 
     @Override
-    public MambaReport getMambaReportByUuid(String uuid) {
-        return (MambaReport) sessionFactory.getCurrentSession()
-                .createQuery("from MambaReport r where r.uuid = :uuid")
-                .setParameter("uuid", uuid)
-                .uniqueResult();
+    public ReportBuilderReport getReportBuilderReportByUuid(String uuid) {
+        Criteria c = getSession().createCriteria(ReportBuilderReport.class);
+        c.add(Restrictions.eq("uuid", uuid));
+        return (ReportBuilderReport) c.uniqueResult();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<MambaReport> getMambaReports(String q, boolean includeRetired, Integer startIndex, Integer limit) {
-        StringBuilder hql = new StringBuilder("from MambaReport r where 1=1 ");
+    public List<ReportBuilderReport> getReportBuilderReports(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+        Criteria c = getSession().createCriteria(ReportBuilderReport.class);
 
         if (!includeRetired) {
-            hql.append("and r.retired = false ");
+            c.add(Restrictions.eq("retired", false));
         }
 
         if (q != null && !q.trim().isEmpty()) {
-            hql.append("and (lower(r.name) like :q or lower(r.description) like :q or lower(r.code) like :q) ");
+            c.add(
+                    Restrictions.or(
+                            Restrictions.ilike("name", q.trim(), MatchMode.ANYWHERE),
+                            Restrictions.ilike("description", q.trim(), MatchMode.ANYWHERE),
+                            Restrictions.ilike("code", q.trim(), MatchMode.ANYWHERE)
+                    )
+            );
         }
 
-        hql.append("order by r.name asc");
-
-        org.hibernate.Query query = sessionFactory.getCurrentSession().createQuery(hql.toString());
-
-        if (q != null && !q.trim().isEmpty()) {
-            query.setParameter("q", "%" + q.trim().toLowerCase() + "%");
-        }
+        c.addOrder(Order.asc("name"));
 
         if (startIndex != null) {
-            query.setFirstResult(startIndex);
+            c.setFirstResult(startIndex);
         }
+
         if (limit != null) {
-            query.setMaxResults(limit);
+            c.setMaxResults(limit);
         }
 
-        return query.list();
+        return c.list();
     }
 
     @Override
-    public void deleteMambaReport(MambaReport report) {
-        sessionFactory.getCurrentSession().delete(report);
+    public void deleteReportBuilderReport(ReportBuilderReport report) {
+        getSession().delete(report);
     }
 
     @Override
-    public void retireMambaReport(MambaReport report, String reason) {
+    public void retireReportBuilderReport(ReportBuilderReport report, String reason) {
         report.setRetired(true);
         report.setRetireReason(reason);
-        report.setDateRetired(new java.util.Date());
-        report.setRetiredBy(org.openmrs.api.context.Context.getAuthenticatedUser());
-        sessionFactory.getCurrentSession().saveOrUpdate(report);
+        report.setDateRetired(new Date());
+        report.setRetiredBy(Context.getAuthenticatedUser());
+        getSession().saveOrUpdate(report);
     }
 
     @Override
-    public void purgeMambaReport(MambaReport report) {
-        sessionFactory.getCurrentSession().delete(report);
+    public void purgeReportBuilderReport(ReportBuilderReport report) {
+        getSession().delete(report);
     }
 }

@@ -2,7 +2,6 @@ package org.openmrs.module.ugandaemrreports.api.db;
 
 import org.openmrs.*;
 import org.openmrs.Concept;
-import org.openmrs.logic.op.In;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
 import org.openmrs.module.ugandaemrreports.model.*;
@@ -12,7 +11,6 @@ import org.openmrs.reporting.ReportObjectWrapper;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Set;
 
 /**
@@ -43,84 +41,84 @@ public interface UgandaEMRReportsDAO {
     // -------------------------
     // MambaIndicator
     // -------------------------
-    MambaIndicator saveMambaIndicator(MambaIndicator indicator);
+    ReportBuilderIndicator saveReportBuilderIndicator(ReportBuilderIndicator indicator);
 
-    MambaIndicator getMambaIndicatorById(Integer id);
+    ReportBuilderIndicator getReportBuilderIndicatorById(Integer id);
 
-    MambaIndicator getMambaIndicatorByUuid(String uuid);
+    ReportBuilderIndicator getReportBuilderIndicatorByUuid(String uuid);
 
-    MambaIndicator getMambaIndicatorByCode(String code);
+    ReportBuilderIndicator getReportBuilderIndicatorByCode(String code);
 
-    List<MambaIndicator> getMambaIndicators(String q, MambaIndicator.Kind kind, boolean includeRetired,
-                                            Integer startIndex, Integer limit);
+    List<ReportBuilderIndicator> getReportBuilderIndicators(String q, ReportBuilderIndicator.Kind kind, boolean includeRetired,
+                                                            Integer startIndex, Integer limit);
 
-    long getMambaIndicatorsCount(String q, MambaIndicator.Kind kind, boolean includeRetired);
+    long getReportBuilderIndicatorsCount(String q, ReportBuilderIndicator.Kind kind, boolean includeRetired);
 
-    void purgeMambaIndicator(MambaIndicator indicator);
+    void purgeReportBuilderIndicator(ReportBuilderIndicator indicator);
 
     // -------------------------
     // MambaSection
     // -------------------------
-    MambaSection saveMambaSection(MambaSection section);
+    ReportBuilderSection saveReportBuilderSection(ReportBuilderSection section);
 
-    MambaSection getMambaSectionById(Integer id);
+    ReportBuilderSection getReportBuilderSectionById(Integer id);
 
-    MambaSection getMambaSectionByUuid(String uuid);
+    ReportBuilderSection getReportBuilderSectionByUuid(String uuid);
 
-    MambaSection getMambaSectionByCode(String code);
+    ReportBuilderSection getReportBuilderSectionByCode(String code);
 
-    List<MambaSection> getMambaSections(String q, boolean includeRetired,
-                                        Integer startIndex, Integer limit);
+    List<ReportBuilderSection> getReportBuilderSections(String q, boolean includeRetired,
+                                                        Integer startIndex, Integer limit);
 
-    long getMambaSectionsCount(String q, boolean includeRetired);
+    long getReportBuilderSectionsCount(String q, boolean includeRetired);
 
-    void purgeMambaSection(MambaSection section);
+    void purgeReportBuilderSection(ReportBuilderSection section);
 
     // -------------------------
     // MambaDataTheme
     // -------------------------
-    MambaDataTheme saveMambaDataTheme(MambaDataTheme theme);
+    ReportBuilderDataTheme saveReportBuilderDataTheme(ReportBuilderDataTheme theme);
 
-    MambaDataTheme getMambaDataThemeById(Integer id);
+    ReportBuilderDataTheme getReportBuilderDataThemeById(Integer id);
 
-    MambaDataTheme getMambaDataThemeByUuid(String uuid);
+    ReportBuilderDataTheme getReportBuilderDataThemeByUuid(String uuid);
 
-    MambaDataTheme getMambaDataThemeByCode(String code);
+    ReportBuilderDataTheme getReportBuilderDataThemeByCode(String code);
 
-    List<MambaDataTheme> getMambaDataThemes(String q, boolean includeRetired,
-                                            Integer startIndex, Integer limit);
+    List<ReportBuilderDataTheme> getReportBuilderDataThemes(String q, boolean includeRetired,
+                                                            Integer startIndex, Integer limit);
 
-    long getMambaDataThemesCount(String q, boolean includeRetired);
+    long getReportBuilderThemesCount(String q, boolean includeRetired);
 
-    void purgeMambaDataTheme(MambaDataTheme theme);
+    void purgeReportBuilderDataTheme(ReportBuilderDataTheme theme);
 
     // -------------------------
     // Age Category & Groups
     // -------------------------
-    MambaAgeCategory saveAgeCategory(MambaAgeCategory category);
+    ReportBuilderAgeCategory saveAgeCategory(ReportBuilderAgeCategory category);
 
-    MambaAgeCategory getAgeCategoryById(Integer id);
+    ReportBuilderAgeCategory getAgeCategoryById(Integer id);
 
-    MambaAgeCategory getAgeCategoryByUuid(String uuid);
+    ReportBuilderAgeCategory getAgeCategoryByUuid(String uuid);
 
-    MambaAgeCategory getAgeCategoryByCode(String code);
+    ReportBuilderAgeCategory getAgeCategoryByCode(String code);
 
-    List<MambaAgeCategory> getAgeCategories(String q, boolean includeRetired, Boolean activeOnly,
-                                            Integer startIndex, Integer limit);
+    List<ReportBuilderAgeCategory> getAgeCategories(String q, boolean includeRetired, Boolean activeOnly,
+                                                    Integer startIndex, Integer limit);
 
     long getAgeCategoriesCount(String q, boolean includeRetired, Boolean activeOnly);
 
-    void purgeAgeCategory(MambaAgeCategory category);
+    void purgeAgeCategory(ReportBuilderAgeCategory category);
 
-    MambaAgeGroup saveAgeGroup(MambaAgeGroup group);
+    ReportBuilderAgeGroup saveAgeGroup(ReportBuilderAgeGroup group);
 
-    MambaAgeGroup getAgeGroupById(Integer id);
+    ReportBuilderAgeGroup getAgeGroupById(Integer id);
 
-    List<MambaAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly);
+    List<ReportBuilderAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly);
 
-    List<MambaAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly);
+    List<ReportBuilderAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly);
 
-    void purgeAgeGroup(MambaAgeGroup group);
+    void purgeAgeGroup(ReportBuilderAgeGroup group);
 
     // -------------------------
     // Utility: list DB tables
@@ -129,23 +127,23 @@ public interface UgandaEMRReportsDAO {
 
     public List<Map> getMambaTableColumns(String tableName);
 
-    List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit);
+    List<ReportBuilderIndicator> getAllReportBuilderaIndicator(Integer startIndex, Integer limit);
 
-    List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
+    List<ReportBuilderAgeGroup> getAgeGroups(String q, ReportBuilderAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
 
 
     SqlPreviewResult previewSql(String sql, Map<String, Object> params, Integer maxRows);
 
 
-    MambaReport saveMambaReport(MambaReport report);
+    ReportBuilderReport saveReportBuilderReport(ReportBuilderReport report);
 
-   MambaReport getMambaReportByUuid(String uuid);
+   ReportBuilderReport getReportBuilderReportByUuid(String uuid);
 
-   List<MambaReport> getMambaReports(String q, boolean includeRetired, Integer startIndex, Integer limit);
+   List<ReportBuilderReport> getReportBuilderReports(String q, boolean includeRetired, Integer startIndex, Integer limit);
 
-   void deleteMambaReport(MambaReport report);
+   void deleteReportBuilderReport(ReportBuilderReport report);
 
-   void retireMambaReport(MambaReport report, String reason);
+   void retireReportBuilderReport(ReportBuilderReport report, String reason);
 
-    void purgeMambaReport(MambaReport report);
+    void purgeReportBuilderReport(ReportBuilderReport report);
 }

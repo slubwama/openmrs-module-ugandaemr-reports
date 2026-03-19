@@ -6,14 +6,14 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "mamba_report")
-public class MambaReport extends BaseOpenmrsMetadata implements Serializable {
+@Table(name = "report_builder_report")
+public class ReportBuilderReport extends BaseOpenmrsMetadata implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "mamba_report_id")
+    @Column(name = "report_builder_report_id")
     private Integer id;
 
     @Column(name = "code", length = 100)

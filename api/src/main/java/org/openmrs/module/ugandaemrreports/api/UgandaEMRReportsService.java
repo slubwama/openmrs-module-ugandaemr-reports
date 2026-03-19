@@ -6,12 +6,14 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
 import org.openmrs.module.ugandaemrreports.model.*;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -146,125 +148,168 @@ public interface UgandaEMRReportsService extends OpenmrsService {
     // =========================
     // MambaIndicator
     // =========================
-    MambaIndicator saveMambaIndicator(MambaIndicator indicator);
+    ReportBuilderIndicator saveReportBuilderIndicator(ReportBuilderIndicator indicator);
 
-    MambaIndicator getMambaIndicatorById(Integer id);
+    ReportBuilderIndicator getReportBuilderIndicatorById(Integer id);
 
-    MambaIndicator getMambaIndicatorByUuid(String uuid);
+    ReportBuilderIndicator getReportBuilderIndicatorByUuid(String uuid);
 
-    MambaIndicator getMambaIndicatorByCode(String code);
+    ReportBuilderIndicator getReportBuilderIndicatorByCode(String code);
 
-    List<MambaIndicator> searchMambaIndicators(String q, MambaIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit);
+    List<ReportBuilderIndicator> searchReportBuilderIndicators(String q, ReportBuilderIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit);
 
-    public List<MambaIndicator> getAllMambaIndicator(Integer startIndex, Integer limit);
+    public List<ReportBuilderIndicator> getAllReportBuilderIndicator(Integer startIndex, Integer limit);
 
-    public List<MambaIndicator> getMambaIndicators(MambaIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit);
+    public List<ReportBuilderIndicator> getReportBuilderIndicators(ReportBuilderIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit);
 
-    long getMambaIndicatorsCount(String q, MambaIndicator.Kind kind, boolean includeRetired);
+    long getReportBuilderIndicatorsCount(String q, ReportBuilderIndicator.Kind kind, boolean includeRetired);
 
-    void retireMambaIndicator(MambaIndicator indicator, String reason);
+    void retireReportBuilderIndicator(ReportBuilderIndicator indicator, String reason);
 
-    void unretireMambaIndicator(MambaIndicator indicator);
+    void unretireReportBuilderIndicator(ReportBuilderIndicator indicator);
 
-    void purgeMambaIndicator(MambaIndicator indicator);
+    void purgeReportBuilderIndicator(ReportBuilderIndicator indicator);
 
     // =========================
     // MambaSection
     // =========================
-    MambaSection saveMambaSection(MambaSection section);
+    ReportBuilderSection saveReportBuilderSection(ReportBuilderSection section);
 
-    MambaSection getMambaSectionById(Integer id);
+    ReportBuilderSection getReportBuilderSectionById(Integer id);
 
-    MambaSection getMambaSectionByUuid(String uuid);
+    ReportBuilderSection getReportBuilderSectionByUuid(String uuid);
 
-    MambaSection getMambaSectionByCode(String code);
+    ReportBuilderSection getReportBuilderSectionByCode(String code);
 
-    List<MambaSection> getMambaSections(String q,
-                                        boolean includeRetired,
-                                        Integer startIndex,
-                                        Integer limit);
+    List<ReportBuilderSection> getReportBuilderSections(String q,
+                                                        boolean includeRetired,
+                                                        Integer startIndex,
+                                                        Integer limit);
 
-    long getMambaSectionsCount(String q, boolean includeRetired);
+    long getReportBuilderSectionsCount(String q, boolean includeRetired);
 
-    void retireMambaSection(MambaSection section, String reason);
+    void retireReportBuilderSection(ReportBuilderSection section, String reason);
 
-    void unretireMambaSection(MambaSection section);
+    void unretireReportBuilderSection(ReportBuilderSection section);
 
-    void purgeMambaSection(MambaSection section);
+    void purgeReportBuilderSection(ReportBuilderSection section);
 
     // =========================
     // MambaDataTheme
     // =========================
-    MambaDataTheme saveMambaDataTheme(MambaDataTheme theme);
+    ReportBuilderDataTheme saveReportBuilderDataTheme(ReportBuilderDataTheme theme);
 
-    MambaDataTheme getMambaDataThemeById(Integer id);
+    ReportBuilderDataTheme getReportBuilderDataThemeById(Integer id);
 
-    MambaDataTheme getMambaDataThemeByUuid(String uuid);
+    ReportBuilderDataTheme getReportBuilderDataThemeByUuid(String uuid);
 
-    MambaDataTheme getMambaDataThemeByCode(String code);
+    ReportBuilderDataTheme getReportBuilderDataThemeByCode(String code);
 
-    List<MambaDataTheme> getMambaDataThemes(String q,
-                                            boolean includeRetired,
-                                            Integer startIndex,
-                                            Integer limit);
+    List<ReportBuilderDataTheme> getReportBuilderDataThemes(String q,
+                                                            boolean includeRetired,
+                                                            Integer startIndex,
+                                                            Integer limit);
 
-    long getMambaDataThemesCount(String q, boolean includeRetired);
+    long getReportBuilderDataThemesCount(String q, boolean includeRetired);
 
-    void retireMambaDataTheme(MambaDataTheme theme, String reason);
+    void retireReportBuilderDataTheme(ReportBuilderDataTheme theme, String reason);
 
-    void unretireMambaDataTheme(MambaDataTheme theme);
+    void unretireReportBuilderDataTheme(ReportBuilderDataTheme theme);
 
-    void purgeMambaDataTheme(MambaDataTheme theme);
+    void purgeReportBuilderDataTheme(ReportBuilderDataTheme theme);
 
     List<String> getMambaTables();
 
     public List<Map> getMambaTableColumns(String tableName);
 
     // Categories
-    MambaAgeCategory saveAgeCategory(MambaAgeCategory category);
+    ReportBuilderAgeCategory saveAgeCategory(ReportBuilderAgeCategory category);
 
-    MambaAgeCategory getAgeCategoryByUuid(String uuid);
+    ReportBuilderAgeCategory getAgeCategoryByUuid(String uuid);
 
-    MambaAgeCategory getAgeCategoryByCode(String code);
+    ReportBuilderAgeCategory getAgeCategoryByCode(String code);
 
-    List<MambaAgeCategory> getAgeCategories(String q, boolean includeRetired, Boolean activeOnly,
-                                            Integer startIndex, Integer limit);
+    List<ReportBuilderAgeCategory> getAgeCategories(String q, boolean includeRetired, Boolean activeOnly,
+                                                    Integer startIndex, Integer limit);
 
     long getAgeCategoriesCount(String q, boolean includeRetired, Boolean activeOnly);
 
-    void retireAgeCategory(MambaAgeCategory category, String reason);
+    void retireAgeCategory(ReportBuilderAgeCategory category, String reason);
 
-    void unretireAgeCategory(MambaAgeCategory category);
+    void unretireAgeCategory(ReportBuilderAgeCategory category);
 
-    void purgeAgeCategory(MambaAgeCategory category);
+    void purgeAgeCategory(ReportBuilderAgeCategory category);
 
     // Groups
-    MambaAgeGroup saveAgeGroup(MambaAgeGroup group);
+    ReportBuilderAgeGroup saveAgeGroup(ReportBuilderAgeGroup group);
 
-    MambaAgeGroup getAgeGroupById(Integer id);
+    ReportBuilderAgeGroup getAgeGroupById(Integer id);
 
-    List<MambaAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly);
+    List<ReportBuilderAgeGroup> getAgeGroupsByCategoryUuid(String categoryUuid, Boolean activeOnly);
 
-    List<MambaAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly);
+    List<ReportBuilderAgeGroup> getAgeGroupsByCategoryCode(String categoryCode, Boolean activeOnly);
 
-    void purgeAgeGroup(MambaAgeGroup group);
+    void purgeAgeGroup(ReportBuilderAgeGroup group);
 
-    List<MambaAgeGroup> getAgeGroups(String q, MambaAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
+    List<ReportBuilderAgeGroup> getAgeGroups(String q, ReportBuilderAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit);
 
     SqlPreviewResult previewSql(String sql, Map<String, Object> params, Integer maxRows);
 
     @Transactional
-    public MambaReport saveMambaReport(MambaReport report);
+    public ReportBuilderReport saveReportBuilderReport(ReportBuilderReport report);
 
     @Transactional(readOnly = true)
-    public MambaReport getMambaReportByUuid(String uuid);
+    public ReportBuilderReport getReportBuilderReportByUuid(String uuid);
 
     @Transactional(readOnly = true)
-    public List<MambaReport> getMambaReports(String q, boolean includeRetired, Integer startIndex, Integer limit);
+    public List<ReportBuilderReport> getReportBuilderReports(String q, boolean includeRetired, Integer startIndex, Integer limit);
 
     @Transactional
-    public void retireMambaReport(MambaReport report, String reason);
+    public void retireReportBuilderReport(ReportBuilderReport report, String reason);
 
     @Transactional
-    public void purgeMambaReport(MambaReport report);
+    public void purgeReportBuilderReport(ReportBuilderReport report);
+
+    @Transactional
+    CompiledReportArtifacts compileReport(String reportBuilderReportUuid);
+
+    class CompiledReportArtifacts {
+        private ReportBuilderReport reportBuilderReport;
+        private ReportDefinition reportDefinition;
+        private File reportDesignFile;
+        private String compiledJson;
+
+        public ReportBuilderReport getReportBuilderReport() {
+            return reportBuilderReport;
+        }
+
+        public void setReportBuilderReport(ReportBuilderReport reportBuilderReport) {
+            this.reportBuilderReport = reportBuilderReport;
+        }
+
+        public ReportDefinition getReportDefinition() {
+            return reportDefinition;
+        }
+
+        public void setReportDefinition(ReportDefinition reportDefinition) {
+            this.reportDefinition = reportDefinition;
+        }
+
+        public File getReportDesignFile() {
+            return reportDesignFile;
+        }
+
+        public void setReportDesignFile(File reportDesignFile) {
+            this.reportDesignFile = reportDesignFile;
+        }
+
+        public String getCompiledJson() {
+            return compiledJson;
+        }
+
+        public void setCompiledJson(String compiledJson) {
+            this.compiledJson = compiledJson;
+        }
+    }
+
 }

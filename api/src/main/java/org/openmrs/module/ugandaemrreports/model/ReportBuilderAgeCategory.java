@@ -23,7 +23,7 @@ import java.util.Set;
                 @Index(name = "idx_rb_dim_age_category_retired", columnList = "retired")
         }
 )
-public class MambaAgeCategory extends BaseOpenmrsMetadata {
+public class ReportBuilderAgeCategory extends BaseOpenmrsMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +47,7 @@ public class MambaAgeCategory extends BaseOpenmrsMetadata {
 
     @OneToMany(mappedBy = "ageCategory", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("sortOrder asc")
-    private Set<MambaAgeGroup> ageGroups = new HashSet<>();
+    private Set<ReportBuilderAgeGroup> ageGroups = new HashSet<>();
 
     @Override
     public Integer getId() {
@@ -102,11 +102,11 @@ public class MambaAgeCategory extends BaseOpenmrsMetadata {
         this.active = active;
     }
 
-    public Set<MambaAgeGroup> getAgeGroups() {
+    public Set<ReportBuilderAgeGroup> getAgeGroups() {
         return ageGroups;
     }
 
-    public void setAgeGroups(Set<MambaAgeGroup> ageGroups) {
+    public void setAgeGroups(Set<ReportBuilderAgeGroup> ageGroups) {
         this.ageGroups = ageGroups;
     }
 }

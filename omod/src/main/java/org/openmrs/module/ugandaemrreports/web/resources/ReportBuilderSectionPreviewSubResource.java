@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
-import org.openmrs.module.ugandaemrreports.model.MambaSection;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderSection;
 import org.openmrs.module.ugandaemrreports.web.controller.dto.SectionPreviewRequest;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
@@ -21,17 +21,17 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * POST /ws/rest/v1/mambasection/{uuid}/preview
+ * POST /ws/rest/v1/reportbuildersection/{uuid}/preview
  * Body: { indicatorUuid, params, maxRows }
  */
 @SubResource(
-        parent = MambaSectionResource.class,
+        parent = ReportBuilderSectionResource.class,
         path = "preview",
         supportedClass = SectionPreviewRequest.class,
         supportedOpenmrsVersions = {"2.*"}
 )
-public class MambaSectionPreviewSubResource
-        extends DelegatingSubResource<SectionPreviewRequest, MambaSection, MambaSectionResource> {
+public class ReportBuilderSectionPreviewSubResource
+        extends DelegatingSubResource<SectionPreviewRequest, ReportBuilderSection, ReportBuilderSectionResource> {
 
     private UgandaEMRReportsService service() {
         return Context.getService(UgandaEMRReportsService.class);
@@ -43,7 +43,7 @@ public class MambaSectionPreviewSubResource
      * really have persisted delegates, so return null safely.
      */
     @Override
-    public MambaSection getParent(SectionPreviewRequest delegate) {
+    public ReportBuilderSection getParent(SectionPreviewRequest delegate) {
         return null;
     }
 
@@ -53,7 +53,7 @@ public class MambaSectionPreviewSubResource
      * We do nothing safely.
      */
     @Override
-    public void setParent(SectionPreviewRequest delegate, MambaSection parent) {
+    public void setParent(SectionPreviewRequest delegate, ReportBuilderSection parent) {
         // no-op
     }
 
@@ -61,7 +61,7 @@ public class MambaSectionPreviewSubResource
      * We don't support listing preview "items"
      */
     @Override
-    public PageableResult doGetAll(MambaSection parent, RequestContext context) throws ResponseException {
+    public PageableResult doGetAll(ReportBuilderSection parent, RequestContext context) throws ResponseException {
         throw new ResourceDoesNotSupportOperationException();
     }
 
@@ -143,7 +143,7 @@ public class MambaSectionPreviewSubResource
             }
         }
 
-        MambaSection section = service().getMambaSectionByUuid(parentUniqueId);
+        ReportBuilderSection section = service().getReportBuilderSectionByUuid(parentUniqueId);
         if (section == null) {
             throw new ObjectNotFoundException();
         }

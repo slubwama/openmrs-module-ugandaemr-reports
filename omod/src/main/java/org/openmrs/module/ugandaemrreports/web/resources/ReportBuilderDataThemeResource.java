@@ -2,7 +2,7 @@ package org.openmrs.module.ugandaemrreports.web.resources;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
-import org.openmrs.module.ugandaemrreports.model.MambaReport;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderDataTheme;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
@@ -17,56 +17,48 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/mambareport", supportedClass = MambaReport.class, supportedOpenmrsVersions = { "1.8 - 9.0.*" })
-public class MambaReportResource extends DelegatingCrudResource<MambaReport> {
+@Resource(
+        name = RestConstants.VERSION_1 + "/reportbuilderdatatheme",
+        supportedClass = ReportBuilderDataTheme.class,
+        supportedOpenmrsVersions = {"1.8 - 9.0.*"}
+)
+public class ReportBuilderDataThemeResource extends DelegatingCrudResource<ReportBuilderDataTheme> {
 
     private UgandaEMRReportsService service() {
         return Context.getService(UgandaEMRReportsService.class);
     }
 
     @Override
-    public MambaReport getByUniqueId(String uuid) {
-        return service().getMambaReportByUuid(uuid);
+    public ReportBuilderDataTheme getByUniqueId(String uuid) {
+        return service().getReportBuilderDataThemeByUuid(uuid);
     }
 
     @Override
-    protected void delete(MambaReport report, String reason, RequestContext context) throws ResponseException {
-        if (reason == null || reason.trim().isEmpty()) {
-            reason = "Retired via REST";
+    public ReportBuilderDataTheme newDelegate() {
+        return new ReportBuilderDataTheme();
+    }
+
+    @Override
+    public ReportBuilderDataTheme save(ReportBuilderDataTheme theme) {
+        if (theme.getConfigJson() == null || theme.getConfigJson().trim().isEmpty()) {
+            throw new IllegalArgumentException("configJson is required");
         }
-        service().retireMambaReport(report, reason);
-    }
-
-    @Override
-    public void purge(MambaReport report, RequestContext context) throws ResponseException {
-        service().purgeMambaReport(report);
-    }
-
-    @Override
-    public MambaReport newDelegate() {
-        return new MambaReport();
-    }
-
-    @Override
-    public MambaReport save(MambaReport report) {
-        return service().saveMambaReport(report);
+        return service().saveReportBuilderDataTheme(theme);
     }
 
     @Override
     public PageableResult doGetAll(RequestContext context) throws ResponseException {
+
         String q = context.getParameter("q");
         boolean includeRetired = Boolean.parseBoolean(
                 context.getParameter("includeRetired") != null ? context.getParameter("includeRetired") : "false"
         );
 
-        List<MambaReport> results = service().getMambaReports(
-                q,
-                includeRetired,
-                context.getStartIndex(),
-                context.getLimit()
+        List<ReportBuilderDataTheme> results = service().getReportBuilderDataThemes(
+                q, includeRetired, context.getStartIndex(), context.getLimit()
         );
 
-        return new NeedsPaging<MambaReport>(results, context);
+        return new NeedsPaging<>(results, context);
     }
 
     @Override
@@ -76,12 +68,14 @@ public class MambaReportResource extends DelegatingCrudResource<MambaReport> {
 
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
+
         if (rep instanceof DefaultRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
+            d.addProperty("domain");
             d.addProperty("retired");
             return d;
         }
@@ -92,10 +86,12 @@ public class MambaReportResource extends DelegatingCrudResource<MambaReport> {
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
+            d.addProperty("domain");
             d.addProperty("configJson");
             d.addProperty("metaJson");
             d.addProperty("retired");
             d.addProperty("retireReason");
+            d.addProperty("auditInfo", findMethod("getAuditInfo"));
             return d;
         }
 
@@ -108,7 +104,8 @@ public class MambaReportResource extends DelegatingCrudResource<MambaReport> {
         d.addRequiredProperty("name");
         d.addProperty("description");
         d.addProperty("code");
-        d.addProperty("configJson");
+        d.addProperty("domain");
+        d.addRequiredProperty("configJson");
         d.addProperty("metaJson");
         return d;
     }
@@ -117,11 +114,24 @@ public class MambaReportResource extends DelegatingCrudResource<MambaReport> {
     public DelegatingResourceDescription getUpdatableProperties() {
         return getCreatableProperties();
     }
-
-    public String getDisplayString(MambaReport report) {
-        if (report.getName() != null && report.getCode() != null) {
-            return report.getName() + " (" + report.getCode() + ")";
+    
+    public String getDisplayString(ReportBuilderDataTheme theme) {
+        if (theme.getName() != null && theme.getCode() != null) {
+            return theme.getName() + " (" + theme.getCode() + ")";
         }
-        return report.getName() != null ? report.getName() : report.getUuid();
+        return theme.getName() != null ? theme.getName() : theme.getUuid();
+    }
+
+    @Override
+    protected void delete(ReportBuilderDataTheme theme, String reason, RequestContext context) throws ResponseException {
+        if (reason == null || reason.trim().isEmpty()) {
+            reason = "Retired via REST";
+        }
+        service().retireReportBuilderDataTheme(theme, reason);
+    }
+
+    @Override
+    public void purge(ReportBuilderDataTheme theme, RequestContext context) throws ResponseException {
+        service().purgeReportBuilderDataTheme(theme);
     }
 }

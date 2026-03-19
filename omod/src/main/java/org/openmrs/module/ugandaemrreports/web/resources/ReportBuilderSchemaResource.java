@@ -24,10 +24,10 @@ import java.util.UUID;
  */
 @Resource(
         name = RestConstants.VERSION_1 + "/schema",
-        supportedClass = MambaSchemaResource.MambaTable.class,
+        supportedClass = ReportBuilderSchemaResource.MambaTable.class,
         supportedOpenmrsVersions = {"1.8 - 9.0.*"}
 )
-public class MambaSchemaResource extends DelegatingCrudResource<MambaSchemaResource.MambaTable> {
+public class ReportBuilderSchemaResource extends DelegatingCrudResource<ReportBuilderSchemaResource.MambaTable> {
 
     /**
      * RESTWS likes delegates that have a uuid.

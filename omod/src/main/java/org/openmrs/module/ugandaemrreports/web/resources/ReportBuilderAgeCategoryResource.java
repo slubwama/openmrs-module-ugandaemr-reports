@@ -2,7 +2,7 @@ package org.openmrs.module.ugandaemrreports.web.resources;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
-import org.openmrs.module.ugandaemrreports.model.MambaSection;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderAgeCategory;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
@@ -15,39 +15,41 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/mambasection", supportedClass = MambaSection.class, supportedOpenmrsVersions = {"1.8 - 9.0.*"})
-public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
+@Resource(
+        name = RestConstants.VERSION_1 + "/reportbuilderagecategory",
+        supportedClass = ReportBuilderAgeCategory.class,
+        supportedOpenmrsVersions = { "2.*", "3.*" }
+)
+public class ReportBuilderAgeCategoryResource extends DelegatingCrudResource<ReportBuilderAgeCategory> {
 
     private UgandaEMRReportsService service() {
         return Context.getService(UgandaEMRReportsService.class);
     }
 
     @Override
-    public MambaSection getByUniqueId(String uuid) {
-        return service().getMambaSectionByUuid(uuid);
+    public ReportBuilderAgeCategory getByUniqueId(String uuid) {
+        return service().getAgeCategoryByUuid(uuid);
     }
 
     @Override
-    protected void delete(MambaSection section, String reason, RequestContext context) throws ResponseException {
-        if (reason == null || reason.trim().isEmpty()) {
-            reason = "Retired via REST";
-        }
-        service().retireMambaSection(section, reason);
+    protected void delete(ReportBuilderAgeCategory category, String reason, RequestContext context) throws ResponseException {
+        if (reason == null || reason.trim().isEmpty()) reason = "Retired via REST";
+        service().retireAgeCategory(category, reason);
     }
 
     @Override
-    public void purge(MambaSection section, RequestContext context) throws ResponseException {
-        service().purgeMambaSection(section);
+    public void purge(ReportBuilderAgeCategory category, RequestContext context) throws ResponseException {
+        service().purgeAgeCategory(category);
     }
 
     @Override
-    public MambaSection newDelegate() {
-        return new MambaSection();
+    public ReportBuilderAgeCategory newDelegate() {
+        return new ReportBuilderAgeCategory();
     }
 
     @Override
-    public MambaSection save(MambaSection section) {
-        return service().saveMambaSection(section);
+    public ReportBuilderAgeCategory save(ReportBuilderAgeCategory category) {
+        return service().saveAgeCategory(category);
     }
 
     @Override
@@ -57,15 +59,22 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
         boolean includeRetired = Boolean.parseBoolean(
                 context.getParameter("includeRetired") != null ? context.getParameter("includeRetired") : "false"
         );
+Context.getAdministrationService().executeSQL("",false);
+        Boolean activeOnly = null;
+        String activeOnlyStr = context.getParameter("activeOnly");
+        if (activeOnlyStr != null && !activeOnlyStr.trim().isEmpty()) {
+            activeOnly = Boolean.parseBoolean(activeOnlyStr);
+        }
 
-        List<MambaSection> results = service().getMambaSections(
+        List<ReportBuilderAgeCategory> list = service().getAgeCategories(
                 q,
                 includeRetired,
+                activeOnly,
                 context.getStartIndex(),
                 context.getLimit()
         );
 
-        return new NeedsPaging<>(results, context);
+        return new NeedsPaging<>(list, context);
     }
 
     @Override
@@ -76,15 +85,26 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
 
+        // ✅ REQUIRED so nested ageCategory can serialize as REF
+        if (rep instanceof RefRepresentation) {
+            DelegatingResourceDescription d = new DelegatingResourceDescription();
+            d.addProperty("uuid");
+            d.addProperty("display", findMethod("getDisplayString"));
+            return d;
+        }
+
         if (rep instanceof DefaultRepresentation) {
             DelegatingResourceDescription d = new DelegatingResourceDescription();
             d.addProperty("uuid");
-            d.addProperty("display",findMethod("getDisplayString"));
+            d.addProperty("display", findMethod("getDisplayString"));
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
+            d.addProperty("version");
+            d.addProperty("effectiveFrom");
+            d.addProperty("effectiveTo");
+            d.addProperty("active");
             d.addProperty("retired");
-            d.addProperty("auditInfo", findMethod("getAuditInfo"));
             return d;
         }
 
@@ -95,8 +115,11 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
             d.addProperty("name");
             d.addProperty("description");
             d.addProperty("code");
-            d.addProperty("configJson");
-            d.addProperty("metaJson");
+            d.addProperty("version");
+            d.addProperty("effectiveFrom");
+            d.addProperty("effectiveTo");
+            d.addProperty("active");
+            d.addProperty("ageGroups"); // careful: may be lazy
             d.addProperty("retired");
             d.addProperty("retireReason");
             d.addProperty("auditInfo", findMethod("getAuditInfo"));
@@ -110,10 +133,12 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
     public DelegatingResourceDescription getCreatableProperties() {
         DelegatingResourceDescription d = new DelegatingResourceDescription();
         d.addRequiredProperty("name");
+        d.addRequiredProperty("code");
         d.addProperty("description");
-        d.addProperty("code");
-        d.addProperty("configJson");
-        d.addProperty("metaJson");
+        d.addProperty("version");
+        d.addProperty("effectiveFrom");
+        d.addProperty("effectiveTo");
+        d.addProperty("active");
         return d;
     }
 
@@ -122,10 +147,7 @@ public class MambaSectionResource extends DelegatingCrudResource<MambaSection> {
         return getCreatableProperties();
     }
 
-    public String getDisplayString(MambaSection section) {
-        if (section.getName() != null && section.getCode() != null) {
-            return section.getName() + " (" + section.getCode() + ")";
-        }
-        return section.getName() != null ? section.getName() : section.getUuid();
+    public String getDisplayString(ReportBuilderAgeCategory c) {
+        return c.getName() != null ? c.getName() : c.getUuid();
     }
 }

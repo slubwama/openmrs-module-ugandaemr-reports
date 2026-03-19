@@ -2,8 +2,8 @@ package org.openmrs.module.ugandaemrreports.web.resources;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
-import org.openmrs.module.ugandaemrreports.model.MambaAgeCategory;
-import org.openmrs.module.ugandaemrreports.model.MambaAgeGroup;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderAgeCategory;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderAgeGroup;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
@@ -33,11 +33,11 @@ import java.util.List;
  * Later (recommended): add a uuid column/field so it behaves like other OpenMRS resources.
  */
 @Resource(
-        name = RestConstants.VERSION_1 + "/mambaagegroup",
-        supportedClass = MambaAgeGroup.class,
+        name = RestConstants.VERSION_1 + "/reportbuilderagegroup",
+        supportedClass = ReportBuilderAgeGroup.class,
         supportedOpenmrsVersions = { "2.*", "3.*" }
 )
-public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup> {
+public class ReportBuilderAgeGroupResource extends DelegatingCrudResource<ReportBuilderAgeGroup> {
 
     private UgandaEMRReportsService service() {
         return Context.getService(UgandaEMRReportsService.class);
@@ -48,15 +48,15 @@ public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup>
     // ----------------------------
 
     @Override
-    public MambaAgeGroup newDelegate() {
-        return new MambaAgeGroup();
+    public ReportBuilderAgeGroup newDelegate() {
+        return new ReportBuilderAgeGroup();
     }
 
     /**
      * Since MambaAgeGroup has no uuid field, we treat the numeric id as uniqueId.
      */
     @Override
-    public MambaAgeGroup getByUniqueId(String uniqueId) {
+    public ReportBuilderAgeGroup getByUniqueId(String uniqueId) {
         if (uniqueId == null || uniqueId.trim().isEmpty()) return null;
         try {
             Integer id = Integer.valueOf(uniqueId);
@@ -68,12 +68,12 @@ public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup>
     }
 
     @Override
-    public MambaAgeGroup save(MambaAgeGroup group) {
+    public ReportBuilderAgeGroup save(ReportBuilderAgeGroup group) {
         return service().saveAgeGroup(group);
     }
 
     @Override
-    protected void delete(MambaAgeGroup group, String reason, RequestContext context) throws ResponseException {
+    protected void delete(ReportBuilderAgeGroup group, String reason, RequestContext context) throws ResponseException {
         // soft delete pattern: set active=false (like your schema is_active)
         if (group == null) return;
         group.setActive(false);
@@ -81,7 +81,7 @@ public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup>
     }
 
     @Override
-    public void purge(MambaAgeGroup group, RequestContext context) throws ResponseException {
+    public void purge(ReportBuilderAgeGroup group, RequestContext context) throws ResponseException {
         service().purgeAgeGroup(group);
     }
 
@@ -109,7 +109,7 @@ public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup>
             activeOnly = Boolean.parseBoolean(activeOnlyStr);
         }
 
-        MambaAgeCategory category = null;
+        ReportBuilderAgeCategory category = null;
         if (categoryUuid != null && !categoryUuid.trim().isEmpty()) {
             category = service().getAgeCategoryByUuid(categoryUuid);
         } else if (categoryCode != null && !categoryCode.trim().isEmpty()) {
@@ -117,7 +117,7 @@ public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup>
         }
 
         // If you haven't implemented service search yet, return empty to avoid 500s.
-        List<MambaAgeGroup> groups;
+        List<ReportBuilderAgeGroup> groups;
         try {
             groups = service().getAgeGroups(
                     q,
@@ -190,7 +190,7 @@ public class MambaAgeGroupResource extends DelegatingCrudResource<MambaAgeGroup>
         return getCreatableProperties();
     }
 
-    public String getDisplayString(MambaAgeGroup g) {
+    public String getDisplayString(ReportBuilderAgeGroup g) {
         if (g == null) return "";
         String label = g.getLabel() != null ? g.getLabel() : "";
         String code = g.getCode() != null ? g.getCode() : "";

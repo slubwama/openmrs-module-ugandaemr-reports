@@ -2,7 +2,7 @@ package org.openmrs.module.ugandaemrreports.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openmrs.module.ugandaemrreports.model.MambaIndicator;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderIndicator;
 
 public final class MambaIndicatorValidator {
 
@@ -10,7 +10,7 @@ public final class MambaIndicatorValidator {
 
     private MambaIndicatorValidator() {}
 
-    public static void validate(MambaIndicator ind) {
+    public static void validate(ReportBuilderIndicator ind) {
         if (ind == null) throw new IllegalArgumentException("Indicator is required");
         if (ind.getKind() == null) throw new IllegalArgumentException("Indicator.kind is required");
         if (isBlank(ind.getName())) throw new IllegalArgumentException("Indicator.name is required");
@@ -24,7 +24,7 @@ public final class MambaIndicatorValidator {
         }
     }
 
-    private static void validateBase(MambaIndicator ind) {
+    private static void validateBase(ReportBuilderIndicator ind) {
         // Allow sqlTemplate to be stored either in configJson.base.sqlTemplate OR in sqlTemplate column.
         // But require at least one.
         final String sql = !isBlank(ind.getSqlTemplate())

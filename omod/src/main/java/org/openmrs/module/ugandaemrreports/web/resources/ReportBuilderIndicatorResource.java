@@ -3,7 +3,7 @@ package org.openmrs.module.ugandaemrreports.web.resources;
 import com.sun.jdi.request.InvalidRequestStateException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
-import org.openmrs.module.ugandaemrreports.model.MambaIndicator;
+import org.openmrs.module.ugandaemrreports.model.ReportBuilderIndicator;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
@@ -15,48 +15,47 @@ import org.openmrs.module.webservices.rest.web.representation.*;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Resource(
-        name = RestConstants.VERSION_1 + "/mambaindicator",
-        supportedClass = MambaIndicator.class,
+        name = RestConstants.VERSION_1 + "/reportbuilderindicator",
+        supportedClass = ReportBuilderIndicator.class,
         supportedOpenmrsVersions = {"1.8 - 9.0.*"}
 )
-public class MambaIndicatorResource extends DelegatingCrudResource<MambaIndicator> {
+public class ReportBuilderIndicatorResource extends DelegatingCrudResource<ReportBuilderIndicator> {
 
     private UgandaEMRReportsService service() {
         return Context.getService(UgandaEMRReportsService.class);
     }
 
     @Override
-    public MambaIndicator getByUniqueId(String uuid) {
-        return service().getMambaIndicatorByUuid(uuid);
+    public ReportBuilderIndicator getByUniqueId(String uuid) {
+        return service().getReportBuilderIndicatorByUuid(uuid);
     }
 
     @Override
-    public MambaIndicator newDelegate() {
-        return new MambaIndicator();
+    public ReportBuilderIndicator newDelegate() {
+        return new ReportBuilderIndicator();
     }
 
     @Override
-    public MambaIndicator save(MambaIndicator indicator) {
+    public ReportBuilderIndicator save(ReportBuilderIndicator indicator) {
         // validation should happen in service (as you already do)
-        return service().saveMambaIndicator(indicator);
+        return service().saveReportBuilderIndicator(indicator);
     }
 
     @Override
-    public void purge(MambaIndicator indicator, RequestContext context) {
-        service().purgeMambaIndicator(indicator);
+    public void purge(ReportBuilderIndicator indicator, RequestContext context) {
+        service().purgeReportBuilderIndicator(indicator);
     }
 
     @Override
-    protected void delete(MambaIndicator indicator, String reason, RequestContext context) throws ResponseException {
+    protected void delete(ReportBuilderIndicator indicator, String reason, RequestContext context) throws ResponseException {
         // DELETE defaults to retire unless purge=true
         if (reason == null || reason.trim().isEmpty()) {
             reason = "Retired via REST";
         }
-        service().retireMambaIndicator(indicator, reason);
+        service().retireReportBuilderIndicator(indicator, reason);
     }
 
     // ---------------------------
@@ -68,7 +67,7 @@ public class MambaIndicatorResource extends DelegatingCrudResource<MambaIndicato
 
         Integer startIndex = context.getStartIndex();
         Integer limit = context.getLimit();
-        List<MambaIndicator> results = service().getAllMambaIndicator(startIndex, limit);
+        List<ReportBuilderIndicator> results = service().getAllReportBuilderIndicator(startIndex, limit);
 
         return new NeedsPaging<>(results, context);
     }
@@ -97,9 +96,9 @@ public class MambaIndicatorResource extends DelegatingCrudResource<MambaIndicato
             includeRetiredFinal = false;
         }
 
-        MambaIndicator.Kind kind = parseEnumOrNull(kindStr, MambaIndicator.Kind.class, "kind");
+        ReportBuilderIndicator.Kind kind = parseEnumOrNull(kindStr, ReportBuilderIndicator.Kind.class, "kind");
 
-        MambaIndicator.ValueType defaultValueType = parseEnumOrNull(defaultValueTypeStr, MambaIndicator.ValueType.class, "defaultValueType");
+        ReportBuilderIndicator.ValueType defaultValueType = parseEnumOrNull(defaultValueTypeStr, ReportBuilderIndicator.ValueType.class, "defaultValueType");
 
         Integer startIndex = context.getStartIndex();
         Integer limit = context.getLimit();
@@ -107,11 +106,11 @@ public class MambaIndicatorResource extends DelegatingCrudResource<MambaIndicato
         // If you want "retired=true only" support, your service should allow it.
         // For now, we pass includeRetiredFinal and let service decide.
 
-        List<MambaIndicator> results = new ArrayList<>();
+        List<ReportBuilderIndicator> results = new ArrayList<>();
         if (q != null) {
-            results = service().searchMambaIndicators(q, kind, includeRetiredFinal, startIndex, limit);
+            results = service().searchReportBuilderIndicators(q, kind, includeRetiredFinal, startIndex, limit);
         } else {
-             results = service().getMambaIndicators(kind, includeRetiredFinal, startIndex, limit);
+             results = service().getReportBuilderIndicators(kind, includeRetiredFinal, startIndex, limit);
         }
 
         // Optional: if client requested retired=true/false explicitly, filter here if service doesn't support it.
@@ -254,7 +253,7 @@ public class MambaIndicatorResource extends DelegatingCrudResource<MambaIndicato
         return "display";
     }
 
-    public String getDisplayString(MambaIndicator indicator) {
+    public String getDisplayString(ReportBuilderIndicator indicator) {
         if (indicator == null) return "";
         if (indicator.getName() != null && indicator.getCode() != null) {
             return indicator.getName() + " (" + indicator.getCode() + ")";

@@ -21,7 +21,7 @@ import javax.persistence.*;
                 @Index(name = "idx_rb_dim_age_group_label", columnList = "label")
         }
 )
-public class MambaAgeGroup {
+public class ReportBuilderAgeGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class MambaAgeGroup {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "age_category_id", nullable = false)
-    private MambaAgeCategory ageCategory;
+    private ReportBuilderAgeCategory ageCategory;
 
     @Column(name = "code", length = 50)
     private String code;
@@ -60,11 +60,11 @@ public class MambaAgeGroup {
         this.id = id;
     }
 
-    public MambaAgeCategory getAgeCategory() {
+    public ReportBuilderAgeCategory getAgeCategory() {
         return ageCategory;
     }
 
-    public void setAgeCategory(MambaAgeCategory ageCategory) {
+    public void setAgeCategory(ReportBuilderAgeCategory ageCategory) {
         this.ageCategory = ageCategory;
     }
 
