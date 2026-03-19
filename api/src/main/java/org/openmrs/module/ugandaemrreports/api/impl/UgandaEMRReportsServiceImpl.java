@@ -65,7 +65,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     private HibernateUgandaEMRReportsDAO dao;
 
 
-
     private final JsonTemplateConverter converter = new JsonTemplateConverter();
 
     public HibernateUgandaEMRReportsDAO getDao() {
@@ -845,7 +844,7 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
     @Override
     public List<ReportBuilderAgeGroup> getAgeGroups(String q, ReportBuilderAgeCategory category, Boolean activeOnly, Integer startIndex, Integer limit) {
-        return dao.getAgeGroups(q,category,activeOnly,startIndex,limit);
+        return dao.getAgeGroups(q, category, activeOnly, startIndex, limit);
     }
 
     @Override
@@ -886,39 +885,332 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     @Override
     public CompiledReportArtifacts compileReport(String reportBuilderReportUuid) {
         ReportDefinitionService reportDefinitionService = Context.getService(ReportDefinitionService.class);
-        ReportService reportService = Context.getService(ReportService.class);
 
         ReportBuilderReport report = getReportBuilderReportByUuid(reportBuilderReportUuid);
         if (report == null) {
-            throw new IllegalArgumentException("MambaReport not found: " + reportBuilderReportUuid);
+            throw new IllegalArgumentException("ReportBuilderReport not found: " + reportBuilderReportUuid);
         }
 
-        JsonNode reportConfig = parseJson(report.getConfigJson(), "Invalid MambaReport configJson");
+        report.setCompileStatus(ReportBuilderReport.ReportCompileStatus.COMPILING);
+        saveReportBuilderReport(report);
 
-        JsonNode definitionNode = reportConfig.path("definition");
-        JsonNode designNode = reportConfig.path("design");
+        try {
+            JsonNode reportConfig = parseJson(report.getConfigJson(), "Invalid ReportBuilderReport configJson");
 
-        JsonNode sections = definitionNode.path("sections");
-        if (!sections.isArray()) {
-            sections = reportConfig.path("sections"); // legacy fallback
-        }
+            JsonNode definitionNode = reportConfig.path("definition");
+            JsonNode designNode = reportConfig.path("design");
 
-        ArrayNode compiledFields = objectMapper.createArrayNode();
-        ArrayNode compiledDesignGroups = objectMapper.createArrayNode();
-        ObjectNode compiledDhis2 = objectMapper.createObjectNode();
-        ArrayNode compiledDhis2Rows = objectMapper.createArrayNode();
+            JsonNode sections = definitionNode.path("sections");
+            if (!sections.isArray()) {
+                sections = reportConfig.path("sections");
+            }
 
-        if (sections.isArray()) {
-            List<JsonNode> sectionRefs = new ArrayList<JsonNode>();
-            for (JsonNode s : sections) {
-                if (s.path("enabled").asBoolean(true)) {
-                    sectionRefs.add(s);
+            ArrayNode compiledFields = objectMapper.createArrayNode();
+            ArrayNode compiledDhis2Rows = objectMapper.createArrayNode();
+
+            if (sections.isArray()) {
+                List<JsonNode> sectionRefs = new ArrayList<JsonNode>();
+                for (JsonNode s : sections) {
+                    if (s.path("enabled").asBoolean(true)) {
+                        sectionRefs.add(s);
+                    }
+                }
+
+                sectionRefs.sort(Comparator.comparingInt(a -> a.path("sortOrder").asInt(9999)));
+
+                for (JsonNode sectionRef : sectionRefs) {
+                    String sectionUuid = sectionRef.path("sectionUuid").asText(null);
+                    if (sectionUuid == null || sectionUuid.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    ReportBuilderSection section = getReportBuilderSectionByUuid(sectionUuid);
+                    if (section == null) {
+                        continue;
+                    }
+
+                    JsonNode sectionConfig = parseJson(section.getConfigJson(), "Invalid section configJson for " + sectionUuid);
+
+                    String sectionName = sectionRef.path("titleOverride").asText(null);
+                    if (sectionName == null || sectionName.trim().isEmpty()) {
+                        sectionName = section.getName();
+                    }
+
+                    ArrayNode sectionFields = compileSectionToReportFields(sectionName, sectionConfig);
+                    for (JsonNode f : sectionFields) {
+                        compiledFields.add(f);
+                    }
+
+                    appendSectionDhis2Mappings(compiledDhis2Rows, sectionConfig);
                 }
             }
 
-            sectionRefs.sort(Comparator.comparingInt(a -> a.path("sortOrder").asInt(9999)));
+            ObjectNode compiledDefinitionRoot = objectMapper.createObjectNode();
+            compiledDefinitionRoot.put("version", 1);
+            compiledDefinitionRoot.put("name", report.getName());
+            compiledDefinitionRoot.put("code", report.getCode());
+            compiledDefinitionRoot.set("report_fields", compiledFields);
 
-            for (JsonNode sectionRef : sectionRefs) {
+            String compiledDefinitionJson;
+            try {
+                compiledDefinitionJson = objectMapper.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(compiledDefinitionRoot);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to serialize compiled report definition JSON", e);
+            }
+
+            String definitionFileName = buildDefinitionFileName(report);
+            File definitionFile;
+            try {
+                definitionFile = ReportDesignFileUtil.writeJsonStringToDesignFile(definitionFileName, compiledDefinitionJson);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to write compiled report definition file", e);
+            }
+
+            ArrayNode compiledDesignGroups;
+            JsonNode authoredGroups = designNode.path("groups");
+            if (authoredGroups.isArray() && authoredGroups.size() > 0) {
+                compiledDesignGroups = compileAuthoredDesignGroups(authoredGroups, sections);
+            } else {
+                compiledDesignGroups = compileGeneratedDesignGroupsFromSections(sections, designNode);
+            }
+
+            ObjectNode compiledDesignRoot = objectMapper.createObjectNode();
+            compiledDesignRoot.put("version", 1);
+            compiledDesignRoot.put("name", report.getName());
+            compiledDesignRoot.put("code", report.getCode());
+            compiledDesignRoot.put("template", designNode.path("template").asText("section-tabular"));
+            compiledDesignRoot.put("arrayName", designNode.path("arrayName").asText("results"));
+            compiledDesignRoot.put("defaultValue", designNode.path("defaultValue").asInt(0));
+            compiledDesignRoot.set("groups", compiledDesignGroups);
+            compiledDesignRoot.set("dimensions", compileDimensionsFromDesignAndSections(designNode, sections));
+
+            ObjectNode compiledDhis2 = objectMapper.createObjectNode();
+            compiledDhis2.put("enabled", compiledDhis2Rows.size() > 0);
+            compiledDhis2.set("rows", compiledDhis2Rows);
+            compiledDesignRoot.set("dhis2", compiledDhis2);
+
+            String compiledDesignJson;
+            try {
+                compiledDesignJson = objectMapper.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(compiledDesignRoot);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to serialize compiled report design JSON", e);
+            }
+
+            ReportDefinition reportDefinition = findOrCreateReportDefinition(report, reportDefinitionService);
+
+            AggregateReportDataSetDefinition dsd = new AggregateReportDataSetDefinition();
+            dsd.setName(report.getName() + " Data Set");
+            dsd.setDescription(report.getDescription());
+            dsd.setReportDesign(definitionFile);
+            dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+            dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+            reportDefinition.setName(report.getName());
+            reportDefinition.setDescription(report.getDescription());
+            reportDefinition.getParameters().clear();
+            reportDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+            reportDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+            reportDefinition.getDataSetDefinitions().clear();
+
+            Map<String, Object> parameterMappings = new HashMap<String, Object>();
+            parameterMappings.put("startDate", "${startDate}");
+            parameterMappings.put("endDate", "${endDate}");
+
+            reportDefinition.addDataSetDefinition("defaultDataSet", dsd, parameterMappings);
+
+            reportDefinition = reportDefinitionService.saveDefinition(reportDefinition);
+
+            ReportDesign jsonDesign = saveOrUpdateJsonReportDesign(reportDefinition, compiledDesignJson, report);
+
+            report.setCompiledReportDefinitionUuid(reportDefinition.getUuid());
+            report.setCompiledReportDesignUuid(jsonDesign != null ? jsonDesign.getUuid() : null);
+            report.setLastCompiledAt(new Date());
+            report.setCompileStatus(ReportBuilderReport.ReportCompileStatus.COMPILED);
+            report = saveReportBuilderReport(report);
+
+            CompiledReportArtifacts out = new CompiledReportArtifacts();
+            out.setReportBuilderReport(report);
+            out.setReportDefinition(reportDefinition);
+            out.setReportDesignFile(definitionFile);
+            out.setCompiledJson(compiledDefinitionJson);
+            return out;
+        } catch (Exception e) {
+            report.setLastCompiledAt(new Date());
+            report.setCompileStatus(ReportBuilderReport.ReportCompileStatus.FAILED);
+            saveReportBuilderReport(report);
+            throw e;
+        }
+    }
+
+    private ArrayNode compileAuthoredDesignGroups(JsonNode authoredGroups, JsonNode sections) {
+        ArrayNode out = objectMapper.createArrayNode();
+        Map<String, ObjectNode> sectionMeta = buildSectionDimensionMetadata(sections);
+
+        for (JsonNode groupNode : authoredGroups) {
+            ObjectNode group = objectMapper.createObjectNode();
+            group.put("title", groupNode.path("title").asText(""));
+
+            String groupId = groupNode.path("id").asText(null);
+            ObjectNode meta = groupId != null ? sectionMeta.get(groupId) : null;
+
+            boolean disaggregated = meta != null && meta.path("disaggregated").asBoolean(false);
+            String ageCategoryCode = meta != null ? meta.path("ageCategoryCode").asText("") : "";
+
+            ArrayNode rowsOut = objectMapper.createArrayNode();
+            JsonNode rows = groupNode.path("rows");
+
+            if (rows.isArray()) {
+                for (JsonNode rowNode : rows) {
+                    ObjectNode row = objectMapper.createObjectNode();
+
+                    String type = rowNode.path("type").asText("indicator");
+                    row.put("type", type);
+                    row.put("label", rowNode.path("label").asText(""));
+                    row.put("indent", rowNode.path("indent").asInt(0));
+
+                    if (rowNode.hasNonNull("code")) {
+                        row.put("code", rowNode.path("code").asText(""));
+                    }
+                    if (rowNode.hasNonNull("indicatorUuid")) {
+                        row.put("indicatorUuid", rowNode.path("indicatorUuid").asText(""));
+                    }
+                    if (rowNode.hasNonNull("span")) {
+                        row.put("span", rowNode.path("span").asText(""));
+                    }
+                    if (rowNode.hasNonNull("emphasis")) {
+                        row.put("emphasis", rowNode.path("emphasis").asText(""));
+                    }
+
+                    if ("indicator".equals(type)) {
+                        row.put("showTotal", rowNode.path("showTotal").asBoolean(true));
+                        row.put("showDisaggregation", rowNode.path("showDisaggregation").asBoolean(disaggregated));
+
+                        if (rowNode.hasNonNull("keyPattern")) {
+                            row.put("keyPattern", rowNode.path("keyPattern").asText(""));
+                        } else {
+                            row.put("keyPattern", disaggregated ? "{code}_{age}_{sex}" : "{code}_TOTAL");
+                        }
+
+                        ObjectNode dims = objectMapper.createObjectNode();
+                        JsonNode authoredDims = rowNode.path("dims");
+                        if (authoredDims.isObject()) {
+                            dims.setAll((ObjectNode) authoredDims);
+                        }
+
+                        if (disaggregated) {
+                            if (!dims.has("age") && ageCategoryCode != null && !ageCategoryCode.trim().isEmpty()) {
+                                dims.put("age", ageCategoryCode);
+                            }
+                            if (!dims.has("sex")) {
+                                dims.put("sex", "sex");
+                            }
+                        }
+
+                        row.set("dims", dims);
+                    } else if ("section-label".equals(type)) {
+                        row.put("showTotal", false);
+                        row.put("showDisaggregation", false);
+                        if (!row.has("span")) {
+                            row.put("span", "all");
+                        }
+                        if (!row.has("emphasis")) {
+                            row.put("emphasis", "section");
+                        }
+                    } else if ("group-label".equals(type)) {
+                        row.put("showTotal", false);
+                        row.put("showDisaggregation", false);
+                        if (!row.has("span")) {
+                            row.put("span", "label-only");
+                        }
+                        if (!row.has("emphasis")) {
+                            row.put("emphasis", "group");
+                        }
+                    } else {
+                        row.put("showTotal", false);
+                        row.put("showDisaggregation", false);
+                    }
+
+                    rowsOut.add(row);
+                }
+            }
+
+            group.set("rows", rowsOut);
+            out.add(group);
+        }
+
+        return out;
+    }
+
+    private ArrayNode compileGeneratedDesignGroupsFromSections(JsonNode sections, JsonNode designNode) {
+        ArrayNode out = objectMapper.createArrayNode();
+        if (!sections.isArray()) {
+            return out;
+        }
+
+        List<JsonNode> sectionRefs = new ArrayList<JsonNode>();
+        for (JsonNode s : sections) {
+            if (s.path("enabled").asBoolean(true)) {
+                sectionRefs.add(s);
+            }
+        }
+        sectionRefs.sort(Comparator.comparingInt(a -> a.path("sortOrder").asInt(9999)));
+
+        for (JsonNode sectionRef : sectionRefs) {
+            String sectionUuid = sectionRef.path("sectionUuid").asText(null);
+            if (sectionUuid == null || sectionUuid.trim().isEmpty()) {
+                continue;
+            }
+
+            ReportBuilderSection section = getReportBuilderSectionByUuid(sectionUuid);
+            if (section == null) {
+                continue;
+            }
+
+            JsonNode sectionConfig = parseJson(section.getConfigJson(), "Invalid section configJson for " + sectionUuid);
+
+            String sectionName = sectionRef.path("titleOverride").asText(null);
+            if (sectionName == null || sectionName.trim().isEmpty()) {
+                sectionName = section.getName();
+            }
+
+            ObjectNode group = compileSectionToDesignGroup(sectionName, sectionConfig, designNode);
+            if (group != null) {
+                out.add(group);
+            }
+        }
+
+        return out;
+    }
+
+    private ObjectNode compileDimensionsFromDesignAndSections(JsonNode designNode, JsonNode sections) {
+        ObjectNode dimensions = objectMapper.createObjectNode();
+
+        ArrayNode sex = objectMapper.createArrayNode();
+        ObjectNode female = objectMapper.createObjectNode();
+        female.put("id", "F");
+        female.put("label", "Female");
+        sex.add(female);
+
+        ObjectNode male = objectMapper.createObjectNode();
+        male.put("id", "M");
+        male.put("label", "Male");
+        sex.add(male);
+
+        dimensions.set("sex", sex);
+
+        JsonNode authoredDimensions = designNode.path("dimensions");
+        if (authoredDimensions.isObject()) {
+            Iterator<String> names = authoredDimensions.fieldNames();
+            while (names.hasNext()) {
+                String name = names.next();
+                dimensions.set(name, authoredDimensions.get(name));
+            }
+        }
+
+        if (sections.isArray()) {
+            for (JsonNode sectionRef : sections) {
                 String sectionUuid = sectionRef.path("sectionUuid").asText(null);
                 if (sectionUuid == null || sectionUuid.trim().isEmpty()) {
                     continue;
@@ -930,106 +1222,42 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
                 }
 
                 JsonNode sectionConfig = parseJson(section.getConfigJson(), "Invalid section configJson for " + sectionUuid);
+                String ageCategoryCode = sectionConfig.path("disaggregation").path("ageCategoryCode").asText(null);
 
-                String sectionName = sectionRef.path("titleOverride").asText(null);
-                if (sectionName == null || sectionName.trim().isEmpty()) {
-                    sectionName = section.getName();
+                if (ageCategoryCode != null && !ageCategoryCode.trim().isEmpty() && !dimensions.has(ageCategoryCode)) {
+                    ArrayNode ageOptions = compileAgeDimension(ageCategoryCode);
+                    if (ageOptions.size() > 0) {
+                        dimensions.set(ageCategoryCode, ageOptions);
+                    }
                 }
-
-                // 1) compile executable definition fields
-                ArrayNode sectionFields = compileSectionToReportFields(sectionName, sectionConfig);
-                for (JsonNode f : sectionFields) {
-                    compiledFields.add(f);
-                }
-
-                // 2) compile design groups
-                ObjectNode designGroup = compileSectionToDesignGroup(sectionName, sectionConfig, designNode);
-                if (designGroup != null) {
-                    compiledDesignGroups.add(designGroup);
-                }
-
-                // 3) collect DHIS2 mappings
-                appendSectionDhis2Mappings(compiledDhis2Rows, sectionConfig);
             }
         }
 
-        // -------- Definition JSON --------
-        ObjectNode compiledDefinitionRoot = objectMapper.createObjectNode();
-        compiledDefinitionRoot.put("version", 1);
-        compiledDefinitionRoot.put("name", report.getName());
-        compiledDefinitionRoot.put("code", report.getCode());
-        compiledDefinitionRoot.set("report_fields", compiledFields);
+        return dimensions;
+    }
 
-        String compiledDefinitionJson;
-        try {
-            compiledDefinitionJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(compiledDefinitionRoot);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize compiled report definition JSON", e);
+    private ArrayNode compileAgeDimension(String ageCategoryCode) {
+        ArrayNode out = objectMapper.createArrayNode();
+
+        ReportBuilderAgeCategory category = getAgeCategoryByCode(ageCategoryCode);
+        if (category == null || category.getAgeGroups() == null) {
+            return out;
         }
 
-        String definitionFileName = buildDefinitionFileName(report);
-        File definitionFile;
-        try {
-            definitionFile = ReportDesignFileUtil.writeJsonStringToDesignFile(definitionFileName, compiledDefinitionJson);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to write compiled report definition file", e);
+        List<ReportBuilderAgeGroup> groups = new ArrayList<ReportBuilderAgeGroup>(category.getAgeGroups());
+        groups.sort(Comparator.comparingInt(g -> g.getSortOrder() == null ? Integer.MAX_VALUE : g.getSortOrder()));
+
+        for (ReportBuilderAgeGroup g : groups) {
+            if (g == null || !Boolean.TRUE.equals(g.getActive()) || g.getLabel() == null || g.getLabel().trim().isEmpty()) {
+                continue;
+            }
+
+            ObjectNode one = objectMapper.createObjectNode();
+            one.put("id", sanitize(g.getLabel()));
+            one.put("label", g.getLabel());
+            out.add(one);
         }
 
-        // -------- Design JSON --------
-        ObjectNode compiledDesignRoot = objectMapper.createObjectNode();
-        compiledDesignRoot.put("version", 1);
-        compiledDesignRoot.put("name", report.getName());
-        compiledDesignRoot.put("code", report.getCode());
-        compiledDesignRoot.put("template", designNode.path("template").asText("section-tabular"));
-        compiledDesignRoot.put("arrayName", designNode.path("arrayName").asText("results"));
-        compiledDesignRoot.put("defaultValue", designNode.path("defaultValue").asInt(0));
-        compiledDesignRoot.set("groups", compiledDesignGroups);
-
-        JsonNode designDimensions = designNode.path("dimensions");
-        if (designDimensions.isObject()) {
-            compiledDesignRoot.set("dimensions", designDimensions);
-        } else {
-            compiledDesignRoot.set("dimensions", objectMapper.createObjectNode());
-        }
-
-        compiledDhis2.put("enabled", compiledDhis2Rows.size() > 0);
-        compiledDhis2.set("rows", compiledDhis2Rows);
-        compiledDesignRoot.set("dhis2", compiledDhis2);
-
-        String compiledDesignJson;
-        try {
-            compiledDesignJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(compiledDesignRoot);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize compiled report design JSON", e);
-        }
-
-        ReportDefinition reportDefinition = findOrCreateReportDefinition(report, reportDefinitionService);
-
-        AggregateReportDataSetDefinition dsd = new AggregateReportDataSetDefinition();
-        dsd.setName(report.getName() + " Data Set");
-        dsd.setDescription(report.getDescription());
-        dsd.setReportDesign(definitionFile);
-        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
-
-        reportDefinition.setName(report.getName());
-        reportDefinition.setDescription(report.getDescription());
-        reportDefinition.getParameters().clear();
-        reportDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        reportDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        reportDefinition.getDataSetDefinitions().clear();
-        reportDefinition.addDataSetDefinition("defaultDataSet", dsd, new HashMap<String, Object>());
-
-        reportDefinition = reportDefinitionService.saveDefinition(reportDefinition);
-
-        // Create or update JSON ReportDesign in DB
-        ReportDesign jsonDesign = saveOrUpdateJsonReportDesign(reportDefinition, compiledDesignJson, report);
-
-        CompiledReportArtifacts out = new CompiledReportArtifacts();
-        out.setReportBuilderReport(report);
-        out.setReportDefinition(reportDefinition);
-        out.setReportDesignFile(definitionFile); // evaluator definition file
-        out.setCompiledJson(compiledDefinitionJson);
         return out;
     }
 
@@ -1046,6 +1274,8 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         sectionRow.put("indent", 0);
         sectionRow.put("span", "all");
         sectionRow.put("emphasis", "section");
+        sectionRow.put("showTotal", false);
+        sectionRow.put("showDisaggregation", false);
         rows.add(sectionRow);
 
         JsonNode indicators = sectionConfig.path("indicators");
@@ -1066,6 +1296,8 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
                 row.put("keyPattern", buildIndicatorKeyPattern(indicator, sectionConfig));
                 row.put("showTotal", true);
                 row.put("showDisaggregation", looksDisaggregated(indicator, sectionConfig));
+                row.put("span", "label-only");
+                row.put("emphasis", "normal");
 
                 ObjectNode dims = objectMapper.createObjectNode();
                 if (looksDisaggregated(indicator, sectionConfig)) {
@@ -1103,6 +1335,7 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         for (JsonNode m : mappings) {
             ObjectNode row = objectMapper.createObjectNode();
             row.put("indicatorUuid", m.path("indicatorUuid").asText(""));
+            row.put("indicatorCode", m.path("indicatorCode").asText(""));
             row.put("dataElementId", m.path("dataElementId").asText(""));
 
             JsonNode coc = m.path("categoryOptionComboByDisagg");
@@ -1119,14 +1352,21 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     private ReportDesign saveOrUpdateJsonReportDesign(ReportDefinition reportDefinition, String compiledDesignJson, ReportBuilderReport report) {
         ReportService reportService = Context.getService(ReportService.class);
 
-        List<ReportDesign> existing = reportService.getReportDesigns(reportDefinition, null, false);
         ReportDesign design = null;
 
-        if (existing != null) {
-            for (ReportDesign d : existing) {
-                if ("JSON".equalsIgnoreCase(d.getName())) {
-                    design = d;
-                    break;
+        String existingDesignUuid = report.getCompiledReportDesignUuid();
+        if (existingDesignUuid != null && !existingDesignUuid.trim().isEmpty()) {
+            design = reportService.getReportDesignByUuid(existingDesignUuid);
+        }
+
+        if (design == null) {
+            List<ReportDesign> existing = reportService.getReportDesigns(reportDefinition, null, false);
+            if (existing != null) {
+                for (ReportDesign d : existing) {
+                    if ("JSON".equalsIgnoreCase(d.getName())) {
+                        design = d;
+                        break;
+                    }
                 }
             }
         }
@@ -1138,6 +1378,7 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
             design.setReportDefinition(reportDefinition);
             design.setRendererType(TextTemplateRenderer.class);
         } else {
+            design.setName("JSON");
             design.setReportDefinition(reportDefinition);
             design.setRendererType(TextTemplateRenderer.class);
             if (design.getResources() != null) {
@@ -1275,8 +1516,17 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return base + ".json";
     }
 
-    private ReportDefinition findOrCreateReportDefinition(ReportBuilderReport report, ReportDefinitionService reportDefinitionService) {
-        // TODO: later persist runtime linkage and re-use exact ReportDefinition UUID
+    private ReportDefinition findOrCreateReportDefinition(ReportBuilderReport report,
+                                                          ReportDefinitionService reportDefinitionService) {
+        String existingUuid = report.getCompiledReportDefinitionUuid();
+
+        if (existingUuid != null && !existingUuid.trim().isEmpty()) {
+            ReportDefinition existing = reportDefinitionService.getDefinitionByUuid(existingUuid);
+            if (existing != null) {
+                return existing;
+            }
+        }
+
         ReportDefinition rd = new ReportDefinition();
         rd.setName(report.getName());
         rd.setDescription(report.getDescription());
@@ -1319,5 +1569,38 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
     private String buildDisaggregatedPlaceholder(String indicatorCode, String ageLabel, String gender) {
         return sanitize(indicatorCode) + "_" + sanitize(ageLabel) + "_" + sanitize(gender);
+    }
+
+    private Map<String, ObjectNode> buildSectionDimensionMetadata(JsonNode sections) {
+        Map<String, ObjectNode> out = new LinkedHashMap<String, ObjectNode>();
+
+        if (!sections.isArray()) {
+            return out;
+        }
+
+        for (JsonNode sectionRef : sections) {
+            String sectionUuid = sectionRef.path("sectionUuid").asText(null);
+            if (sectionUuid == null || sectionUuid.trim().isEmpty()) {
+                continue;
+            }
+
+            ReportBuilderSection section = getReportBuilderSectionByUuid(sectionUuid);
+            if (section == null) {
+                continue;
+            }
+
+            JsonNode sectionConfig = parseJson(section.getConfigJson(), "Invalid section configJson for " + sectionUuid);
+
+            ObjectNode meta = objectMapper.createObjectNode();
+            boolean disaggregated = sectionConfig.path("disaggregation").isObject()
+                    && !sectionConfig.path("disaggregation").path("none").asBoolean(false);
+
+            meta.put("disaggregated", disaggregated);
+            meta.put("ageCategoryCode", sectionConfig.path("disaggregation").path("ageCategoryCode").asText(""));
+
+            out.put(sectionUuid, meta);
+        }
+
+        return out;
     }
 }

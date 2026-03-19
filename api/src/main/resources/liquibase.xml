@@ -595,7 +595,7 @@
         </changeSet>
 
 
-    <changeSet id="ugandaemrreports-20260316-01-create-mamba-report" author="slubwama">
+    <changeSet id="ugandaemrreports-20260316-01-create-report-builder-report" author="slubwama">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="report_builder_report"/>
@@ -607,41 +607,47 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-                <column name="uuid" type="CHAR(38)">
-                    <constraints nullable="false" unique="true"/>
-                </column>
+            <column name="uuid" type="CHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
 
-                <column name="name" type="VARCHAR(255)">
-                    <constraints nullable="false"/>
-                </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
 
-                <column name="description" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
 
-                <column name="code" type="VARCHAR(100)"/>
+            <column name="code" type="VARCHAR(100)"/>
 
-                <column name="config_json" type="LONGTEXT"/>
+            <column name="config_json" type="LONGTEXT"/>
 
-                <column name="meta_json" type="LONGTEXT"/>
+            <column name="meta_json" type="LONGTEXT"/>
 
-                <column name="creator" type="INT">
-                    <constraints nullable="false"/>
-                </column>
+            <!-- Runtime artifact references -->
+            <column name="compiled_report_definition_uuid" type="CHAR(38)"/>
+            <column name="compiled_report_design_uuid" type="CHAR(38)"/>
+            <column name="last_compiled_at" type="DATETIME"/>
+            <column name="compile_status" type="VARCHAR(50)"/>
 
-                <column name="date_created" type="DATETIME">
-                    <constraints nullable="false"/>
-                </column>
+            <column name="creator" type="INT">
+                <constraints nullable="false"/>
+            </column>
 
-                <column name="changed_by" type="INT"/>
-                <column name="date_changed" type="DATETIME"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
 
-                <column name="retired" type="BIT(1)" defaultValueBoolean="false">
-                    <constraints nullable="false"/>
-                </column>
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
 
-                <column name="retired_by" type="INT"/>
-                <column name="date_retired" type="DATETIME"/>
-                <column name="retire_reason" type="VARCHAR(255)"/>
-            </createTable>
+            <column name="retired" type="BIT(1)" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="retired_by" type="INT"/>
+            <column name="date_retired" type="DATETIME"/>
+            <column name="retire_reason" type="VARCHAR(255)"/>
+        </createTable>
 
         <addForeignKeyConstraint
                 baseTableName="report_builder_report"
@@ -678,6 +684,18 @@
 
         <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_retired">
             <column name="retired"/>
+        </createIndex>
+
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_compiled_definition_uuid">
+            <column name="compiled_report_definition_uuid"/>
+        </createIndex>
+
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_compiled_design_uuid">
+            <column name="compiled_report_design_uuid"/>
+        </createIndex>
+
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_compile_status">
+            <column name="compile_status"/>
         </createIndex>
     </changeSet>
 </databaseChangeLog>

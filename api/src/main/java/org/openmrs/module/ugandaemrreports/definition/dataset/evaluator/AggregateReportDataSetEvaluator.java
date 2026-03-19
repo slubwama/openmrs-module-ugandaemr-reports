@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Handler(supports = { AggregateReportDataSetDefinition.class })
@@ -50,8 +51,12 @@ public class AggregateReportDataSetEvaluator implements DataSetEvaluator {
     private DataSetRow getReportQuery(AggregateReportDataSetDefinition definition, EvaluationContext evaluationContext) {
         DataSetRow row = new DataSetRow();
 
-        String startDate = DateUtil.formatDate(definition.getStartDate(), "yyyy-MM-dd");
-        String endDate = DateUtil.formatDate(definition.getEndDate(), "yyyy-MM-dd");
+        Date startDateValue = resolveDateParameter(evaluationContext, "startDate", definition.getStartDate());
+        Date endDateValue = resolveDateParameter(evaluationContext, "endDate", definition.getEndDate());
+
+        String startDate = formatDateYmd(startDateValue);
+        String endDate = formatDateYmd(endDateValue);
+
         File file = definition.getReportDesign();
 
         if (file == null) {
@@ -199,6 +204,18 @@ public class AggregateReportDataSetEvaluator implements DataSetEvaluator {
         return row;
     }
 
+    private Date resolveDateParameter(EvaluationContext context, String name, Date fallback) {
+        Object val = context.getParameterValue(name);
+        if (val instanceof Date) {
+            return (Date) val;
+        }
+        return fallback;
+    }
+
+    private String formatDateYmd(Date date) {
+        return date != null ? DateUtil.formatDate(date, "yyyy-MM-dd") : null;
+    }
+
     private static String cleanupSql(String sql) {
         if (sql == null) {
             return "";
@@ -214,8 +231,17 @@ public class AggregateReportDataSetEvaluator implements DataSetEvaluator {
     }
 
     private static String applyDatePlaceholders(String sql, String startDate, String endDate) {
-        return sql.replace(":startDate", startDate)
-                .replace(":endDate", endDate);
+        String out = sql;
+
+        if (startDate != null) {
+            out = out.replace(":startDate", "'" + startDate + "'");
+        }
+
+        if (endDate != null) {
+            out = out.replace(":endDate", "'" + endDate + "'");
+        }
+
+        return out;
     }
 
     private static String buildBaseColumnKey(String indicatorCode, String indicatorName, String sectionName) {
