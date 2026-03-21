@@ -594,6 +594,85 @@
                     constraintName="uq_rb_dim_age_group_cat_label"/>
         </changeSet>
 
+    <changeSet id="ugandaemrreports-20260320-01-create-report-builder-report-category" author="slubwama">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="report_builder_report_category"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="report_builder_report_category">
+            <column name="report_builder_report_category_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="uuid" type="CHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="VARCHAR(255)"/>
+
+            <column name="creator" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+
+            <column name="retired" type="BIT(1)" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="retired_by" type="INT"/>
+            <column name="date_retired" type="DATETIME"/>
+            <column name="retire_reason" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="report_builder_report_category"
+                baseColumnNames="creator"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_rb_report_category_creator"/>
+
+        <addForeignKeyConstraint
+                baseTableName="report_builder_report_category"
+                baseColumnNames="changed_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_rb_report_category_changed_by"/>
+
+        <addForeignKeyConstraint
+                baseTableName="report_builder_report_category"
+                baseColumnNames="retired_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_rb_report_category_retired_by"/>
+
+        <createIndex tableName="report_builder_report_category"
+                     indexName="idx_report_builder_report_category_uuid"
+                     unique="true">
+            <column name="uuid"/>
+        </createIndex>
+
+        <createIndex tableName="report_builder_report_category"
+                     indexName="idx_report_builder_report_category_retired">
+            <column name="retired"/>
+        </createIndex>
+
+        <createIndex tableName="report_builder_report_category"
+                     indexName="idx_report_builder_report_category_name">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
 
     <changeSet id="ugandaemrreports-20260316-01-create-report-builder-report" author="slubwama">
         <preConditions onFail="MARK_RAN">
@@ -619,6 +698,14 @@
 
             <column name="code" type="VARCHAR(100)"/>
 
+            <!-- NEW: Report Type -->
+            <column name="report_type" type="VARCHAR(30)" defaultValue="AGGREGATE">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- NEW: Category -->
+            <column name="category_id" type="INT"/>
+
             <column name="config_json" type="LONGTEXT"/>
 
             <column name="meta_json" type="LONGTEXT"/>
@@ -627,8 +714,13 @@
             <column name="compiled_report_definition_uuid" type="CHAR(38)"/>
             <column name="compiled_report_design_uuid" type="CHAR(38)"/>
             <column name="last_compiled_at" type="DATETIME"/>
-            <column name="compile_status" type="VARCHAR(50)"/>
 
+            <!-- ENUM stored as STRING -->
+            <column name="compile_status" type="VARCHAR(30)" defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- OpenMRS metadata fields -->
             <column name="creator" type="INT">
                 <constraints nullable="false"/>
             </column>
@@ -648,6 +740,8 @@
             <column name="date_retired" type="DATETIME"/>
             <column name="retire_reason" type="VARCHAR(255)"/>
         </createTable>
+
+        <!-- ================= FKs ================= -->
 
         <addForeignKeyConstraint
                 baseTableName="report_builder_report"
@@ -670,6 +764,16 @@
                 referencedColumnNames="user_id"
                 constraintName="fk_report_builder_report_retired_by"/>
 
+        <!-- NEW FK: Category -->
+        <addForeignKeyConstraint
+                baseTableName="report_builder_report"
+                baseColumnNames="category_id"
+                referencedTableName="report_builder_category"
+                referencedColumnNames="report_builder_category_id"
+                constraintName="fk_report_builder_report_category"/>
+
+        <!-- ================= INDEXES ================= -->
+
         <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_uuid" unique="true">
             <column name="uuid"/>
         </createIndex>
@@ -682,8 +786,20 @@
             <column name="code"/>
         </createIndex>
 
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_type">
+            <column name="report_type"/>
+        </createIndex>
+
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_category">
+            <column name="category_id"/>
+        </createIndex>
+
         <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_retired">
             <column name="retired"/>
+        </createIndex>
+
+        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_compile_status">
+            <column name="compile_status"/>
         </createIndex>
 
         <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_compiled_definition_uuid">
@@ -694,8 +810,132 @@
             <column name="compiled_report_design_uuid"/>
         </createIndex>
 
-        <createIndex tableName="report_builder_report" indexName="idx_report_builder_report_compile_status">
-            <column name="compile_status"/>
+    </changeSet>
+
+    <changeSet id="ugandaemrreports-20260321-01-create-report-library" author="slubwama">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="report_library"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="report_library">
+            <column name="report_library_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="uuid" type="CHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="VARCHAR(255)"/>
+
+            <column name="code" type="VARCHAR(100)"/>
+
+            <column name="source_type" type="VARCHAR(30)" defaultValue="LEGACY">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="report_definition_uuid" type="CHAR(38)"/>
+            <column name="report_builder_report_uuid" type="CHAR(38)"/>
+
+            <column name="category_id" type="INT"/>
+
+            <column name="report_type" type="VARCHAR(30)" defaultValue="AGGREGATE">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="migrated" type="BIT(1)" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="creator" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+
+            <column name="retired" type="BIT(1)" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="retired_by" type="INT"/>
+            <column name="date_retired" type="DATETIME"/>
+            <column name="retire_reason" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="report_library"
+                baseColumnNames="creator"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_report_library_creator"/>
+
+        <addForeignKeyConstraint
+                baseTableName="report_library"
+                baseColumnNames="changed_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_report_library_changed_by"/>
+
+        <addForeignKeyConstraint
+                baseTableName="report_library"
+                baseColumnNames="retired_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_report_library_retired_by"/>
+
+        <addForeignKeyConstraint
+                baseTableName="report_library"
+                baseColumnNames="category_id"
+                referencedTableName="report_builder_report_category"
+                referencedColumnNames="report_builder_report_category_id"
+                constraintName="fk_report_library_category"/>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_uuid" unique="true">
+            <column name="uuid"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_name">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_code">
+            <column name="code"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_source_type">
+            <column name="source_type"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_report_type">
+            <column name="report_type"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_migrated">
+            <column name="migrated"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_category">
+            <column name="category_id"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_report_definition_uuid">
+            <column name="report_definition_uuid"/>
+        </createIndex>
+
+        <createIndex tableName="report_library" indexName="idx_report_library_report_builder_uuid">
+            <column name="report_builder_report_uuid"/>
         </createIndex>
     </changeSet>
+
 </databaseChangeLog>

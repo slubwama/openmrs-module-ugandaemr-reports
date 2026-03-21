@@ -20,6 +20,14 @@ public class ReportBuilderReport extends BaseOpenmrsMetadata implements Serializ
     @Column(name = "code", length = 100)
     private String code;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "report_type", length = 30, nullable = false)
+    private ReportType reportType = ReportType.AGGREGATE;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private ReportCategory category;
+
     @Lob
     @Column(name = "config_json")
     private String configJson;
@@ -37,8 +45,9 @@ public class ReportBuilderReport extends BaseOpenmrsMetadata implements Serializ
     @Column(name = "last_compiled_at")
     private Date lastCompiledAt;
 
-    @Column(name = "compile_status", length = 50)
-    private ReportCompileStatus compileStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "compile_status", length = 30, nullable = false)
+    private ReportCompileStatus compileStatus = ReportCompileStatus.DRAFT;
 
     public Integer getId() {
         return id;
@@ -58,6 +67,26 @@ public class ReportBuilderReport extends BaseOpenmrsMetadata implements Serializ
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public ReportType getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(ReportType reportType) {
+        this.reportType = reportType;
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = ReportType.fromString(reportType);
+    }
+
+    public ReportCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ReportCategory category) {
+        this.category = category;
     }
 
     public String getConfigJson() {
@@ -113,6 +142,21 @@ public class ReportBuilderReport extends BaseOpenmrsMetadata implements Serializ
 
     public void setCompileStatus(ReportCompileStatus compileStatus) {
         this.compileStatus = compileStatus;
+    }
+
+    public enum ReportType {
+        AGGREGATE,
+        LINE_LIST;
+        public static ReportType fromString(String value) {
+            if (value == null || value.trim().isEmpty()) {
+                return AGGREGATE;
+            }
+            try {
+                return ReportType.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                return AGGREGATE;
+            }
+        }
     }
 
     public enum ReportCompileStatus {

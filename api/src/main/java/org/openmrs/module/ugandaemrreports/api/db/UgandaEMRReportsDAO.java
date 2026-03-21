@@ -146,4 +146,30 @@ public interface UgandaEMRReportsDAO {
    void retireReportBuilderReport(ReportBuilderReport report, String reason);
 
     void purgeReportBuilderReport(ReportBuilderReport report);
+
+    // ReportCategory
+    ReportCategory saveReportCategory(ReportCategory category);
+
+    ReportCategory getReportCategoryById(Integer id);
+
+    ReportCategory getReportCategoryByUuid(String uuid);
+
+    List<ReportCategory> getReportCategories(String q, boolean includeRetired, Integer startIndex, Integer limit);
+
+    long getReportCategoriesCount(String q, boolean includeRetired);
+
+    void purgeReportCategory(ReportCategory category);
+
+    ReportLibrary saveReportLibrary(ReportLibrary reportLibrary);
+
+    ReportLibrary getReportLibraryById(Integer id);
+
+    ReportLibrary getReportLibraryByUuid(String uuid);
+
+    List<ReportLibrary> getReportLibraries(String q, boolean includeRetired, Integer startIndex, Integer limit);
+
+    long getReportLibrariesCount(String q, boolean includeRetired);
+
+    void purgeReportLibrary(ReportLibrary reportLibrary);
+
 }

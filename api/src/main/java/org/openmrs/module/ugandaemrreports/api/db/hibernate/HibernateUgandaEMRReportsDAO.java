@@ -6,10 +6,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Expression;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.openmrs.Concept;
@@ -979,5 +976,168 @@ public class HibernateUgandaEMRReportsDAO implements UgandaEMRReportsDAO {
     @Override
     public void purgeReportBuilderReport(ReportBuilderReport report) {
         getSession().delete(report);
+    }
+
+    @Override
+    public ReportCategory saveReportCategory(ReportCategory category) {
+        getSession().saveOrUpdate(category);
+        return category;
+    }
+
+    @Override
+    public ReportCategory getReportCategoryById(Integer id) {
+        return (ReportCategory) getSession().get(ReportCategory.class, id);
+    }
+
+    @Override
+    public ReportCategory getReportCategoryByUuid(String uuid) {
+        Criteria criteria = getSession().createCriteria(ReportCategory.class);
+        criteria.add(Restrictions.eq("uuid", uuid));
+        return (ReportCategory) criteria.uniqueResult();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ReportCategory> getReportCategories(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+
+        Criteria criteria = getSession().createCriteria(ReportCategory.class);
+
+        if (!includeRetired) {
+            criteria.add(Restrictions.eq("retired", false));
+        }
+
+        if (q != null && !q.trim().isEmpty()) {
+            String query = "%" + q.trim().toLowerCase() + "%";
+
+            Disjunction or = Restrictions.disjunction();
+            or.add(Restrictions.ilike("name", query));
+            or.add(Restrictions.ilike("description", query));
+
+            criteria.add(or);
+        }
+
+        criteria.addOrder(Order.asc("name"));
+
+        if (startIndex != null) {
+            criteria.setFirstResult(startIndex);
+        }
+
+        if (limit != null) {
+            criteria.setMaxResults(limit);
+        }
+
+        return criteria.list();
+    }
+
+    @Override
+    public long getReportCategoriesCount(String q, boolean includeRetired) {
+
+        Criteria criteria = getSession().createCriteria(ReportCategory.class);
+
+        if (!includeRetired) {
+            criteria.add(Restrictions.eq("retired", false));
+        }
+
+        if (q != null && !q.trim().isEmpty()) {
+            String query = "%" + q.trim().toLowerCase() + "%";
+
+            Disjunction or = Restrictions.disjunction();
+            or.add(Restrictions.ilike("name", query));
+            or.add(Restrictions.ilike("description", query));
+
+            criteria.add(or);
+        }
+
+        criteria.setProjection(Projections.rowCount());
+
+        Number count = (Number) criteria.uniqueResult();
+        return count == null ? 0 : count.longValue();
+    }
+
+    @Override
+    public void purgeReportCategory(ReportCategory category) {
+        getSession().delete(category);
+    }
+
+
+    // =========================
+// ReportLibrary DAO
+// =========================
+
+    @Override
+    public ReportLibrary saveReportLibrary(ReportLibrary reportLibrary) {
+        getSession().saveOrUpdate(reportLibrary);
+        return reportLibrary;
+    }
+
+    @Override
+    public ReportLibrary getReportLibraryById(Integer id) {
+        return (ReportLibrary) getSession().get(ReportLibrary.class, id);
+    }
+
+    @Override
+    public ReportLibrary getReportLibraryByUuid(String uuid) {
+        Criteria c = getSession().createCriteria(ReportLibrary.class);
+        c.add(Restrictions.eq("uuid", uuid));
+        return (ReportLibrary) c.uniqueResult();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ReportLibrary> getReportLibraries(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+        Criteria c = getSession().createCriteria(ReportLibrary.class);
+
+        if (!includeRetired) {
+            c.add(Restrictions.eq("retired", false));
+        }
+
+        if (q != null && !q.trim().isEmpty()) {
+            String query = "%" + q.trim().toLowerCase() + "%";
+            Disjunction or = Restrictions.disjunction();
+            or.add(Restrictions.ilike("name", query));
+            or.add(Restrictions.ilike("description", query));
+            or.add(Restrictions.ilike("code", query));
+            c.add(or);
+        }
+
+        c.addOrder(Order.asc("name"));
+
+        if (startIndex != null) {
+            c.setFirstResult(startIndex);
+        }
+
+        if (limit != null) {
+            c.setMaxResults(limit);
+        }
+
+        return c.list();
+    }
+
+    @Override
+    public long getReportLibrariesCount(String q, boolean includeRetired) {
+        Criteria c = getSession().createCriteria(ReportLibrary.class);
+
+        if (!includeRetired) {
+            c.add(Restrictions.eq("retired", false));
+        }
+
+        if (q != null && !q.trim().isEmpty()) {
+            String query = "%" + q.trim().toLowerCase() + "%";
+            Disjunction or = Restrictions.disjunction();
+            or.add(Restrictions.ilike("name", query));
+            or.add(Restrictions.ilike("description", query));
+            or.add(Restrictions.ilike("code", query));
+            c.add(or);
+        }
+
+        c.setProjection(Projections.rowCount());
+
+        Number count = (Number) c.uniqueResult();
+        return count == null ? 0 : count.longValue();
+    }
+
+    @Override
+    public void purgeReportLibrary(ReportLibrary reportLibrary) {
+        getSession().delete(reportLibrary);
     }
 }

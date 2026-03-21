@@ -144,6 +144,8 @@ public interface UgandaEMRReportsService extends OpenmrsService {
 
     public String buildPreviewHtml(ReportData reportData, ReportDesign reportDesign);
 
+    public String buildRenderedOutput(ReportData reportData, ReportDesign reportDesign, String remapJsonOptional);
+
 
     // =========================
     // MambaIndicator
@@ -272,6 +274,55 @@ public interface UgandaEMRReportsService extends OpenmrsService {
 
     @Transactional
     CompiledReportArtifacts compileReport(String reportBuilderReportUuid);
+
+
+    @Transactional
+    public ReportCategory saveReportCategory(ReportCategory category);
+
+    @Transactional(readOnly = true)
+    public ReportCategory getReportCategoryById(Integer id);
+
+    @Transactional(readOnly = true)
+    public ReportCategory getReportCategoryByUuid(String uuid);
+
+    @Transactional(readOnly = true)
+    public List<ReportCategory> getReportCategories(String q, boolean includeRetired, Integer startIndex, Integer limit);
+
+    @Transactional(readOnly = true)
+    public long getReportCategoriesCount(String q, boolean includeRetired);
+
+    @Transactional
+    public void retireReportCategory(ReportCategory category, String reason);
+
+    @Transactional
+    public void unretireReportCategory(ReportCategory category);
+
+    @Transactional
+    public void purgeReportCategory(ReportCategory category);
+
+    @Transactional
+    ReportLibrary saveReportLibrary(ReportLibrary reportLibrary);
+
+    @Transactional(readOnly = true)
+    ReportLibrary getReportLibraryById(Integer id);
+
+    @Transactional(readOnly = true)
+    ReportLibrary getReportLibraryByUuid(String uuid);
+
+    @Transactional(readOnly = true)
+    List<ReportLibrary> getReportLibraries(String q, boolean includeRetired, Integer startIndex, Integer limit);
+
+    @Transactional(readOnly = true)
+    long getReportLibrariesCount(String q, boolean includeRetired);
+
+    @Transactional
+    void retireReportLibrary(ReportLibrary reportLibrary, String reason);
+
+    @Transactional
+    void unretireReportLibrary(ReportLibrary reportLibrary);
+
+    @Transactional
+    void purgeReportLibrary(ReportLibrary reportLibrary);
 
     class CompiledReportArtifacts {
         private ReportBuilderReport reportBuilderReport;

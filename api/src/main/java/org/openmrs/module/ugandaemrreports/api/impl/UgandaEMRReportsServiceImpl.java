@@ -37,10 +37,10 @@ import org.openmrs.module.ugandaemrreports.api.db.hibernate.HibernateUgandaEMRRe
 import org.openmrs.module.ugandaemrreports.definition.data.evaluator.SqlPreviewResult;
 import org.openmrs.module.ugandaemrreports.definition.dataset.definition.AggregateReportDataSetDefinition;
 import org.openmrs.module.ugandaemrreports.model.*;
-import org.openmrs.module.ugandaemrreports.util.JsonTemplateConverter;
-import org.openmrs.module.ugandaemrreports.util.MambaIndicatorValidator;
 import org.openmrs.module.ugandaemrreports.util.MambaIndicatorSqlSync;
+import org.openmrs.module.ugandaemrreports.util.MambaIndicatorValidator;
 import org.openmrs.module.ugandaemrreports.util.ReportDesignFileUtil;
+import org.openmrs.module.ugandaemrreports.util.ReportDesignHtmlRenderer;
 import org.openmrs.reporting.PatientSearch;
 import org.openmrs.reporting.ReportObjectWrapper;
 import org.openmrs.util.OpenmrsUtil;
@@ -64,8 +64,7 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
     private HibernateUgandaEMRReportsDAO dao;
 
-
-    private final JsonTemplateConverter converter = new JsonTemplateConverter();
+    private final ReportDesignHtmlRenderer reportDesignHtmlRenderer = new ReportDesignHtmlRenderer();
 
     public HibernateUgandaEMRReportsDAO getDao() {
         return dao;
@@ -74,8 +73,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     public void setDao(HibernateUgandaEMRReportsDAO dao) {
         this.dao = dao;
     }
-
-    /* -------------------- Existing DAO methods (unchanged) -------------------- */
 
     @Override
     public List<DashboardReportObject> getAllDashboardReportObjects() throws APIException {
@@ -172,8 +169,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return dao.getDrugOrderByIndication(patients, drugIndication, orderType);
     }
 
-    /* -------------------- Setup / init -------------------- */
-
     public void addMambaetlProperties() {
         File appDataDir = FileUtils.getFile(OpenmrsUtil.getApplicationDataDirectory());
         File propertiesFile = new File(appDataDir, "openmrs-runtime.properties");
@@ -267,47 +262,28 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return l;
     }
 
-    /* -------------------- JSON Template API (NEW) -------------------- */
-
-    /**
-     * Returns a final HTML document (iframe-ready).
-     * NOTE: This method does not use @Override unless you add it to the interface.
-     */
     public String renderHtmlFinalFromTemplate(ReportData reportData, ReportDesign reportDesign) {
         String templateJson = readDesignResource(reportDesign);
         Map<String, Object> values = extractFlatValues(reportData);
-        return converter.renderHtmlFinal(templateJson, values);
+        return reportDesignHtmlRenderer.convert(templateJson, values, null).html;
     }
 
-    /**
-     * Preview-only HTML (no values) still useful for design preview.
-     * Existing signature you already had.
-     */
     @Override
     public String renderHtmlFromJsonTemplate(ReportDesign reportDesign) {
         String templateJson = readDesignResource(reportDesign);
-        return converter.renderHtmlFinal(templateJson, Collections.<String, Object>emptyMap());
+        return reportDesignHtmlRenderer.convert(templateJson, Collections.<String, Object>emptyMap(), null).html;
     }
 
     @Override
-    public String createPayloadJsonFromTemplate(ReportData reportData,
-                                                ReportDesign reportDesign,
-                                                String renderType,
-                                                Map<String, Object> flatValues,
-                                                String remapJsonOptional) {
+    public String createPayloadJsonFromTemplate(ReportData reportData, ReportDesign reportDesign, String renderType, Map<String, Object> flatValues, String remapJsonOptional) {
         String templateJson = readDesignResource(reportDesign);
-        return converter.buildPayloadOnly(templateJson,
-                flatValues == null ? Collections.<String, Object>emptyMap() : flatValues,
-                remapJsonOptional);
+        Map<String, Object> values = flatValues == null
+                ? Collections.<String, Object>emptyMap()
+                : flatValues;
+
+        return reportDesignHtmlRenderer.convert(templateJson, values, remapJsonOptional).payloadJson;
     }
 
-    /**
-     * Extract values into Map<String,Object> in a GENERIC way:
-     * - Supports rows that already provide flat keys like OR02_29d_4y_F -> 0
-     * - Also supports rows with code/age/sex/value columns.
-     * <p>
-     * NOTE: Add to interface if controller calls through interface.
-     */
     public Map<String, Object> extractFlatValues(ReportData reportData) {
         Map<String, Object> out = new HashMap<String, Object>();
         if (reportData == null || reportData.getDataSets() == null) {
@@ -325,7 +301,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
                 Map<String, Object> cols = row.getColumnValuesByKey();
                 if (cols == null || cols.isEmpty()) continue;
 
-                // Style A: code/age/sex/value columns
                 String code = firstString(cols, "code", "dataelement", "dataElement", "data_element");
                 String age = firstString(cols, "age", "agegroup", "age_group");
                 String sex = firstString(cols, "sex", "gender");
@@ -336,13 +311,11 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
                     continue;
                 }
 
-                // Style B: already-flat keys in cols map
                 for (Map.Entry<String, Object> e : cols.entrySet()) {
                     String k = e.getKey();
                     Object v = e.getValue();
                     if (k == null) continue;
 
-                    // Accept keys like EP11_0_28d_F
                     if (looksLikeKey(k) && v != null && isNumeric(v)) {
                         out.put(k.trim(), v);
                     }
@@ -354,8 +327,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     }
 
     private boolean looksLikeKey(String k) {
-        // minimal safe check: CODE_AGE_SEX (3 parts)
-        // e.g. OR02_29d_4y_F
         String s = k.trim();
         int a = s.indexOf('_');
         if (a <= 0) return false;
@@ -398,24 +369,13 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return s == null || s.trim().isEmpty();
     }
 
-    /* -------------------- Legacy support (kept) -------------------- */
-
-    /**
-     * Legacy payload builder (old HTML-template approach), returns STRING.
-     * Use this when renderType=legacy.
-     * <p>
-     * NOTE: Add to interface if you want controller to call via interface.
-     */
     public String createLegacyPayloadJson(ReportData reportData, ReportDesign reportDesign) {
         try {
             TextTemplateRenderer textTemplateRenderer = new TextTemplateRenderer();
             ReportDesignResource res = textTemplateRenderer.getTemplate(reportDesign);
             String templateContents = new String(res.getContents(), StandardCharsets.UTF_8);
 
-            // Render template using OpenMRS reporting engines
             String rendered = fillTemplateWithReportData(templateContents, reportData, reportDesign);
-
-            // Fix value quotes and return
             return removeQuotesFromValues(rendered);
 
         } catch (Exception e) {
@@ -482,9 +442,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
     @Override
     public String buildPayloadJson(ReportData reportData, ReportDesign reportDesign, String renderType) {
-        // Keeps backward compatibility:
-        // - if renderType says "legacy" -> use old renderer approach
-        // - otherwise -> new template payload (still returns JSON string)
         if (renderType != null && "legacy".equalsIgnoreCase(renderType)) {
             return createLegacyPayloadJson(reportData, reportDesign);
         }
@@ -495,27 +452,23 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
     @Override
     public String buildFinalPayloadJson(ReportData reportData, ReportDesign reportDesign, String renderType, Date endDate) {
-
-        // 1) Build payload (legacy or new)
         String payloadJson = buildPayloadJson(reportData, reportDesign, renderType);
-
-        // 2) Append period (same logic you had in controller)
         String period = getYearAndQuarter(endDate);
         return appendPeriod(payloadJson, period);
     }
 
     @Override
     public String buildPreviewHtml(ReportData reportData, ReportDesign reportDesign) {
-        // Preview HTML for iframe:
-        // - Prefer actual values if present
-        // - Otherwise it still renders with default 0s.
         String templateJson = readDesignResource(reportDesign);
-
         Map<String, Object> values = extractFlatValues(reportData);
-        return converter.renderHtmlFinal(templateJson, values);
+        return reportDesignHtmlRenderer.convert(templateJson, values, null).html;
     }
 
-    /* ------------------ helpers used by buildFinalPayloadJson ------------------ */
+    public String buildRenderedOutput(ReportData reportData, ReportDesign reportDesign, String remapJsonOptional) {
+        String templateJson = readDesignResource(reportDesign);
+        Map<String, Object> values = extractFlatValues(reportData);
+        return reportDesignHtmlRenderer.buildRenderedOutputOnly(templateJson, values, remapJsonOptional);
+    }
 
     private String getYearAndQuarter(Date date) {
         if (date == null) return null;
@@ -545,15 +498,9 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
             return om.writeValueAsString(root);
         } catch (Exception e) {
-            // fail-safe: return original if period append fails
             return payloadJson;
         }
     }
-
-
-    // =========================
-    // MambaIndicator
-    // =========================
 
     @Override
     public ReportBuilderIndicator saveReportBuilderIndicator(ReportBuilderIndicator indicator) {
@@ -601,7 +548,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return dao.getAllReportBuilderaIndicator(startIndex, limit);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public List<ReportBuilderIndicator> getReportBuilderIndicators(ReportBuilderIndicator.Kind kind, boolean includeRetired, Integer startIndex, Integer limit) {
@@ -632,10 +578,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     public void purgeReportBuilderIndicator(ReportBuilderIndicator indicator) {
         dao.purgeReportBuilderIndicator(indicator);
     }
-
-    // =========================
-    // MambaSection
-    // =========================
 
     @Override
     public ReportBuilderSection saveReportBuilderSection(ReportBuilderSection section) {
@@ -690,10 +632,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     public void purgeReportBuilderSection(ReportBuilderSection section) {
         dao.purgeReportBuilderSection(section);
     }
-
-    // =========================
-    // MambaDataTheme
-    // =========================
 
     @Override
     public ReportBuilderDataTheme saveReportBuilderDataTheme(ReportBuilderDataTheme theme) {
@@ -761,8 +699,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return dao.getMambaTableColumns(tableName);
     }
 
-    // Categories
-
     @Override
     public ReportBuilderAgeCategory saveAgeCategory(ReportBuilderAgeCategory category) {
         return dao.saveAgeCategory(category);
@@ -812,8 +748,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         dao.purgeAgeCategory(category);
     }
 
-    // Groups
-
     @Override
     public ReportBuilderAgeGroup saveAgeGroup(ReportBuilderAgeGroup group) {
         return dao.saveAgeGroup(group);
@@ -852,7 +786,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         return dao.previewSql(sql, params, maxRows);
     }
 
-
     @Override
     public ReportBuilderReport saveReportBuilderReport(ReportBuilderReport report) {
         if (report.getUuid() == null) {
@@ -880,7 +813,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
     public void purgeReportBuilderReport(ReportBuilderReport report) {
         dao.purgeReportBuilderReport(report);
     }
-
 
     @Override
     public CompiledReportArtifacts compileReport(String reportBuilderReportUuid) {
@@ -1019,7 +951,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
             parameterMappings.put("endDate", "${endDate}");
 
             reportDefinition.addDataSetDefinition("defaultDataSet", dsd, parameterMappings);
-
             reportDefinition = reportDefinitionService.saveDefinition(reportDefinition);
 
             ReportDesign jsonDesign = saveOrUpdateJsonReportDesign(reportDefinition, compiledDesignJson, report);
@@ -1267,7 +1198,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
 
         ArrayNode rows = objectMapper.createArrayNode();
 
-        // section label row
         ObjectNode sectionRow = objectMapper.createObjectNode();
         sectionRow.put("type", "section-label");
         sectionRow.put("label", sectionName);
@@ -1419,8 +1349,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
             }
 
             ObjectNode field = objectMapper.createObjectNode();
-
-            // Keep closer to the legacy template structure
             field.put("indicator_name", indicator.path("code").asText(""));
             field.put("indicator_label", indicator.path("name").asText(""));
             field.put("subsection", sectionName);
@@ -1438,7 +1366,6 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
                 if (values.size() > 0) {
                     field.set("values", values);
                 } else {
-                    // fail-safe fallback if groups cannot be resolved
                     field.put("value_place_holder", buildSinglePlaceholder(indicator));
                 }
             } else {
@@ -1602,5 +1529,101 @@ public class UgandaEMRReportsServiceImpl extends BaseOpenmrsService implements U
         }
 
         return out;
+    }
+
+
+    @Override
+    public ReportCategory saveReportCategory(ReportCategory category) {
+        if (category.getUuid() == null) {
+            category.setUuid(UUID.randomUUID().toString());
+        }
+        return dao.saveReportCategory(category);
+    }
+
+    @Override
+    public ReportCategory getReportCategoryById(Integer id) {
+        return dao.getReportCategoryById(id);
+    }
+
+    @Override
+    public ReportCategory getReportCategoryByUuid(String uuid) {
+        return dao.getReportCategoryByUuid(uuid);
+    }
+
+    @Override
+    public List<ReportCategory> getReportCategories(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+        return dao.getReportCategories(q, includeRetired, startIndex, limit);
+    }
+
+    @Override
+    public long getReportCategoriesCount(String q, boolean includeRetired) {
+        return dao.getReportCategoriesCount(q, includeRetired);
+    }
+
+    @Override
+    public void retireReportCategory(ReportCategory category, String reason) {
+        category.setRetired(true);
+        category.setRetireReason(reason);
+        dao.saveReportCategory(category);
+    }
+
+    @Override
+    public void unretireReportCategory(ReportCategory category) {
+        category.setRetired(false);
+        category.setRetireReason(null);
+        dao.saveReportCategory(category);
+    }
+
+    @Override
+    public void purgeReportCategory(ReportCategory category) {
+        dao.purgeReportCategory(category);
+    }
+
+
+    @Override
+    public ReportLibrary saveReportLibrary(ReportLibrary reportLibrary) {
+        if (reportLibrary.getUuid() == null) {
+            reportLibrary.setUuid(UUID.randomUUID().toString());
+        }
+        return dao.saveReportLibrary(reportLibrary);
+    }
+
+    @Override
+    public ReportLibrary getReportLibraryById(Integer id) {
+        return dao.getReportLibraryById(id);
+    }
+
+    @Override
+    public ReportLibrary getReportLibraryByUuid(String uuid) {
+        return dao.getReportLibraryByUuid(uuid);
+    }
+
+    @Override
+    public List<ReportLibrary> getReportLibraries(String q, boolean includeRetired, Integer startIndex, Integer limit) {
+        return dao.getReportLibraries(q, includeRetired, startIndex, limit);
+    }
+
+    @Override
+    public long getReportLibrariesCount(String q, boolean includeRetired) {
+        return dao.getReportLibrariesCount(q, includeRetired);
+    }
+
+    @Override
+    public void retireReportLibrary(ReportLibrary reportLibrary, String reason) {
+        reportLibrary.setRetired(true);
+        reportLibrary.setRetireReason(reason);
+        dao.saveReportLibrary(reportLibrary);
+    }
+
+    @Override
+    public void unretireReportLibrary(ReportLibrary reportLibrary) {
+        reportLibrary.setRetired(false);
+        reportLibrary.setRetireReason(null);
+        dao.saveReportLibrary(reportLibrary);
+    }
+
+    @Override
+    public void purgeReportLibrary(ReportLibrary reportLibrary) {
+        dao.purgeReportLibrary(reportLibrary);
     }
 }

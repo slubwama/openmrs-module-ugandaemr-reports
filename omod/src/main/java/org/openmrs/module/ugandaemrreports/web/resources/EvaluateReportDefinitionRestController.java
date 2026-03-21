@@ -88,8 +88,10 @@ public class EvaluateReportDefinitionRestController {
 
             // 4) Render based on renderType
             if ("html".equalsIgnoreCase(renderType)) {
-                String html = ugandaEMRReportsService.buildPreviewHtml(reportData, jsonDesign);
-                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.TEXT_HTML).body(html);
+                String rendered = ugandaEMRReportsService.buildRenderedOutput(reportData, jsonDesign, null);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(rendered);
             }
 
             if ("json".equalsIgnoreCase(renderType)) {
