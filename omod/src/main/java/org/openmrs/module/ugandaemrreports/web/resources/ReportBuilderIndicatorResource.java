@@ -1,6 +1,5 @@
 package org.openmrs.module.ugandaemrreports.web.resources;
 
-import com.sun.jdi.request.InvalidRequestStateException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ugandaemrreports.api.UgandaEMRReportsService;
 import org.openmrs.module.ugandaemrreports.model.ReportBuilderIndicator;
@@ -13,6 +12,9 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceD
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.representation.*;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +112,7 @@ public class ReportBuilderIndicatorResource extends DelegatingCrudResource<Repor
         if (q != null) {
             results = service().searchReportBuilderIndicators(q, kind, includeRetiredFinal, startIndex, limit);
         } else {
-             results = service().getReportBuilderIndicators(kind, includeRetiredFinal, startIndex, limit);
+            results = service().getReportBuilderIndicators(kind, includeRetiredFinal, startIndex, limit);
         }
 
         // Optional: if client requested retired=true/false explicitly, filter here if service doesn't support it.
@@ -137,7 +139,7 @@ public class ReportBuilderIndicatorResource extends DelegatingCrudResource<Repor
         if (t == null) return null;
         if ("true".equalsIgnoreCase(t)) return Boolean.TRUE;
         if ("false".equalsIgnoreCase(t)) return Boolean.FALSE;
-        throw new InvalidRequestStateException("Invalid boolean value: " + v);
+        throw new IllegalArgumentException("Invalid boolean value: " + v);
     }
 
     private <E extends Enum<E>> E parseEnumOrNull(String raw, Class<E> enumClass, String paramName) {
@@ -145,7 +147,7 @@ public class ReportBuilderIndicatorResource extends DelegatingCrudResource<Repor
         try {
             return Enum.valueOf(enumClass, raw.trim().toUpperCase());
         } catch (Exception e) {
-            throw new InvalidRequestStateException("Invalid " + paramName + ": " + raw);
+            throw new IllegalArgumentException("Invalid value for " + paramName + ": " + raw, e);
         }
     }
 
