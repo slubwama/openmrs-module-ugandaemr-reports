@@ -594,7 +594,7 @@
                     constraintName="uq_rb_dim_age_group_cat_label"/>
         </changeSet>
 
-    <changeSet id="ugandaemrreports-20260320-01-create-report-builder-report-category" author="slubwama">
+    <changeSet id="ugandaemrreports-20260320-01-report-builder-report-category" author="slubwama">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="report_builder_report_category"/>
