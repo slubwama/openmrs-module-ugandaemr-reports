@@ -28,7 +28,7 @@ import java.util.Map;
         parent = ReportBuilderSectionResource.class,
         path = "preview",
         supportedClass = SectionPreviewRequest.class,
-        supportedOpenmrsVersions = {"2.*"}
+        supportedOpenmrsVersions = {"1.8 - 9.0.*"}
 )
 public class ReportBuilderSectionPreviewSubResource
         extends DelegatingSubResource<SectionPreviewRequest, ReportBuilderSection, ReportBuilderSectionResource> {

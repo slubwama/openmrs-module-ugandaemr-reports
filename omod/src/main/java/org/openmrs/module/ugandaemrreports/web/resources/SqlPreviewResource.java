@@ -23,7 +23,7 @@ import java.util.Collections;
  * Response: same object + { columns, rows, rowCount, truncated }
  */
 @Resource(
-        name = RestConstants.VERSION_1 + "/sqlpreview",
+        name = RestConstants.VERSION_1 + "/preview",
         supportedClass = SqlPreviewRequest.class,
         supportedOpenmrsVersions = {"2.*", "3.*"}
 )
