@@ -110,6 +110,11 @@
             <groupId>org.openmrs.module</groupId>
             <artifactId>mamba-core-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>reportbuilder-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

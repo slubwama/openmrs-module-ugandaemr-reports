@@ -1,7 +1,7 @@
 package org.openmrs.module.ugandaemrreports.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openmrs.module.ugandaemrreports.definition.dataset.definition.AggregateReportDataSetDefinition;
+import org.openmrs.module.reportbuilder.util.data.definition.AggregateReportDataSetDefinition;
 
 import java.io.File;
 import java.io.IOException;

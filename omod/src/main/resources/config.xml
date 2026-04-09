@@ -35,6 +35,10 @@
 		<require_module>
 			org.openmrs.module.reportingcompatibility
 		</require_module>
+
+		<require_module>
+			org.openmrs.module.reportbuilder
+		</require_module>
 	</require_modules>
 
 	<privilege>

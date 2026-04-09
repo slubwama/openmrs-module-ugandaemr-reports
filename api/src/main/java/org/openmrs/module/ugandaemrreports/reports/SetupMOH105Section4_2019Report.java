@@ -1,25 +1,17 @@
 package org.openmrs.module.ugandaemrreports.reports;
 
-import org.openmrs.module.reporting.data.patient.library.BuiltInPatientDataLibrary;
-import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.openmrs.module.ugandaemrreports.definition.dataset.definition.AggregateReportDataSetDefinition;
+import org.openmrs.module.reportbuilder.util.data.definition.AggregateReportDataSetDefinition;
 import org.openmrs.module.ugandaemrreports.definition.dataset.definition.EMRVersionDatasetDefinition;
 import org.openmrs.module.ugandaemrreports.library.*;
-import org.openmrs.module.ugandaemrreports.metadata.HIVMetadata;
-import org.openmrs.module.ugandaemrreports.reporting.library.dimension.CommonReportDimensionLibrary;
-import org.openmrs.module.ugandaemrreports.reporting.utils.ReportUtils;
-import org.openmrs.module.ugandaemrreports.reports.UgandaEMRDataExportManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.openmrs.module.ugandaemrreports.library.CommonDatasetLibrary.period;

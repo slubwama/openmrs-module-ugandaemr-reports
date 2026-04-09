@@ -1,14 +1,8 @@
 package org.openmrs.module.ugandaemrreports.reports;
 
-import com.google.common.base.Joiner;
-import org.openmrs.EncounterType;
-import org.openmrs.Location;
-import org.openmrs.VisitType;
-import org.openmrs.api.context.Context;
+
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.common.ObjectUtil;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -16,21 +10,18 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.openmrs.module.ugandaemrreports.definition.dataset.definition.AggregateReportDataSetDefinition;
+import org.openmrs.module.reportbuilder.util.data.definition.AggregateReportDataSetDefinition;
 import org.openmrs.module.ugandaemrreports.definition.dataset.definition.EMRVersionDatasetDefinition;
 import org.openmrs.module.ugandaemrreports.definition.dataset.definition.TodayDateDatasetDefinition;
-import org.openmrs.module.ugandaemrreports.library.*;
-import org.openmrs.module.ugandaemrreports.metadata.HIVMetadata;
+import org.openmrs.module.ugandaemrreports.library.CommonDatasetLibrary;
+import org.openmrs.module.ugandaemrreports.library.DataFactory;
+import org.openmrs.module.ugandaemrreports.library.ARTClinicCohortDefinitionLibrary;
 import org.openmrs.module.ugandaemrreports.reporting.dataset.definition.SharedDataDefintion;
-import org.openmrs.module.ugandaemrreports.reporting.library.cohort.ARTCohortLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**

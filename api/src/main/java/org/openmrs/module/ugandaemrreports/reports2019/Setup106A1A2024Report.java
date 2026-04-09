@@ -5,7 +5,7 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.openmrs.module.ugandaemrreports.definition.dataset.definition.AggregateReportDataSetDefinition;
+import org.openmrs.module.reportbuilder.util.data.definition.AggregateReportDataSetDefinition;
 import org.openmrs.module.ugandaemrreports.definition.dataset.definition.EMRVersionDatasetDefinition;
 import org.openmrs.module.ugandaemrreports.reports.AggregateReportDataExportManager;
 import org.springframework.stereotype.Component;
